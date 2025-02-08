@@ -108,7 +108,7 @@ public class WeatherWidget extends Widget {
 		roundPanel.setLayout(new GridBagLayout());
 		roundPanel.setBackground(Daten.efaConfig.getToolTipBackgroundColor());
 		roundPanel.setForeground(Daten.efaConfig.getToolTipForegroundColor());
-		roundPanel.setBorder(new RoundedBorder(mainPanel.getForeground()));
+		roundPanel.setBorder(new RoundedBorder(Daten.efaConfig.getToolTipForegroundColor()));
 
 		mainPanel.add(roundPanel, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0,0,0,0), 0, 0));
 
@@ -127,9 +127,9 @@ public class WeatherWidget extends Widget {
 		roundPanel.add(titlePanel, new GridBagConstraints(0, 0, /*3*/4, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(2,2,2,2), 0, 0));
 		roundPanel.setMinimumSize(new Dimension(240,120));;
 		//mainPanel.setPreferredSize(new Dimension(240,140));
-		//addCurrentWeather();
+		addCurrentWeather();
 
-		addForeCast();
+		//addForeCast();
 		
 		
 	}
@@ -137,24 +137,24 @@ public class WeatherWidget extends Widget {
 
 	private void addCurrentWeather() {
 		curWeather_temp = new JLabel();
-		curWeather_temp.setForeground(mainPanel.getForeground());
+		curWeather_temp.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
 		curWeather_temp.setFont(mainPanel.getFont().deriveFont((float) (Daten.efaConfig.getValueEfaDirekt_BthsFontSize()+10)));
-		//curWeather_temp.setFont(curWeather_temp.getFont().deriveFont(Font.BOLD));
+		curWeather_temp.setFont(curWeather_temp.getFont().deriveFont(Font.BOLD));
 		curWeather_temp.setText("28 °C");
 		curWeather_temp.setHorizontalTextPosition(SwingConstants.LEFT);
 		
 		curWeather_icon.setIcon(ImagesAndIcons.getIcon(ImagesAndIcons.IMAGE_WEATHER_116_64));
 		
 		curWeather_minTemp.setText("Min: 14 °C");
-		curWeather_minTemp.setForeground(mainPanel.getForeground());
+		curWeather_minTemp.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
 		curWeather_minTemp.setHorizontalTextPosition(SwingConstants.RIGHT);
 		
 		curWeather_maxTemp.setText("Max: 30 °C");
-		curWeather_maxTemp.setForeground(mainPanel.getForeground());
+		curWeather_maxTemp.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
 		curWeather_maxTemp.setHorizontalTextPosition(SwingConstants.RIGHT);
 		
 		curWeather_wind.setText("Wind: SO mit 11 km/h");
-		curWeather_wind.setForeground(mainPanel.getForeground());
+		curWeather_wind.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
 		curWeather_wind.setHorizontalTextPosition(SwingConstants.CENTER);
 		
 		roundPanel.add(curWeather_temp, new GridBagConstraints(0, 1, 1, 2, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(2,4,2,4), 0, 0));
@@ -188,8 +188,8 @@ public class WeatherWidget extends Widget {
 		myPanel.setForeground(Daten.efaConfig.getToolTipForegroundColor());
 		myPanel.setBackground(Daten.efaConfig.getToolTipBackgroundColor());
 		
-		topLabel.setForeground(myPanel.getForeground());
-		bottomLabel.setForeground(myPanel.getForeground());
+		topLabel.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
+		bottomLabel.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
 		
 		topLabel.setText(time);
 		topLabel.setHorizontalTextPosition(SwingConstants.CENTER);

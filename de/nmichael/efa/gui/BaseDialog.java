@@ -220,7 +220,7 @@ public abstract class BaseDialog extends JDialog implements ActionListener {
         		}
         	}
     		// otherwise, hide basewindow.
-        	cancel();
+        	cancel(true);
         }
 
         if (evt.getActionCommand().equals(KEYACTION_F1)) {
@@ -339,6 +339,9 @@ public abstract class BaseDialog extends JDialog implements ActionListener {
     }
 
     public boolean cancel() {
+    	return cancel(false);
+    }
+    public boolean cancel(Boolean keyESCAction) {
         _inCancel = true;
         if (doWindowStackChecks) {
             Dialog.frameClosed(this);

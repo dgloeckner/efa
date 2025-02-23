@@ -9,8 +9,11 @@
 			<ChangeItem>Neu: Mehrere Bootshäuser: Wenn man im Verein mehr als ein Bootshaus konfiguriert hat, werden bei 'Boote auf Fahrt' nur noch die Boote angezeigt, die eine Fahrt im Fahrtenbuch zum Bootshaus haben. Siehe auch Dokumentation: http://efa.nmichael.de/dokuwiki/doku.php?id=config_mehrere_bootshaeuser</ChangeItem>
 			<ChangeItem>Neu: Mehrere Bootshäuser: Werden in einem Projekt mehrere Bootshäuser verwaltet, zeigt die Bootsliste in einer zusätzlichen Spalte an, welches Boot exklusiv in welchem Bootshaus angezeigt werden soll.</ChangeItem>
 			<ChangeItem>Neu: Konfiguration von Bootstypen: Wenn 'Kanufahren in Deutschland' aktiviert ist, wird ein Hinweis mit Verweis auf die Kanu-EFB-Synchronisation mit den dort konfigurierten Bootstypen angezeigt.</ChangeItem>
+			<ChangeItem>Neu: Dialog für Auswahl von Projekt/Fahrtenbuch/Vereinsarbeit zeigt Informationen zum aktuell geladenen Projekt etc. an.</ChangeItem>
+			<ChangeItem>Neu: Dialog für Ausahl von Projekt zeigt Projekttyp (Lokal, efaCloud, efaRemote) und die Namen der Bootshäuser an.</ChangeItem>
 			<ChangeItem>Neu: Im 'Über efa2' Dialog wird die Versionshistorie angezeigt.</ChangeItem>
        	 	<ChangeItem>Neu: efaCloud: Bei Einsatz von efaCloud: Auf dem Server muss MINDESTENS VERSION 2.3.3 oder höher installiert sein.</ChangeItem>
+			<ChangeItem>BugFix: efaBase schließt sich nicht mehr bei Betätigung von ESC.</ChangeItem>
 			<ChangeItem>BugFix: efaCloud: Für efaCloud wurde die Synchronisation der Daten zwischen Bootshaus und Server optimiert. Die Verwendung des eindeutigen Datensatzschlüssels des Servers in efa löst Konflikte, die etwa bei temporärem Internetausfall oder Parallelität von Fahrteinträgen in zwei angebundenen Bootshäusern auftreten.</ChangeItem>
 			<ChangeItem>BugFix: efaCloud: Nullpointer-Fehlermeldung behoben, wenn efaCloud den Status im Fenstertitel aktualisiert.</ChangeItem>
 			<ChangeItem>BugFix: efaCloud: Direkt nach dem Start wartet EFA 15 Sekunden statt 5 Sekunden, bis der erste Upload in efaCloud gestartet wird.</ChangeItem>
@@ -18,8 +21,11 @@
         <Changes lang="en">
        	 	<ChangeItem>New: Multiple Boathouses: If you have configured more than one boathouse in the club, the Boat list in admin modes provides an additional colum which shows for which boathouse a boat is shown exclusively.</ChangeItem>
        	 	<ChangeItem>New: Multiple Boathouses: If you have configured more than one boathouse in the club, only the boats that have a trip to the boathouse in the logbook are displayed under 'Boats on the water'. See also documentation: http://efa.nmichael.de/dokuwiki/doku.php?id=config_mehrere_bootshaeuser</ChangeItem>
+			<ChangeItem>New: Dialog for choosing Project/Logbook/Clubwork shows info about the currently loaded Project, Logbook, Clubwork.</ChangeItem>
+			<ChangeItem>New: Dialog for choosing the project shows project type (local, efaCloud, efaRemote) and the names of the Boathouses in multi-Boathouse configurations.</ChangeItem>			
 			<ChangeItem>New: Efa2's version history is shown in efa 'About' dialog.</ChangeItem>
        	 	<ChangeItem>New: efaCloud: When using efaCloud, the server MUST HAVE INSTALLED AT LEAST efaCloud 2.3.3 or newer.</ChangeItem>
+       	 	<ChangeItem>BugFix: efaBase does not close anymore when hitting ESC key.</ChangeItem>
        	 	<ChangeItem>BugFix: efaCloud: For efaCloud, the synchronization of data between the boathouse and the server has been optimized. The use of the server's unique data record key in efa resolves conflicts that arise, for example, in the event of a temporary Internet outage or parallel trip entries in two connected boathouses.</ChangeItem>
 			<ChangeItem>BugFix: efaCloud: Fixed nullpointer exception when efaCloud updated its status the window title.</ChangeItem>
 			<ChangeItem>BugFix: efaCloud: After startup efa waits 15 seconds instead of 5 before the first attempt to upload data starts.</ChangeItem>

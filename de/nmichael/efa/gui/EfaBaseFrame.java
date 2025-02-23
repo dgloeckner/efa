@@ -4341,7 +4341,8 @@ public class EfaBaseFrame extends BaseDialog implements IItemListener {
         }
     }
 
-    public boolean cancel() {
+    public boolean cancel(Boolean keyESCAction) {
+    	
         if (isModeBoathouse()) {
             efaBoathouseHideEfaFrame();
             return true;
@@ -4356,10 +4357,14 @@ public class EfaBaseFrame extends BaseDialog implements IItemListener {
             return true;
         }
 
+        if (isModeBase()) {
+        	if (keyESCAction) return true; // we don't want to close the baseframe if in efaBase
+        }
+        
         //@efaconfig if (!Daten.efaConfig.writeFile()) {
         //@efaconfig     LogString.logError_fileWritingFailed(Daten.efaConfig.getFileName(), International.getString("Konfigurationsdatei"));
         //@efaconfig }
-        super.cancel();
+        super.cancel(false);
         Daten.haltProgram(0);
         return true;
     }

@@ -545,7 +545,17 @@ public class Project extends StorageObject {
                                     description.append((j > 0 ? ", " : "") + boatHouseNames[j]);
                                 }
                             }
-                            items.put(name, "<html>"+description.toString()+"</html>");
+                            
+                            Boolean currentProject=(Daten.project != null ? p.getName().equals(Daten.project.getName()) : false);
+                            
+                            //items.put(name, "<html>"+description.toString()+"</html>");
+                            //highlight currently loaded project with green background
+                            items.put(name, "<html><table width=\"100%\" " 
+                            		+ (currentProject ? " bgcolor=\"#ccffcc\"" : "") + "><tr><td>"
+                            		+ (currentProject ? "<font color=black>" : "")
+                            		+ description.toString()
+                            		+ (currentProject ? "</font>" : "")
+                            		+"</td></tr></table></html>");
                         } catch (Exception e1) {
                         }
                     }
@@ -587,7 +597,19 @@ public class Project extends StorageObject {
                 String name = "<b>" + International.getString("Fahrtenbuch") + ":</b> <b><font color=blue>" + logbooks[i] + "</font></b><br>";
                 String description = (r.getDescription() != null && r.getDescription().length() > 0 ? r.getDescription() + " " : "");
                 description += "(" + r.getStartDate().toString() + " - " + r.getEndDate() + ")";
-                items.put(logbooks[i], "<html>"+name + description+"</html>");
+                
+                Boolean currentLogbook=(Daten.project != null && Daten.project.getCurrentLogbook() != null 
+                		? logbooks[i].equals(Daten.project.getCurrentLogbook().getName() ) 
+                		: false);
+                
+                //items.put(name, "<html>"+description.toString()+"</html>");
+                //highlight currently loaded project with green background
+                items.put(logbooks[i], "<html><table width=\"100%\" " 
+                		+ (currentLogbook ? " bgcolor=\"#ccffcc\"" : "") + "><tr><td>"
+                		+ (currentLogbook ? "<font color=black>" : "")
+                		+ name + description
+                		+ (currentLogbook ? "</font>" : "")
+                		+"</td></tr></table></html>");
             }
         }
         return items;
@@ -602,7 +624,20 @@ public class Project extends StorageObject {
                 String name = "<b>" + International.getString("Vereinsarbeit") + ":</b> <b><font color=blue>" + clubworks[i] + "</font></b><br>";
                 String description = (r.getDescription() != null && r.getDescription().length() > 0 ? r.getDescription() + " " : "");
                 description += "(" + r.getStartDate().toString() + " - " + r.getEndDate() + ")";
-                items.put(clubworks[i], "<html>"+name + description+"</html>");
+                
+                Boolean currentClubwork=(Daten.project != null && Daten.project.getCurrentClubwork() != null 
+                		? clubworks[i].equals(Daten.project.getCurrentClubwork().getName() ) 
+                		: false);
+                
+                //items.put(name, "<html>"+description.toString()+"</html>");
+                //highlight currently loaded project with green background
+                items.put(clubworks[i], "<html><table width=\"100%\" " 
+                		+ (currentClubwork ? " bgcolor=\"#ccffcc\"" : "") + "><tr><td>"
+                		+ (currentClubwork ? "<font color=black>" : "")
+                		+ name + description
+                		+ (currentClubwork ? "</font>" : "")
+                		+"</td></tr></table></html>");                
+
             }
         }
         return items;

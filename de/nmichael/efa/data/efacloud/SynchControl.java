@@ -18,6 +18,7 @@ import de.nmichael.efa.data.storage.DataRecord;
 import de.nmichael.efa.data.storage.EfaCloudStorage;
 import de.nmichael.efa.data.types.DataTypeIntString;
 import de.nmichael.efa.ex.EfaException;
+import de.nmichael.efa.util.EfaUtil;
 import de.nmichael.efa.util.International;
 
 import java.io.File;
@@ -37,6 +38,9 @@ class SynchControl {
     static final long clockoffsetBuffer = 600000L; // max number of millis which client clock may be offset, 10 mins
     static final long synch_upload_look_back_ms = 15 * 24 * 3600000L; // period in past to check for upload
     static final long surely_newer_after_ms = 60000L; // one-minute time difference accepted for timestamps server <-> client
+    
+    private static final int SYNCHERRORS_LOG_MAX_SIZE = 5000000; //5 MB
+    private static final String FILENAME_PREVIOUS_SUFFIX = ".previous.log";
 
     long lastSynchStartedMillis;
     long LastModifiedLimit;
@@ -89,8 +93,24 @@ class SynchControl {
         String dateString = format.format(new Date()) + " INFO state, [" + tablename + dataKeyStr + "]: " + info + logMessage;
         String path = (isError) ? synchErrorFilePath : TxRequestQueue.logFilePath;
         // truncate log files,
-        File f = new File(path);
-        TextResource.writeContents(path, dateString, (f.length() <= 200000) || (!f.renameTo(new File(path + ".previous"))));
+        File synchErrorsFile = new File(path);
+        
+        Boolean appendLine=true;
+        
+        //synchErrors.log rotation: if >5 Mb, delete old synchErrors.previous.log file and rename synchErrors.log to synchErrors.log.previous.log
+        if (synchErrorsFile.length() > SYNCHERRORS_LOG_MAX_SIZE) {
+        	File oldPreviousLogfile=new File(path + FILENAME_PREVIOUS_SUFFIX);
+        	
+        	// rotate existing efacloud.log to efacloud.log.previous and delete the existing file if necessary.
+        	if ((oldPreviousLogfile.exists() && oldPreviousLogfile.delete()) 
+        			|| (!oldPreviousLogfile.exists())) {
+        		if (synchErrorsFile.renameTo(new File(path + FILENAME_PREVIOUS_SUFFIX))) {
+        			appendLine=false;
+        		}
+        	}
+        }
+        
+        TextResource.writeContents(path, dateString, appendLine);
     }
 
     /**

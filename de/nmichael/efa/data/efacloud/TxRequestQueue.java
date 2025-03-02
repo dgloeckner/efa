@@ -28,6 +28,7 @@ import de.nmichael.efa.gui.EfaBaseFrame;
 import de.nmichael.efa.gui.EfaBoathouseFrame;
 import de.nmichael.efa.gui.EfaCloudConfigDialog;
 import de.nmichael.efa.gui.ImagesAndIcons;
+import de.nmichael.efa.util.EfaUtil;
 import de.nmichael.efa.util.International;
 import de.nmichael.efa.util.Logger;
 
@@ -100,6 +101,9 @@ public class TxRequestQueue implements TaskManager.RequestDispatcherIF {
     // can use considerable memory space
     private static final int DONE_QUEUE_MAX_TXS = 50;
     private static final int DROPPED_QUEUE_MAX_TXS = 50;
+    
+    private static final int EFACLOUD_LOG_MAX_SIZE = 5000000; //5 MB
+    private static final String FILENAME_PREVIOUS_SUFFIX = ".previous.log";    
 
     // Transaction queue indices and names.
     public static final int TX_SYNCH_QUEUE_INDEX = 0;
@@ -158,6 +162,7 @@ public class TxRequestQueue implements TaskManager.RequestDispatcherIF {
     public static final int QUEUE_IS_WORKING = 14;
     public static final int QUEUE_IS_IDLE = 140;            // the idle state is "working" with empty queues
     public static final int QUEUE_IS_SYNCHRONIZING = 15;
+    
     public static final HashMap<Integer, String> QUEUE_STATE = new HashMap<Integer, String>();
 
     static {
@@ -479,9 +484,22 @@ public class TxRequestQueue implements TaskManager.RequestDispatcherIF {
         String dateString = format.format(new Date()) + info;
         if (type < 2) {
             // truncate log files,
-            File f = new File(logFilePath);
-            TextResource.writeContents(logFilePath,
-                    dateString + message, (f.length() <= 200000) || (!f.renameTo(new File(logFilePath + ".previous"))));
+            File efaCloudLogFile = new File(logFilePath);
+            Boolean appendLine=true;
+            
+            //efacloud.log rotation: if >5 Mb, delete old efacloud.previous.log file and rename efacloud.log to efacloud.log.previous.log
+            if (efaCloudLogFile.length() > EFACLOUD_LOG_MAX_SIZE) {
+            	File oldPreviousLogfile=new File(logFilePath + FILENAME_PREVIOUS_SUFFIX);
+            	
+            	// rotate existing efacloud.log to efacloud.log.previous and delete the existing file if necessary.
+            	if ((oldPreviousLogfile.exists() && oldPreviousLogfile.delete()) 
+            			|| (!oldPreviousLogfile.exists())) {
+            		if (efaCloudLogFile.renameTo(new File(logFilePath + FILENAME_PREVIOUS_SUFFIX))) {
+            			appendLine=false;
+            		}
+            	}
+            }
+            TextResource.writeContents(logFilePath, dateString + message, appendLine);
         }
     }
 

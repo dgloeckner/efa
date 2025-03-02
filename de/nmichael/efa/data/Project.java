@@ -595,7 +595,7 @@ public class Project extends StorageObject {
             ProjectRecord r = getLoogbookRecord(logbooks[i]);
             if (r != null) {
                 String name = "<b>" + International.getString("Fahrtenbuch") + ":</b> <b><font color=blue>" + logbooks[i] + "</font></b><br>";
-                String description = (r.getDescription() != null && r.getDescription().length() > 0 ? r.getDescription() + " " : "");
+                String description = (r.getDescription() != null && r.getDescription().length() > 0 ? "<i>"+r.getDescription() + "</i><br> " : "");
                 description += "(" + r.getStartDate().toString() + " - " + r.getEndDate() + ")";
                 
                 Boolean currentLogbook=(Daten.project != null && Daten.project.getCurrentLogbook() != null 

@@ -64,6 +64,8 @@
         <ReleaseDate>27.10.2024</ReleaseDate>
         <DownloadUrl>TODO</DownloadUrl>
         <DownloadSize>TODO</DownloadSize>
+		<MinimumJavaVersion>1.8</MinimumJavaVersion>
+		<MinimumEfaCloudVersion>2.3.3</MinimumEfaCloudVersion>        
         <Changes lang="de">
             <ChangeItem>Neu: efaBths Listen: Farbicons für Bootslisten werden geglättet dargestellt.</ChangeItem>
             <ChangeItem>Neu: Hinweise in EfaConfig usw. werden passend zum efaFlatlaf mit abgerundeten Ecken dargestellt.</ChangeItem>
@@ -167,6 +169,7 @@
         <ReleaseDate>05.04.2024</ReleaseDate>
         <DownloadUrl>http://efa.nmichael.de/download/efa240.zip</DownloadUrl>
         <DownloadSize>6547777</DownloadSize>
+		<MinimumJavaVersion>1.8</MinimumJavaVersion>
         <Changes lang="de">
 			<ChangeItem>Neu: EfaFlatLight LookAndFeel bietet eine klare, modernere Darstellung. In weiten Bereichen konfigurierbar.</ChangeItem>
 			<ChangeItem>Neu: EfaFlatLight Standard-Look nach Update oder Installation. Bei Update ist ein Neustart des Rechners erforderlich, damit efaFlatLight aktiv wird.</ChangeItem>
@@ -301,6 +304,7 @@
         <ReleaseDate>26.11.2023</ReleaseDate>
         <DownloadUrl>http://efa.nmichael.de/download/efa233.zip</DownloadUrl>
         <DownloadSize>4546237</DownloadSize>
+		<MinimumJavaVersion>1.8</MinimumJavaVersion>
         <Changes lang="de">
             <ChangeItem>BugFix: Unerwuenschtes Dialogfenster bei Automatischen Ablauefen angezeigt</ChangeItem>
         </Changes>
@@ -313,6 +317,7 @@
         <ReleaseDate>01.01.2024</ReleaseDate>
         <DownloadUrl>http://efa.nmichael.de/download/efa233.zip</DownloadUrl>
         <DownloadSize>TODO</DownloadSize>
+		<MinimumJavaVersion>1.8</MinimumJavaVersion>
         <Changes lang="de">
             <ChangeItem>BugFix: Datenimport von Fahrtenbucheinträgen funktioniert nicht, wegen ArrayIndexOutOfBounds Exception</ChangeItem>
         </Changes>
@@ -325,6 +330,7 @@
         <ReleaseDate>26.11.2023</ReleaseDate>
         <DownloadUrl>http://efa.nmichael.de/download/efa233.zip</DownloadUrl>
         <DownloadSize>4546237</DownloadSize>
+		<MinimumJavaVersion>1.8</MinimumJavaVersion>
         <Changes lang="de">
             <ChangeItem>BugFix: Unerwuenschtes Dialogfenster bei Automatischen Ablauefen angezeigt</ChangeItem>
         </Changes>
@@ -337,6 +343,7 @@
         <ReleaseDate>05.11.2023</ReleaseDate>
         <DownloadUrl>http://efa.nmichael.de/download/efa233.zip</DownloadUrl>
         <DownloadSize>4545206</DownloadSize>
+		<MinimumJavaVersion>1.8</MinimumJavaVersion>
         <Changes lang="de">
             <ChangeItem>BugFix: Widgets multithreading-sicher: weniger Rendering-Exceptions im efa.log</ChangeItem>
             <ChangeItem>BugFix: Teilbegriffsuche für Eingabefelder mit Vervollständigung suchen nun auf kompletter Liste</ChangeItem>
@@ -370,6 +377,7 @@
         <ReleaseDate>29.09.2023</ReleaseDate>
         <DownloadUrl>http://efa.nmichael.de/download/efa233.zip</DownloadUrl>
         <DownloadSize>4523987</DownloadSize>
+		<MinimumJavaVersion>1.8</MinimumJavaVersion>
         <Changes lang="de">
             <ChangeItem>Neu: efa 2.3.3 erfordert mindestens Java Version 8</ChangeItem>
             <ChangeItem>Neu: Bootsreservierungen (sowohl einmalige als auch wöchentliche) lassen sich jetzt nach Datum filtern</ChangeItem>
@@ -419,6 +427,7 @@
         <ReleaseDate>21.01.2023</ReleaseDate>
         <DownloadUrl>http://efa.nmichael.de/download/efa232.zip</DownloadUrl>
         <DownloadSize>4379916</DownloadSize>
+		<MinimumJavaVersion>1.6</MinimumJavaVersion>
         <Changes lang="de">
             <ChangeItem>Bugfix: Standard Lock Timeout auf 30 Sekunden erhoeht</ChangeItem>
         </Changes>
@@ -432,6 +441,7 @@
         <ReleaseDate>21.01.2023</ReleaseDate>
         <DownloadUrl>http://efa.nmichael.de/download/efa232.zip</DownloadUrl>
         <DownloadSize>4380077</DownloadSize>
+		<MinimumJavaVersion>1.6</MinimumJavaVersion>
         <Changes lang="de">
             <ChangeItem>Bugfix: Erweiterte Lock Timeout Diagnostics</ChangeItem>
         </Changes>
@@ -445,6 +455,7 @@
         <ReleaseDate>28.10.2022</ReleaseDate>
         <DownloadUrl>http://efa.nmichael.de/download/efa232.zip</DownloadUrl>
         <DownloadSize>4380228</DownloadSize>
+		<MinimumJavaVersion>1.6</MinimumJavaVersion>
         <Changes lang="de">
             <ChangeItem>Neu: JavaMail Update auf Version 1.6.2</ChangeItem>
             <ChangeItem>Bugfix: Ungueltige Personen in Personen-Auswahlliste (https://github.com/nicmichael/efa/issues/62)</ChangeItem>
@@ -462,6 +473,7 @@
         <ReleaseDate>04.06.2022</ReleaseDate>
         <DownloadUrl>http://efa.nmichael.de/download/efa232.zip</DownloadUrl>
         <DownloadSize>4269537</DownloadSize>
+		<MinimumJavaVersion>1.6</MinimumJavaVersion>
         <Changes lang="de">
             <ChangeItem>Neu: Filter fuer Liste der verfuegbaren Boote und Boote auf Fahrt</ChangeItem>
             <ChangeItem>Neu: Verbesserte Darstellung von Tabellen</ChangeItem>
@@ -483,6 +495,7 @@
         <ReleaseDate>22.03.2022</ReleaseDate>
         <DownloadUrl>http://efa.nmichael.de/download/efa231.zip</DownloadUrl>
         <DownloadSize>4270829</DownloadSize>
+		<MinimumJavaVersion>1.6</MinimumJavaVersion>
         <Changes lang="de">
             <ChangeItem>Bugfix: Korrektur fuer fehlendes Dezimalkomma in Darstellung von Entfernungen und anderen Dezimalwerten</ChangeItem>
         </Changes>
@@ -496,6 +509,7 @@
         <ReleaseDate>06.03.2022</ReleaseDate>
         <DownloadUrl>http://efa.nmichael.de/download/efa231.zip</DownloadUrl>
         <DownloadSize>4270666</DownloadSize>
+		<MinimumJavaVersion>1.6</MinimumJavaVersion>
         <Changes lang="de">
             <ChangeItem>Neu: Verbesserte Uebersetzung nach Franzoesisch</ChangeItem>
             <ChangeItem>Bugfix: efaCloud Synchronisationsfehler unter Windows behoben</ChangeItem>
@@ -513,6 +527,7 @@
         <ReleaseDate>08.02.2022</ReleaseDate>
         <DownloadUrl>http://efa.nmichael.de/download/efa231.zip</DownloadUrl>
         <DownloadSize>4256352</DownloadSize>
+		<MinimumJavaVersion>1.6</MinimumJavaVersion>
         <Changes lang="de">
             <ChangeItem>Neu: Wettbewerbsbedingungen fuer Fahrtenabzeichen 2022 angepasst</ChangeItem>
             <ChangeItem>Bugfix: efaCloud Bugfix bei Fahrtenbuchwechsel</ChangeItem>
@@ -529,6 +544,7 @@
         <ReleaseDate>24.01.2022</ReleaseDate>
         <DownloadUrl>http://efa.nmichael.de/download/efa231.zip</DownloadUrl>
         <DownloadSize>4256121</DownloadSize>
+		<MinimumJavaVersion>1.6</MinimumJavaVersion>
         <Changes lang="de">
             <ChangeItem>Neu: Verbesserte Auto-Complete Listen schlagen nur Personen vor, die noch nicht fuer das Boot ausgewaehlt sind</ChangeItem>
         </Changes>
@@ -542,6 +558,7 @@
         <ReleaseDate>22.12.2021</ReleaseDate>
         <DownloadUrl>http://efa.nmichael.de/download/efa231.zip</DownloadUrl>
         <DownloadSize>4255809</DownloadSize>
+		<MinimumJavaVersion>1.6</MinimumJavaVersion>
         <Changes lang="de">
             <ChangeItem>efaCloud-Optimierungen mit zentraler Admin-Verwaltung</ChangeItem>
         </Changes>
@@ -555,6 +572,7 @@
         <ReleaseDate>19.11.2021</ReleaseDate>
         <DownloadUrl>http://efa.nmichael.de/download/efa230.zip</DownloadUrl>
         <DownloadSize>4246634</DownloadSize>
+		<MinimumJavaVersion>1.6</MinimumJavaVersion>
         <Changes lang="de">
             <ChangeItem>Bugfix: Fehlende Berechnung der Zielbereiche bei Wettbebwerbsauswertung fuer LRV Sommer-Wettbewerb 2021 behoben</ChangeItem>
         </Changes>
@@ -565,6 +583,7 @@
         <ReleaseDate>26.09.2021</ReleaseDate>
         <DownloadUrl>http://efa.nmichael.de/download/efa230.zip</DownloadUrl>
         <DownloadSize>4246168</DownloadSize>
+		<MinimumJavaVersion>1.6</MinimumJavaVersion>
         <Changes lang="de">
             <ChangeItem>Bugfix: efaCloud: Wenn die Internetverbindung beim Start des Programms noch nicht steht, wird der Retry der Autorisierung nun korrekt angestoßen.</ChangeItem>
             <ChangeItem>Bugfix: Behebung des Referenzfehlers in der Logdatei-Prüfung beim Raspberry Systemzeitfehler-Effekt.</ChangeItem>
@@ -580,6 +599,7 @@
         <ReleaseDate>19.06.2021</ReleaseDate>
         <DownloadUrl>http://efa.nmichael.de/download/efa230.zip</DownloadUrl>
         <DownloadSize>4246311</DownloadSize>
+		<MinimumJavaVersion>1.6</MinimumJavaVersion>
         <Changes lang="de">
             <ChangeItem>Neu: Wettbewerbsbedingungen fuer LRV-Sommer-Wettbewerb 2021 aktualisiert</ChangeItem>
         </Changes>
@@ -590,6 +610,7 @@
         <ReleaseDate>10.06.2021</ReleaseDate>
         <DownloadUrl>http://efa.nmichael.de/download/efa230.zip</DownloadUrl>
         <DownloadSize>4245993</DownloadSize>
+		<MinimumJavaVersion>1.6</MinimumJavaVersion>
         <Changes lang="de">
             <ChangeItem>Bugfix [efaCloud]: Gruppen mit mehr als 27 Mitgliedern nun möglich</ChangeItem>
             <ChangeItem>Bugfix [efaCloud]: efaCloud und efaCLI nun kompatibel. Allerdings keine efaCloud Kommandos über efaCLI</ChangeItem>
@@ -610,6 +631,7 @@
         <ReleaseDate>11.04.2021</ReleaseDate>
         <DownloadUrl>http://efa.nmichael.de/download/efa230.zip</DownloadUrl>
         <DownloadSize>4244761</DownloadSize>
+		<MinimumJavaVersion>1.6</MinimumJavaVersion>
         <Changes lang="de">
             <ChangeItem>Change: Bedingungen fuer DRV-Fahrtenabzeichen 2021 angepasst</ChangeItem>
         </Changes>
@@ -620,6 +642,7 @@
         <ReleaseDate>30.03.2021</ReleaseDate>
         <DownloadUrl>http://efa.nmichael.de/download/efa230.zip</DownloadUrl>
         <DownloadSize>4250040</DownloadSize>
+		<MinimumJavaVersion>1.6</MinimumJavaVersion>
         <Changes lang="de">
             <ChangeItem>Bugfix: efaCloud Fast-Sync alle 30 Sekunden (Verringerung der Latenz der Sichtbarkeit von Aenderungen verschiedener Clients)</ChangeItem>
         </Changes>
@@ -633,6 +656,7 @@
         <ReleaseDate>23.03.2021</ReleaseDate>
         <DownloadUrl>http://efa.nmichael.de/download/efa230.zip</DownloadUrl>
         <DownloadSize>4249529</DownloadSize>
+		<MinimumJavaVersion>1.6</MinimumJavaVersion>
         <Changes lang="de">
             <ChangeItem>Bugfix: NullPointerException in efaCloud beim Beenden einer Fahrt mit unbekanntem Boot oder Doppeleintrag korrigiert</ChangeItem>
         </Changes>
@@ -645,6 +669,7 @@
         <VersionID>2.3.0_05</VersionID>
         <ReleaseDate>22.03.2021</ReleaseDate>
         <DownloadUrl>http://efa.nmichael.de/download/efa230.zip</DownloadUrl>
+		<MinimumJavaVersion>1.6</MinimumJavaVersion>
         <DownloadSize>4249632</DownloadSize>
         <Changes lang="de">
             <ChangeItem>Bugfix: efaCloud Upload-Fehler (manueller Upload) korrigiert</ChangeItem>
@@ -661,6 +686,7 @@
         <ReleaseDate>20.03.2021</ReleaseDate>
         <DownloadUrl>http://efa.nmichael.de/download/efa230.zip</DownloadUrl>
         <DownloadSize>4249556</DownloadSize>
+		<MinimumJavaVersion>1.6</MinimumJavaVersion>
         <Changes lang="de">
             <ChangeItem>New: Erweiterte User Statistics bei remote Online-Update</ChangeItem>
         </Changes>
@@ -674,7 +700,7 @@
         <ReleaseDate>20.03.2021</ReleaseDate>
         <DownloadUrl>http://efa.nmichael.de/download/efa230.zip</DownloadUrl>
         <DownloadSize>4249549</DownloadSize>
-
+		<MinimumJavaVersion>1.6</MinimumJavaVersion>
         <Changes lang="de">
             <ChangeItem>Bugfix: NullPointerException beim Beenden einer Fahrt korrigiert</ChangeItem>
             <ChangeItem>New: User Statistics bei remote Online-Update</ChangeItem>
@@ -690,6 +716,7 @@
         <ReleaseDate>18.03.2021</ReleaseDate>
         <DownloadUrl>http://efa.nmichael.de/download/efa230.zip</DownloadUrl>
         <DownloadSize>4249302</DownloadSize>
+		<MinimumJavaVersion>1.6</MinimumJavaVersion>
 
         <Changes lang="de">
             <ChangeItem>Bugfix: Lizenztext aktualisiert</ChangeItem>
@@ -701,6 +728,7 @@
         <ReleaseDate>16.03.2021</ReleaseDate>
         <DownloadUrl>http://efa.nmichael.de/download/efa230.zip</DownloadUrl>
         <DownloadSize>4249267</DownloadSize>
+		<MinimumJavaVersion>1.6</MinimumJavaVersion>
 
         <Changes lang="de">
             <ChangeItem>Neu: efaCloud - efa in der Cloud (experimentell)</ChangeItem>

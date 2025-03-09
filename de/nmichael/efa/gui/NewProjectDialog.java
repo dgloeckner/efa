@@ -16,8 +16,11 @@ import de.nmichael.efa.core.items.*;
 import de.nmichael.efa.data.*;
 import de.nmichael.efa.data.storage.*;
 import de.nmichael.efa.ex.EfaException;
+import de.nmichael.efa.gui.util.EfaBoathouseBackgroundTask;
 import de.nmichael.efa.*;
 import de.nmichael.efa.core.config.AdminRecord;
+import de.nmichael.efa.core.config.EfaConfig;
+
 import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -30,6 +33,7 @@ public class NewProjectDialog extends StepwiseDialog implements IItemListener {
     private final static String GUIITEM_NODATA_LABEL1 = "GUIITEM_NODATA_LABEL1";
     private final static String GUIITEM_NODATA_LABEL2 = "GUIITEM_NODATA_LABEL2";
     private final static String GUIITEM_CREATE_STATUS_LIST = "GUIITEM_CREATE_PERSON_STATUS_LIST";
+    private final static String GUIITEM_CREATE_STATUS_LIST_HINT = "GUIITEM_CREATE_PERSON_STATUS_LIST_HINT";
     
     private final static String CATEGORY_STEP_0 = "0";
     private final static String CATEGORY_STEP_1 = "1";
@@ -140,14 +144,17 @@ public class NewProjectDialog extends StepwiseDialog implements IItemListener {
             itemsToBeDeleted.addAll(rPrj.getGuiItems(admin, 3, CATEGORY_STEP_2, true));
             rPrj.setStorageType(IDataAccess.TYPE_EFA_CLOUD);
             itemsToBeDeleted.addAll(rPrj.getGuiItems(admin, 3, CATEGORY_STEP_2, true));
-
+            
+            itemsToBeDeleted.add(new ItemTypeBoolean(GUIITEM_CREATE_STATUS_LIST, false,IItemType.TYPE_PUBLIC, CATEGORY_STEP_3, ""));
+            itemsToBeDeleted.add(new ItemTypeLabel(EfaConfig.NOT_STORED_ITEM_PREFIX+GUIITEM_CREATE_STATUS_LIST_HINT, IItemType.TYPE_PUBLIC, CATEGORY_STEP_3, ""));
+            
             // delete all Club items
             itemsToBeDeleted.addAll(rClb.getGuiItems(admin, 1, CATEGORY_STEP_3, true));
             itemsToBeDeleted.addAll(rClb.getGuiItems(admin, 2, CATEGORY_STEP_4, true));
-            itemsToBeDeleted.add(new ItemTypeBoolean(GUIITEM_CREATE_WATERS_LIST, true,
-                    IItemType.TYPE_PUBLIC, CATEGORY_STEP_3, ""));
+            itemsToBeDeleted.add(new ItemTypeBoolean(GUIITEM_CREATE_WATERS_LIST, true, IItemType.TYPE_PUBLIC, CATEGORY_STEP_3, ""));
             itemsToBeDeleted.add(new ItemTypeLabel(GUIITEM_NODATA_LABEL1,  IItemType.TYPE_PUBLIC, CATEGORY_STEP_3, ""));
             itemsToBeDeleted.add(new ItemTypeLabel(GUIITEM_NODATA_LABEL2,  IItemType.TYPE_PUBLIC, CATEGORY_STEP_4, ""));
+            
 
             // delete items we don't want
             for (int i=0; i<items.size(); i++) {
@@ -176,9 +183,8 @@ public class NewProjectDialog extends StepwiseDialog implements IItemListener {
                 
                 if (item.getValue().equals(IDataAccess.TYPESTRING_EFA_CLOUD)) {
                 	String hint1 = International.getString("Folgende Optionen nur dann aktivieren, wenn der efaCloud-Server noch keine Daten hat.");
-                	String hint2 = International.getString("Sonst kann es zu doppelten Einträgen für Status und Gewässer im efaCloud-Server kommen.");
-                	items.add(EfaGuiUtils.createHint(GUIITEM_CREATE_STATUS_LIST+"_HINT", IItemType.TYPE_PUBLIC, CATEGORY_STEP_3,
-                			"<html>"+hint1+"<br>"+hint2+"</html>",3,10,5));
+                	items.add(EfaGuiUtils.createHintWordWrap(GUIITEM_CREATE_STATUS_LIST_HINT, IItemType.TYPE_PUBLIC, CATEGORY_STEP_3,
+                			hint1,3,10,5,500));
                 	items.add(new ItemTypeBoolean(GUIITEM_CREATE_STATUS_LIST, false,
                             IItemType.TYPE_PUBLIC, CATEGORY_STEP_3,
                             International.getString("Status-Einträge für Personen (Gast, Mitglied) erstellen")));

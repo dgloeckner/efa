@@ -1867,13 +1867,11 @@ public class EfaConfig extends StorageObject implements IItemFactory {
 					600, IItemType.TYPE_EXPERT, BaseTabbedDialog.makeCategory(CATEGORY_DATAACCESS, CATEGORY_DATAREMOTE),
 					"Client Receive Timeout (sec)"));
 
-			addHint("dataRemoteEfaOnlineEnabledDescription1", IItemType.TYPE_EXPERT,
-					BaseTabbedDialog.makeCategory(CATEGORY_DATAACCESS, CATEGORY_DATAREMOTE), International.getString(
-							"efaOnline ist ein dynamischer Namensdienst zum vereinfachten Remote-Zugriff."),
-					3, 12, 0);
-			addHint("dataRemoteEfaOnlineEnabledDescription2", IItemType.TYPE_EXPERT,
-					BaseTabbedDialog.makeCategory(CATEGORY_DATAACCESS, CATEGORY_DATAREMOTE),
-					International.getString("Siehe http://efa.nmichael.de/efaonline.html.de"), 3, 0, 3);
+			addHintWordWrap("dataRemoteEfaOnlineEnabledDescription1", IItemType.TYPE_EXPERT,
+					BaseTabbedDialog.makeCategory(CATEGORY_DATAACCESS, CATEGORY_DATAREMOTE), 
+					International.getString("efaOnline ist ein dynamischer Namensdienst zum vereinfachten Remote-Zugriff.")
+					+ " "+ International.getString("Siehe http://efa.nmichael.de/efaonline.html.de"),
+					3, 12, 12,500);
 
 			addParameter(dataRemoteEfaOnlineEnabled = new ItemTypeBoolean("DataRemoteEfaOnlineEnabled", false,
 					IItemType.TYPE_EXPERT, BaseTabbedDialog.makeCategory(CATEGORY_DATAACCESS, CATEGORY_DATAREMOTE),
@@ -1963,6 +1961,12 @@ public class EfaConfig extends StorageObject implements IItemFactory {
 	private IItemType addHint(String uniqueName, int type, String category, String caption, int gridWidth,
 			int padBefore, int padAfter) {
 		IItemType item = EfaGuiUtils.createHint(uniqueName, type, category, caption, gridWidth, padBefore, padAfter);
+		addParameter(item);
+		return item;
+	}
+	private IItemType addHintWordWrap(String uniqueName, int type, String category, String caption, int gridWidth,
+			int padBefore, int padAfter, int maxWidth) {
+		IItemType item = EfaGuiUtils.createHintWordWrap(uniqueName, type, category, caption, gridWidth, padBefore, padAfter, maxWidth);
 		addParameter(item);
 		return item;
 	}
@@ -3459,10 +3463,10 @@ public class EfaConfig extends StorageObject implements IItemFactory {
 		
 		Boolean bCanoeingInGermany= (this.getValueUseFunctionalityCanoeingGermany());
 		if (bCanoeingInGermany) {
-			addHint("BOATS_CANOEING_GERMANY_EFBSYNC_HINT", IItemType.TYPE_EXPERT,
+			addHintWordWrap("BOATS_CANOEING_GERMANY_EFBSYNC_HINT", IItemType.TYPE_EXPERT,
 					BaseTabbedDialog.makeCategory(CATEGORY_TYPES, CATEGORY_TYPES_BOAT),
-					International.onlyFor("<html>Kanufahren in Deutschland ist aktiv. Nutzen Sie die Kanu-EFB-Synchronisation?<br>Wenn ja, sollten Sie bei Hinzufügen neuer Bootsarten nach einem EFA-Neustart <br>in der Registerkarte SYNCHRONISATION die zu synchronisierenden Bootsarten auf Korrektheit prüfen.</html>", "de"),
-					3, 20,10);
+					International.onlyFor("Kanufahren in Deutschland ist aktiv. Nutzen Sie die Kanu-EFB-Synchronisation? Wenn ja, sollten Sie bei Hinzufügen neuer Bootsarten nach einem EFA-Neustart in der Registerkarte SYNCHRONISATION die zu synchronisierenden Bootsarten auf Korrektheit prüfen.", "de"),
+					3, 20,10,500);
 		}
 		addParameter(typesBoat = new ItemTypeHashtable<String>("_TYPES_BOAT", "", true, IItemType.TYPE_EXPERT,
 				BaseTabbedDialog.makeCategory(CATEGORY_TYPES, CATEGORY_TYPES_BOAT),

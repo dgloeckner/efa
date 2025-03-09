@@ -339,9 +339,14 @@ public abstract class BaseDialog extends JDialog implements ActionListener {
     }
 
     public boolean cancel() {
-    	return cancel(false);
+    	return internalCancel();
     }
+    
     public boolean cancel(Boolean keyESCAction) {
+    	return internalCancel();
+    }
+    
+    private boolean internalCancel() {
         _inCancel = true;
         if (doWindowStackChecks) {
             Dialog.frameClosed(this);

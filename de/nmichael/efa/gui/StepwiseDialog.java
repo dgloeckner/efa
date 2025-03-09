@@ -22,7 +22,8 @@ import javax.swing.*;
 
 public abstract class StepwiseDialog extends BaseDialog {
 
-    JPanel stepPanel;
+	private static final long serialVersionUID = 7125589712864431436L;
+	JPanel stepPanel;
     JPanel controlPanel;
     JPanel descriptionPanel;
     JPanel inputPanelWrapper;
@@ -55,6 +56,7 @@ public abstract class StepwiseDialog extends BaseDialog {
         stepPanel.setBorder(new javax.swing.border.EmptyBorder(20,20,20,20));
         JLabel stepHeaderLabel = new JLabel();
         stepHeaderLabel.setText(International.getString("Schritte")+":");
+        stepHeaderLabel.setFont(stepHeaderLabel.getFont().deriveFont(Font.BOLD));
         stepPanel.add(stepHeaderLabel,  new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0
             ,GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 10, 0), 0, 0));
         steps = getSteps();
@@ -132,7 +134,9 @@ public abstract class StepwiseDialog extends BaseDialog {
         descriptionPanel.setBorder(new javax.swing.border.EmptyBorder(20,20,20,20));
         JLabel descriptionLabel = new JLabel();
         descriptionLabel.setText(International.getString("Beschreibung")+":");
+        descriptionLabel.setFont(descriptionLabel.getFont().deriveFont(Font.BOLD));
         descriptionPanel.add(descriptionLabel, BorderLayout.NORTH);
+
         JScrollPane descriptionScrollPane = new JScrollPane();
         descriptionScrollPane.setPreferredSize(new Dimension(200,80));
         descriptionScrollPane.setMinimumSize(new Dimension(200,80));

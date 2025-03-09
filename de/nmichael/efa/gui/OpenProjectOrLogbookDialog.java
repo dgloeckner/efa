@@ -42,6 +42,7 @@ import de.nmichael.efa.gui.util.EfaMouseListener;
 import de.nmichael.efa.gui.util.RoundedBorder;
 import de.nmichael.efa.gui.util.RoundedPanel;
 import de.nmichael.efa.util.Dialog;
+import de.nmichael.efa.util.EfaSortStringComparator;
 import de.nmichael.efa.util.EfaUtil;
 import de.nmichael.efa.util.International;
 import de.nmichael.efa.util.Logger;
@@ -113,7 +114,7 @@ public class OpenProjectOrLogbookDialog extends BaseDialog implements IItemListe
             logbookName.setVisible(false);
         }
         int y=1;
-        mainPanel.add(label, new GridBagConstraints(0, y++, 1, 1, 0.0, 0.0,
+        mainPanel.add(label, new GridBagConstraints(0, y++, 1, 1, 1.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(10, 10, 0, 0), 0, 0));
 
         list = new ItemTypeHtmlList("LIST", null, null, null, IItemType.TYPE_PUBLIC, null, label.getText());
@@ -126,7 +127,7 @@ public class OpenProjectOrLogbookDialog extends BaseDialog implements IItemListe
         list.registerItemListener(this);
         list.setFieldGrid(1, 5, GridBagConstraints.CENTER, GridBagConstraints.BOTH);
         list.setPadding(10, 10, 0, 10);
-        list.displayOnGui(_parent, mainPanel, 0, y++);
+        list.displayOnGui(_parent, mainPanel, 0, y++,1.0,1.0);
 
         JButton newButton = new JButton();
         Mnemonics.setButton(this, newButton, International.getString("Neu"),
@@ -176,21 +177,39 @@ public class OpenProjectOrLogbookDialog extends BaseDialog implements IItemListe
 
     public void updateGui() {
         Hashtable<String,String> items = null;
-
+        String currentItem=null;
         if (type == Type.project) {
             items = Project.getProjects();
+             if (Daten.project != null) {
+             	currentItem=Daten.project.getName();
+             }
         }
         if (type == Type.logbook && Daten.project != null) {
             items = Daten.project.getLogbooks();
+            if (Daten.project.getCurrentLogbook()!=null){
+            	currentItem=Daten.project.getCurrentLogbook().getName();
+            }
         }
         if(type == Type.clubwork && Daten.project != null) {
             items = Daten.project.getClubworks();
+            if (Daten.project.getCurrentClubwork()!=null){
+            	currentItem=Daten.project.getCurrentClubwork().getName();
+            }
         }
 
         keys = items.keySet().toArray(new String[0]);
-        Arrays.sort(keys);
+        Arrays.sort(keys,new EfaSortStringComparator());
 
         list.setValues(keys, items);
+        
+        //select open project, logbook or clubwork
+        if (Daten.project != null && currentItem != null) {
+        	try {
+        		list.parseAndShowValue(currentItem);
+        	} catch (Exception e) {
+        		Logger.logdebug(e);
+        	}
+        }
     }
     
     public void updateInfos() {
@@ -266,8 +285,8 @@ public class OpenProjectOrLogbookDialog extends BaseDialog implements IItemListe
         
         
         updateInfos();
-        mainPanel.add(northPanel, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 10), 0, 0));
+        mainPanel.add(northPanel, new GridBagConstraints(0, 0, 2, 1, 0.0, 0.0,
+                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
     }
 
     public void itemListenerAction(IItemType item, AWTEvent event) {

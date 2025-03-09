@@ -96,11 +96,13 @@ public class NewLogbookDialog extends StepwiseDialog {
             cal.get(Calendar.YEAR) : cal.get(Calendar.YEAR) + 1); // current year until October, year+1 else
 
         if (Daten.project.getNumberOfBoathouses()>1 || Daten.project.getIsProjectStorageTypeEfaCloud()) {
-            items.add(EfaGuiUtils.createHint(LOGBOOKNAMEHINT, IItemType.TYPE_PUBLIC, CATEGORY_STEP_0, 
-            		International.getString("Bei Nutzung von efaCloud oder mehreren Fahrtenbüchern MUSS der Fahrtenbuchname dem Aufbau JJJJ_Freitext entsprechen, z.B. 2025_Freitext"),2,10,2));
+            items.add(EfaGuiUtils.createHintWordWrap(LOGBOOKNAMEHINT, IItemType.TYPE_PUBLIC, CATEGORY_STEP_0,
+            		International.getString("Bei Nutzung von efaCloud oder mehreren Fahrtenbüchern MUSS der Fahrtenbuchname dem Aufbau JJJJ_Freitext entsprechen, z.B. 2025_Bootshausname")
+            		,2,10,10,500));
         } else {
-            items.add(EfaGuiUtils.createHint(LOGBOOKNAMEHINT, IItemType.TYPE_PUBLIC, CATEGORY_STEP_0, 
-            		International.getString("Der Fahrtenbuchname sollte dem Aufbau JJJJ_Freitext entsprechen, z.B. {year}_Freitext"),2,10,2));
+            items.add(EfaGuiUtils.createHintWordWrap(LOGBOOKNAMEHINT, IItemType.TYPE_PUBLIC, CATEGORY_STEP_0, 
+            		International.getString("Der Fahrtenbuchname sollte dem Aufbau JJJJ_Freitext entsprechen z.B. 2025_Bootshausname")
+            		,2,10,10,500));
         }        
         
         item = new ItemTypeString(LOGBOOKNAME, year, IItemType.TYPE_PUBLIC, CATEGORY_STEP_0, International.getString("Name des Fahrtenbuchs"));

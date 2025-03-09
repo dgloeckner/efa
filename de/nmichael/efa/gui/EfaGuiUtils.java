@@ -9,8 +9,12 @@
  */
 package de.nmichael.efa.gui;
 
+import java.awt.FontMetrics;
 import java.awt.GridBagConstraints;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
 import de.nmichael.efa.core.config.EfaConfig;
@@ -26,7 +30,7 @@ public class EfaGuiUtils {
 	public static ItemTypeLabel createHint(String uniqueName, int type, String category, String caption, int gridWidth,
 			int padBefore, int padAfter) {
 		//if caption starts with html, do not have a blank as a prefix as this will disable html rendering.
-		ItemTypeLabel item = (ItemTypeLabel) EfaGuiUtils.createDescription(EfaConfig.NOT_STORED_ITEM_PREFIX + uniqueName, type, category, (caption.startsWith("<html>") ? caption : " "+caption), gridWidth,
+		ItemTypeLabel item = (ItemTypeLabel) EfaGuiUtils.createDescription(uniqueName, type, category, (caption.startsWith("<html>") ? caption : " "+caption), gridWidth,
 				padBefore, padAfter);
 		item.setImage(ImagesAndIcons.getIcon(ImagesAndIcons.IMAGE_INFO));
 		item.setImagePosition(SwingConstants.TRAILING); // info icon should be first, the text trailing.
@@ -36,7 +40,58 @@ public class EfaGuiUtils {
 		item.setRoundShape(true);
 		return item;
 	}	
+	
+	// creates a multi-line hint, the captions provided as an string array. Each caption has a single line.
+	public static ItemTypeLabel createHint(String uniqueName, int type, String category, String[] captions, int gridWidth,
+			int padBefore, int padAfter) {
+		
+		String resultCaption="<html>";
+		for(int i=0;i<captions.length; i++) {
+			resultCaption+=captions[i];
+			if (captions.length>1 && i<captions.length) {
+				resultCaption+="<br>";
+			}
+		}
+		resultCaption+="</html>";
+		return createHint(uniqueName,type,category,resultCaption,gridWidth,padBefore,padAfter);
+	}
 
+	public static ItemTypeLabel createHintWordWrap(String uniqueName, int type, String category, String caption, int gridWidth,
+			int padBefore, int padAfter, int maxPixelWidth) {
+		
+		JLabel x = new JLabel();
+		FontMetrics myFontMetrics = x.getFontMetrics(x.getFont());
+
+        List<String> captions = splitStringByWidth(caption, maxPixelWidth, myFontMetrics);
+        String[] a = captions.toArray(new String[0]);
+        return createHint(uniqueName, type, category, a, gridWidth, padBefore, padAfter);
+	}
+	
+	
+	// Splits a string word-wise into an array. wordwrap when the next word does not fit into maxWidth pixels.
+    private static List<String> splitStringByWidth(String text, int maxWidth, FontMetrics fontMetrics) {
+        List<String> lines = new ArrayList<>();
+        String[] words = text.split(" ");
+        StringBuilder currentLine = new StringBuilder();
+
+        for (String word : words) {
+            String testLine = currentLine.length() == 0 ? word : currentLine + " " + word;
+            int lineWidth = fontMetrics.stringWidth(testLine);
+
+            if (lineWidth > maxWidth) {
+                lines.add(currentLine.toString());
+                currentLine = new StringBuilder(word);
+            } else {
+                currentLine.append(currentLine.length() == 0 ? word : " " + word);
+            }
+        }
+
+        if (currentLine.length() > 0) {
+            lines.add(currentLine.toString());
+        }
+
+        return lines;
+    }
 
 	/**
 	 * Adds a description item in an efa GUI. This description value is not safed

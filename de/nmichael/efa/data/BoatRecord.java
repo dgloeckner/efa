@@ -1215,7 +1215,7 @@ public class BoatRecord extends DataRecord implements IItemFactory, IItemListene
                     IItemType.TYPE_PUBLIC, CAT_RESERVATIONS, International.getString("Reservierungen")));
             ((ItemTypeDataRecordTable) item).setButtonPanelPosition(BorderLayout.NORTH);
             item.setFieldSize(850, -1);
-            item.setPadding(0, 0, 0, 0);
+            item.setPadding(10,10,10,10);
             item.setFieldGrid(1, 1, GridBagConstraints.WEST, GridBagConstraints.BOTH);
         }
         
@@ -1229,7 +1229,7 @@ public class BoatRecord extends DataRecord implements IItemFactory, IItemListene
                     IItemType.TYPE_PUBLIC, CAT_DAMAGES, International.getString("Bootsschäden")));
             ((ItemTypeDataRecordTable) item).setButtonPanelPosition(BorderLayout.NORTH);
             item.setFieldSize(850, -1);
-            item.setPadding(0, 0, 0, 0);
+            item.setPadding(10, 10, 10, 10);
             item.setFieldGrid(1, 1, GridBagConstraints.WEST, GridBagConstraints.BOTH);
         }
 

@@ -169,7 +169,9 @@
         <ReleaseDate>05.04.2024</ReleaseDate>
         <DownloadUrl>http://efa.nmichael.de/download/efa240.zip</DownloadUrl>
         <DownloadSize>6547777</DownloadSize>
-		<MinimumJavaVersion>1.8</MinimumJavaVersion>
+		<MinimumJavaVersion>1.8</MinimumJavaVersion>^
+		<ShowNotice lang="de">Nach dem Update auf 2.4.0 ist ein Neustart des Rechners erforderlich. Ein Neustart von efa selbst reicht nicht aus.</ShowNotice>
+        <ShowNotice lang="en">After updating to 2.4.0, you must restart your computer. Restarting efa itself is not sufficient.</ShowNotice>
         <Changes lang="de">
 			<ChangeItem>Neu: EfaFlatLight LookAndFeel bietet eine klare, modernere Darstellung. In weiten Bereichen konfigurierbar.</ChangeItem>
 			<ChangeItem>Neu: EfaFlatLight Standard-Look nach Update oder Installation. Bei Update ist ein Neustart des Rechners erforderlich, damit efaFlatLight aktiv wird.</ChangeItem>

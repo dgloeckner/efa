@@ -21,6 +21,7 @@ import de.nmichael.efa.data.storage.*;
 import de.nmichael.efa.data.types.*;
 import de.nmichael.efa.gui.BaseDialog;
 import de.nmichael.efa.gui.BaseTabbedDialog;
+import de.nmichael.efa.gui.EfaGuiUtils;
 import de.nmichael.efa.gui.EnterPasswordDialog;
 import de.nmichael.efa.gui.SimpleInputDialog;
 import de.nmichael.efa.gui.util.TableItem;
@@ -2876,7 +2877,7 @@ public class StatisticsRecord extends DataRecord implements IItemListener {
                 International.onlyFor("Alle Zielbereiche ausgeben", "de")));
 
         // CAT_OUTPUT
-        v.add(item = addHint("HINT_"+StatisticsRecord.OUTPUTFILE, IItemType.TYPE_PUBLIC, CAT_OUTPUT, "<html>"+International.getStringWithMnemonic("STATISTICS_RELATIVE_PATHS_HINT")+"</html>", 3, 0, 10));
+        v.add(item = EfaGuiUtils.createHint("HINT_"+StatisticsRecord.OUTPUTFILE, IItemType.TYPE_PUBLIC, CAT_OUTPUT, "<html>"+International.getStringWithMnemonic("STATISTICS_RELATIVE_PATHS_HINT")+"</html>", 3, 0, 10));
         this.itemOutputFileHINT = (ItemTypeLabel) item;
         v.add(item = new ItemTypeStringList(StatisticsRecord.OUTPUTTYPE, getOutputType(),
                 getOutputTypes(ARRAY_STRINGLIST_VALUES), getOutputTypes(ARRAY_STRINGLIST_DISPLAY),

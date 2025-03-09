@@ -245,7 +245,10 @@ public class EfaBoathouseBackgroundTask extends Thread {
             Logger.log(Logger.DEBUG, Logger.MSG_DEBUG_EFABACKGROUNDTASK,
                     "EfaBoathouseBackgroundTask: sleepForAWhile()");
         }
-        if (!isProjectOpen) {
+        // Don't run Backround operations in Admin mode, or if no project is open. 
+        // SleepForAWhile DOES make some checks like getting Boatstatuses and Boatreservations, 
+        // and this is not good when creating new projects, in special efaCloud projects.
+        if (!isProjectOpen || Daten.isAdminMode()) {
             // sleep 60 seconds
             if (Logger.isTraceOn(Logger.TT_BACKGROUND, 9)) {
                 Logger.log(Logger.DEBUG, Logger.MSG_DEBUG_EFABACKGROUNDTASK,

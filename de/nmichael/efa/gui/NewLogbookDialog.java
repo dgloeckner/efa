@@ -35,12 +35,17 @@ import java.util.GregorianCalendar;
 public class NewLogbookDialog extends StepwiseDialog {
 
     private static final String LOGBOOKNAME        = "LOGBOOKNAME";
+    private static final String LOGBOOKNAMEHINT    = "LOGBOOKNAMEHINT";    
     private static final String LOGBOOKDESCRIPTION = "LOGBOOKDESCRIPTION";
     private static final String DATEFROM           = "DATEFROM";
     private static final String DATETO             = "DATETO";
     private static final String AUTOMATICLOGSWITCH = "AUTOMATICLOGSWITCH";
     private static final String LOGSWITCHBOATHOUSE = "LOGSWITCHBOATHOUSE";
 
+    private static final String CATEGORY_STEP_0    = "0";
+    private static final String CATEGORY_STEP_1    = "1";
+    private static final String CATEGORY_STEP_2    = "2";
+    
     private String newLogbookName;
 
     public NewLogbookDialog(JDialog parent) {
@@ -90,24 +95,34 @@ public class NewLogbookDialog extends StepwiseDialog {
         String year = Integer.toString( cal.get(Calendar.MONTH)+1 <= 10 ?
             cal.get(Calendar.YEAR) : cal.get(Calendar.YEAR) + 1); // current year until October, year+1 else
 
-        item = new ItemTypeString(LOGBOOKNAME, year, IItemType.TYPE_PUBLIC, "0", International.getString("Name des Fahrtenbuchs"));
+        if (Daten.project.getNumberOfBoathouses()>1 || Daten.project.getIsProjectStorageTypeEfaCloud()) {
+            items.add(EfaGuiUtils.createHintWordWrap(LOGBOOKNAMEHINT, IItemType.TYPE_PUBLIC, CATEGORY_STEP_0,
+            		International.getString("Bei Nutzung von efaCloud oder mehreren Fahrtenbüchern MUSS der Fahrtenbuchname dem Aufbau JJJJ_Freitext entsprechen, z.B. 2025_Bootshausname")
+            		,2,10,10,500));
+        } else {
+            items.add(EfaGuiUtils.createHintWordWrap(LOGBOOKNAMEHINT, IItemType.TYPE_PUBLIC, CATEGORY_STEP_0, 
+            		International.getString("Der Fahrtenbuchname sollte dem Aufbau JJJJ_Freitext entsprechen z.B. 2025_Bootshausname")
+            		,2,10,10,500));
+        }        
+        
+        item = new ItemTypeString(LOGBOOKNAME, year, IItemType.TYPE_PUBLIC, CATEGORY_STEP_0, International.getString("Name des Fahrtenbuchs"));
         ((ItemTypeString)item).setAllowedCharacters("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_");
         ((ItemTypeString)item).setReplacementCharacter('_');
         ((ItemTypeString)item).setNotNull(true);
         items.add(item);
-        item = new ItemTypeString(LOGBOOKDESCRIPTION, "", IItemType.TYPE_PUBLIC, "0", International.getString("Beschreibung"));
+        item = new ItemTypeString(LOGBOOKDESCRIPTION, "", IItemType.TYPE_PUBLIC, CATEGORY_STEP_0, International.getString("Beschreibung"));
         items.add(item);
 
         // Items for Step 1
-        item = new ItemTypeDate(DATEFROM, new DataTypeDate(1, 1, EfaUtil.string2int(year, 2010)), IItemType.TYPE_PUBLIC, "1", International.getString("Beginn des Zeitraums"));
+        item = new ItemTypeDate(DATEFROM, new DataTypeDate(1, 1, EfaUtil.string2int(year, 2010)), IItemType.TYPE_PUBLIC, CATEGORY_STEP_1, International.getString("Beginn des Zeitraums"));
         ((ItemTypeDate)item).setNotNull(true);
         items.add(item);
-        item = new ItemTypeDate(DATETO, new DataTypeDate(31, 12, EfaUtil.string2int(year, 2010)), IItemType.TYPE_PUBLIC, "1", International.getString("Ende des Zeitraums"));
+        item = new ItemTypeDate(DATETO, new DataTypeDate(31, 12, EfaUtil.string2int(year, 2010)), IItemType.TYPE_PUBLIC, CATEGORY_STEP_1, International.getString("Ende des Zeitraums"));
         ((ItemTypeDate)item).setNotNull(true);
         items.add(item);
 
         // Items for Step 2
-        item = new ItemTypeBoolean(AUTOMATICLOGSWITCH, false, IItemType.TYPE_PUBLIC, "2",
+        item = new ItemTypeBoolean(AUTOMATICLOGSWITCH, false, IItemType.TYPE_PUBLIC, CATEGORY_STEP_2,
                 International.getMessage("Fahrtenbuchwechsel automatisch zum {datum}", "?"));
         items.add(item);
         if (Daten.project.getNumberOfBoathouses() > 1) {
@@ -119,7 +134,7 @@ public class NewLogbookDialog extends StepwiseDialog {
             item = new ItemTypeStringList(LOGSWITCHBOATHOUSE,
                     Integer.toString(Daten.project.getMyBoathouseId()),
                     values, descr,
-                    IItemType.TYPE_PUBLIC, "2",
+                    IItemType.TYPE_PUBLIC, CATEGORY_STEP_2,
                     International.getString("Bootshaus"));
             items.add(item);
         }

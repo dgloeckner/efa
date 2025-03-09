@@ -5,19 +5,55 @@
         <ReleaseDate>TODO</ReleaseDate>
         <DownloadUrl>TODO</DownloadUrl>
         <DownloadSize>TODO</DownloadSize>
+		<MinimumJavaVersion>1.8</MinimumJavaVersion>
+		<MinimumEfaCloudVersion>2.3.3</MinimumEfaCloudVersion>
+        <ShowNotice lang="de">Wenn efaCloud eingesetzt wird, muss der Server mindestens Version 2.3.3 unterstützen.</ShowNotice>
+        <ShowNotice lang="en">If you use efaCloud, make sure your server at least supports efaCloud Version 2.3.3.</ShowNotice>
         <Changes lang="de">
-       	 	<ChangeItem>Neu: efaCloud: Bei Einsatz von efaCloud: Auf dem Server muss MINDESTENS VERSION 2.3.3 oder höher installiert sein.</ChangeItem>
 			<ChangeItem>Neu: Mehrere Bootshäuser: Wenn man im Verein mehr als ein Bootshaus konfiguriert hat, werden bei 'Boote auf Fahrt' nur noch die Boote angezeigt, die eine Fahrt im Fahrtenbuch zum Bootshaus haben. Siehe auch Dokumentation: http://efa.nmichael.de/dokuwiki/doku.php?id=config_mehrere_bootshaeuser</ChangeItem>
+			<ChangeItem>Neu: Mehrere Bootshäuser: Werden in einem Projekt mehrere Bootshäuser verwaltet, zeigt die Bootsliste in einer zusätzlichen Spalte an, welches Boot exklusiv in welchem Bootshaus angezeigt werden soll.</ChangeItem>
 			<ChangeItem>Neu: Konfiguration von Bootstypen: Wenn 'Kanufahren in Deutschland' aktiviert ist, wird ein Hinweis mit Verweis auf die Kanu-EFB-Synchronisation mit den dort konfigurierten Bootstypen angezeigt.</ChangeItem>
+			<ChangeItem>Neu: Dialog für Auswahl von Projekt/Fahrtenbuch/Vereinsarbeit zeigt Informationen zum aktuell geladenen Projekt etc. an.</ChangeItem>
+			<ChangeItem>Neu: Dialog für Auswahl von Projekt zeigt Projekttyp (Lokal, efaCloud, efaRemote) und die Namen der Bootshäuser an.</ChangeItem>
+			<ChangeItem>Neu: Dialog für Auswahl von Projekt zeigt das aktuell geöffnete Projekt/Fahrtenbuch/Vereinsarbeit mit grüner Hinterlegung, und es ist beim Öffnen des Dialogs standardmäßig ausgewählt.</ChangeItem>
 			<ChangeItem>Neu: Im 'Über efa2' Dialog wird die Versionshistorie angezeigt.</ChangeItem>
+       	 	<ChangeItem>Neu: efaCloud: Bei Einsatz von efaCloud: Auf dem Server muss MINDESTENS VERSION 2.3.3 oder höher installiert sein.</ChangeItem>
+			<ChangeItem>Neu: efaCloud: Erstellung von Projekten: Ergänzende Hinweise; Option zum Verhindern der Anlage von Status und Gewässern.</ChangeItem>
+			<ChangeItem>Neu: efaCloud: Bei Aktualisierung von Gewässern nach Update: Hinweis darauf, dass das Gewässerupdate nur bei einer Instanz im efaCloud-System erfolgen sollte.</ChangeItem>
+			<ChangeItem>Neu: efaCloud: Bei Aktualisierung von Gewässern (manueller Aufruf): Hinweis darauf, dass das Gewässerupdate nur bei einer Instanz im efaCloud-System erfolgen sollte.</ChangeItem>
+			<ChangeItem>Neu: efaCloud: Bei Anlage neuer Fahrtenbücher werden Hinweise zur Benennung der Fahrtenbücher gegeben.</ChangeItem>
+			<ChangeItem>New: efaCloud: Wenn das aktuelle Projekt ein efaCloud Projekt ist, wird ein Hinweis angezeigt.</ChangeItem>
+			<ChangeItem>BugFix: efaBase schließt sich nicht mehr bei Betätigung von ESC im Hauptfenster.</ChangeItem>
+			<ChangeItem>BugFix: Admin Modus: Boote bearbeiten: Register 'Bootsreservierungen' und 'Bootsschäden' wachsen mit der Größe des Dialogs.</ChangeItem>
+			<ChangeItem>BugFix: Admin Modus: Projekt/Fahrtenbuch/Vereinsarbeit/Plugin Liste: Listen wachsen mit der Dialoggröße.</ChangeItem>
+			<ChangeItem>BugFix: EfaBackgroundtask führt keine Aktionen mehr durch, wenn Admin-Modus aktiv ist. Dadurch weniger Probleme bei Neuanlage von Projekten, wenn bereits ein Projekt offen ist.</ChangeItem>
+			<ChangeItem>BugFix: efaCloud: Bei Anlage neuer efaCloud-Projekte muss der Admin explizit angeben, dass neue Status + Gewässer angelegt werden sollen.</ChangeItem>
+			<ChangeItem>BugFix: efaCloud: Logrotate für efacloud.log und synchErrors.log korrigiert. Logrotate bei einer Dateigröße von 5 MB.</ChangeItem>
+			<ChangeItem>BugFix: efaCloud: Bei der Projekt-Neuanlage werden nicht mehr automatisch Gewässer angelegt (da dies bei Integration in eine bestehende efaCloud-Instanz zu Problemen führen kann).</ChangeItem>
 			<ChangeItem>BugFix: efaCloud: Für efaCloud wurde die Synchronisation der Daten zwischen Bootshaus und Server optimiert. Die Verwendung des eindeutigen Datensatzschlüssels des Servers in efa löst Konflikte, die etwa bei temporärem Internetausfall oder Parallelität von Fahrteinträgen in zwei angebundenen Bootshäusern auftreten.</ChangeItem>
 			<ChangeItem>BugFix: efaCloud: Nullpointer-Fehlermeldung behoben, wenn efaCloud den Status im Fenstertitel aktualisiert.</ChangeItem>
 			<ChangeItem>BugFix: efaCloud: Direkt nach dem Start wartet EFA 15 Sekunden statt 5 Sekunden, bis der erste Upload in efaCloud gestartet wird.</ChangeItem>
 		</Changes>
         <Changes lang="en">
-       	 	<ChangeItem>New: efaCloud: When using efaCloud, the server MUST HAVE INSTALLED AT LEAST efaCloud 2.3.3 or newer.</ChangeItem>
+       	 	<ChangeItem>New: Multiple Boathouses: If you have configured more than one boathouse in the club, the Boat list in admin modes provides an additional colum which shows for which boathouse a boat is shown exclusively.</ChangeItem>
        	 	<ChangeItem>New: Multiple Boathouses: If you have configured more than one boathouse in the club, only the boats that have a trip to the boathouse in the logbook are displayed under 'Boats on the water'. See also documentation: http://efa.nmichael.de/dokuwiki/doku.php?id=config_mehrere_bootshaeuser</ChangeItem>
+			<ChangeItem>New: Dialog for choosing Project/Logbook/Clubwork shows info about the currently loaded Project, Logbook, Clubwork.</ChangeItem>
+			<ChangeItem>New: Dialog for choosing the Project shows project type (local, efaCloud, efaRemote) and the names of the Boathouses in multi-Boathouse configurations.</ChangeItem>			
+			<ChangeItem>New: Dialog for choosing the Project/Logbook/Clubwork highlights and autoselects the currently loaded item.</ChangeItem>
 			<ChangeItem>New: Efa2's version history is shown in efa 'About' dialog.</ChangeItem>
+       	 	<ChangeItem>New: efaCloud: When using efaCloud, the server MUST HAVE INSTALLED AT LEAST efaCloud 2.3.3 or newer.</ChangeItem>
+			<ChangeItem>New: efaCloud: Creating new Projects: Added hints and an option to avoid creation of Statuses and Waters.</ChangeItem>
+			<ChangeItem>New: efaCloud: Update of Waters after an update: Added hint to inform that waters update should only be done on a single efa client of efaCloud system.</ChangeItem>
+			<ChangeItem>New: efaCloud: Update of Waters (manually): Added hint to inform that waters update should only be done on a single efa client of efaCloud system.</ChangeItem>
+			<ChangeItem>New: efaCloud: When creating new logbooks, a hint is shown stating how the logbooks name should look like.</ChangeItem>
+			<ChangeItem>New: efaCloud: When the current Project uses efaCloud, the Admin list dialog now shows an hint.</ChangeItem>
+       	 	<ChangeItem>BugFix: efaBase does not close anymore when hitting ESC key in the main window.</ChangeItem>
+			<ChangeItem>BugFix: Admin mode: Edit boats: Tabs 'Boat reservations' and 'Boat damages' grow their size according to the dialog size.</ChangeItem>
+			<ChangeItem>BugFix: Admin mode: Project/Logbook/Clubwork/Plugin list: List grow according to the dialog size.</ChangeItem>
+			<ChangeItem>BugFix: EfaBackgroundtask no longer runs actions when Admin mode is active. Less problems when creating new projects when a project is currently open.</ChangeItem>
+			<ChangeItem>BugFix: efaCloud: When creating new efaCloud projects in efa, the admin now needs to manually enable the creation of Statuses and Waters.</ChangeItem>
+			<ChangeItem>BugFix: efaCloud: Logrotate works now for efacloud.log und synchErrors.log. Logrotate if filesize &gt; 5 MB.</ChangeItem>
+			<ChangeItem>BugFix: efaCloud: When creating a new efaCloud project, the option to automatically create a waters list has been removed (as it may lead to duplicate waters if the new project is used to add a new efa instance to an existing efaCloud server).</ChangeItem>
        	 	<ChangeItem>BugFix: efaCloud: For efaCloud, the synchronization of data between the boathouse and the server has been optimized. The use of the server's unique data record key in efa resolves conflicts that arise, for example, in the event of a temporary Internet outage or parallel trip entries in two connected boathouses.</ChangeItem>
 			<ChangeItem>BugFix: efaCloud: Fixed nullpointer exception when efaCloud updated its status the window title.</ChangeItem>
 			<ChangeItem>BugFix: efaCloud: After startup efa waits 15 seconds instead of 5 before the first attempt to upload data starts.</ChangeItem>

@@ -13,6 +13,8 @@ package de.nmichael.efa.gui;
 import de.nmichael.efa.util.*;
 import de.nmichael.efa.util.Dialog;
 import de.nmichael.efa.core.items.*;
+import de.nmichael.efa.gui.util.RoundedBorder;
+
 import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -20,7 +22,8 @@ import javax.swing.*;
 
 public abstract class StepwiseDialog extends BaseDialog {
 
-    JPanel stepPanel;
+	private static final long serialVersionUID = 7125589712864431436L;
+	JPanel stepPanel;
     JPanel controlPanel;
     JPanel descriptionPanel;
     JPanel inputPanelWrapper;
@@ -53,6 +56,7 @@ public abstract class StepwiseDialog extends BaseDialog {
         stepPanel.setBorder(new javax.swing.border.EmptyBorder(20,20,20,20));
         JLabel stepHeaderLabel = new JLabel();
         stepHeaderLabel.setText(International.getString("Schritte")+":");
+        stepHeaderLabel.setFont(stepHeaderLabel.getFont().deriveFont(Font.BOLD));
         stepPanel.add(stepHeaderLabel,  new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0
             ,GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 10, 0), 0, 0));
         steps = getSteps();
@@ -130,7 +134,9 @@ public abstract class StepwiseDialog extends BaseDialog {
         descriptionPanel.setBorder(new javax.swing.border.EmptyBorder(20,20,20,20));
         JLabel descriptionLabel = new JLabel();
         descriptionLabel.setText(International.getString("Beschreibung")+":");
+        descriptionLabel.setFont(descriptionLabel.getFont().deriveFont(Font.BOLD));
         descriptionPanel.add(descriptionLabel, BorderLayout.NORTH);
+
         JScrollPane descriptionScrollPane = new JScrollPane();
         descriptionScrollPane.setPreferredSize(new Dimension(200,80));
         descriptionScrollPane.setMinimumSize(new Dimension(200,80));
@@ -147,7 +153,7 @@ public abstract class StepwiseDialog extends BaseDialog {
         inputPanelWrapper.setBorder(new javax.swing.border.EmptyBorder(20,20,20,20));
         inputPanelWrapper.setMinimumSize(new Dimension(600,300));
         inputScrollPane = new JScrollPane();
-        inputScrollPane.setPreferredSize(new Dimension(600,300));
+        inputScrollPane.setPreferredSize(new Dimension(660,300));
         inputPanelWrapper.add(inputScrollPane, BorderLayout.CENTER);
 
         // Add Panels to basePanel and mainPanel
@@ -167,6 +173,7 @@ public abstract class StepwiseDialog extends BaseDialog {
         finishButton.setEnabled(steps != null && step+1 == steps.length);
         for (int i=0; i<stepsLabel.length; i++) {
             stepsLabel[i].setForeground( (i == step ? Color.blue : Color.black) );
+            stepsLabel[i].setFont( (i == step ? mainPanel.getFont().deriveFont(Font.BOLD): mainPanel.getFont()) );
         }
 
         descriptionText.setText(getDescription(step));
@@ -181,6 +188,7 @@ public abstract class StepwiseDialog extends BaseDialog {
         titleLabel.setText(steps[step]);
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         titleLabel.setForeground(Color.blue);
+        titleLabel.setFont(titleLabel.getFont().deriveFont(Font.BOLD));
         inputPanel.add(titleLabel,  new GridBagConstraints(0, 0, 10, 1, 0.0, 0.0
             ,GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 20, 0), 0, 0));
 
@@ -197,9 +205,11 @@ public abstract class StepwiseDialog extends BaseDialog {
                     itemToBeFocused = item;
                 }
             }
-            inputPanel.setBorder(new javax.swing.border.LineBorder(Color.black));
+            RoundedBorder myBorder=new RoundedBorder(inputPanel.getBackground().darker());
+            inputPanel.setBorder(myBorder); // new javax.swing.border.LineBorder(Color.black)
             // inputPanelWrapper.add(inputPanel, BorderLayout.CENTER);
             inputScrollPane.getViewport().add(inputPanel, null);
+            inputScrollPane.setBorder(BorderFactory.createEmptyBorder());
         }
         this.validate();
         if (itemToBeFocused != null) {

@@ -162,10 +162,18 @@ public class AdminTask extends Thread {
         if (Daten.project != null && Daten.project.isOpen()
                 && Waters.getResourceTemplate(International.getLanguageID()) != null
                 && Waters.hasWaterTemplateChanged(International.getLanguageID())) {
-            if (Dialog.yesNoDialog(International.getString("Gewässerkatalog aktualisiert"),
-                    International.getMessage("Der vom {author} erstellte Gewässerkatalog wurde überarbeitet.",
-                            Waters.getWaterTemplateAuthor(International.getLanguageID())) + "\n"
-                    + International.getString("Möchstest Du die Gewässerliste jetzt aktualisieren?")) == Dialog.YES) {
+        	
+        	String combinedMessage = International.getMessage("Der vom {author} erstellte Gewässerkatalog wurde überarbeitet.",
+                    Waters.getWaterTemplateAuthor(International.getLanguageID())) ;
+        			
+        	if (Daten.project.getIsProjectStorageTypeEfaCloud()) {
+        		combinedMessage += "\n\n" 
+        				+ International.getString("Bei einem EfaCloud-Projekt sollte diese Funktion nur auf einer einzigen Instanz durchgeführt werden. Die anderen Instanzen erhalten die Gewässer automatisch über die efaCloud-Synchronisation.");
+        	}
+        	
+        	combinedMessage += "\n\n" + International.getString("Möchstest Du die Gewässerliste jetzt aktualisieren?");
+        			
+            if (Dialog.yesNoDialog(International.getString("Gewässerkatalog aktualisiert"),combinedMessage) == Dialog.YES) {
                 int count = Daten.project.getWaters(false).addAllWatersFromTemplate(International.getLanguageID());
                 if (count > 0) {
                     Dialog.infoDialog(International.getMessage("{count} Gewässer aus Gewässerkatalog erfolgreich hinzugefügt oder aktualisiert.",

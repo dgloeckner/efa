@@ -10,10 +10,8 @@
 
 package de.nmichael.efa.gui.widgets;
 
-import de.nmichael.efa.core.config.EfaConfig;
 import de.nmichael.efa.core.items.*;
-import de.nmichael.efa.gui.ImagesAndIcons;
-import de.nmichael.efa.gui.util.RoundedBorder;
+import de.nmichael.efa.gui.EfaGuiUtils;
 import de.nmichael.efa.util.*;
 import java.util.*;
 import java.awt.*;
@@ -90,9 +88,7 @@ public abstract class Widget implements IWidget {
      * @param gridWidth How many GridBagLayout cells shall this header be placed in?
      */
     protected IItemType addHeader(String uniqueName, int type, String category, String caption, int gridWidth) {
-    	IItemType item = new ItemTypeLabelHeader(NOT_STORED_ITEM_PREFIX+uniqueName, type, category, " "+caption);
-        item.setPadding(0, 0, 10, 10);
-        item.setFieldGrid(3,GridBagConstraints.EAST, GridBagConstraints.BOTH);
+    	IItemType item = EfaGuiUtils.createHeader(uniqueName, type, category, caption, gridWidth);
         addParameterInternal(item);
         return item;
     }
@@ -110,21 +106,14 @@ public abstract class Widget implements IWidget {
      * @param gridWidth How many GridBagLayout cells shall this description be placed in?
      */      
     protected IItemType addDescription(String uniqueName, int type, String category, String caption, int gridWidth, int padBefore, int padAfter) {
-    	IItemType item = new ItemTypeLabel(NOT_STORED_ITEM_PREFIX+uniqueName, type, category, caption);
-        item.setPadding(0, 0, padBefore, padAfter);
-        item.setFieldGrid(3,GridBagConstraints.EAST, GridBagConstraints.BOTH);
+    	IItemType item = EfaGuiUtils.createDescription(uniqueName, type, category, caption, gridWidth, padBefore, padAfter);
         addParameterInternal(item);
         return item;
     }
     
     protected IItemType addHint(String uniqueName, int type, String category, String caption, int gridWidth, int padBefore, int padAfter) {
-    	ItemTypeLabel item = (ItemTypeLabel) addDescription(uniqueName, type, category, " "+caption, gridWidth, padBefore,padAfter);
-		item.setImage(ImagesAndIcons.getIcon(ImagesAndIcons.IMAGE_INFO));
-		item.setImagePosition(SwingConstants.TRAILING); // info icon should be first, the text trailing.
-		item.setBackgroundColor(EfaConfig.hintBackgroundColor);
-		item.setBorder(new RoundedBorder(EfaConfig.hintBorderColor));
-		item.setHorizontalAlignment(SwingConstants.LEFT);
-		item.setRoundShape(true);
+    	IItemType item = EfaGuiUtils.createHint(uniqueName, type, category, caption, gridWidth, padBefore, padAfter);
+        addParameterInternal(item);
 		return item;
     }
     

@@ -10,24 +10,50 @@
 
 package de.nmichael.efa.gui;
 
-import de.nmichael.efa.*;
+import java.awt.AWTEvent;
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Arrays;
+import java.util.Hashtable;
+
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.border.Border;
+
+import de.nmichael.efa.Daten;
 import de.nmichael.efa.core.config.AdminRecord;
-import de.nmichael.efa.util.*;
-import de.nmichael.efa.data.*;
-import de.nmichael.efa.data.storage.*;
+import de.nmichael.efa.core.items.IItemListener;
+import de.nmichael.efa.core.items.IItemType;
+import de.nmichael.efa.core.items.ItemTypeHtmlList;
+import de.nmichael.efa.data.Clubwork;
+import de.nmichael.efa.data.Logbook;
+import de.nmichael.efa.data.Project;
+import de.nmichael.efa.data.ProjectRecord;
+import de.nmichael.efa.data.storage.IDataAccess;
+import de.nmichael.efa.gui.dataedit.ProjectEditDialog;
+import de.nmichael.efa.gui.util.EfaMouseListener;
+import de.nmichael.efa.gui.util.RoundedBorder;
+import de.nmichael.efa.gui.util.RoundedPanel;
 import de.nmichael.efa.util.Dialog;
-import de.nmichael.efa.core.items.*;
-import de.nmichael.efa.gui.dataedit.*;
-import de.nmichael.efa.gui.util.*;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import java.util.*;
+import de.nmichael.efa.util.EfaSortStringComparator;
+import de.nmichael.efa.util.EfaUtil;
+import de.nmichael.efa.util.International;
+import de.nmichael.efa.util.Logger;
+import de.nmichael.efa.util.Mnemonics;
 
 // @i18n complete
 public class OpenProjectOrLogbookDialog extends BaseDialog implements IItemListener {
 
-    public enum Type {
+	private static final long serialVersionUID = 8095338806279770826L;
+
+	public enum Type {
         project,
         logbook,
         clubwork
@@ -38,6 +64,10 @@ public class OpenProjectOrLogbookDialog extends BaseDialog implements IItemListe
     private AdminRecord admin;
     private String[] keys;
     private ItemTypeHtmlList list;
+    
+    private JLabel projectName;
+    private JLabel logbookName;
+    private JLabel clubworkName;
 
     public OpenProjectOrLogbookDialog(Frame parent, Type type, AdminRecord admin) {
         super(parent,
@@ -68,17 +98,23 @@ public class OpenProjectOrLogbookDialog extends BaseDialog implements IItemListe
         // create GUI items
         mainPanel.setLayout(new GridBagLayout());
 
+        iniNorthPanel();
+        
         JLabel label = new JLabel();
+        label.setFont(label.getFont().deriveFont(Font.BOLD));;
         if (type == Type.project) {
             label.setText(International.getString("vorhandene Projekte"));
         }
         if (type == Type.logbook) {
             label.setText(International.getString("vorhandene Fahrtenbücher"));
+            clubworkName.setVisible(false);
         }
         if (type == Type.clubwork) {
             label.setText(International.getString("vorhandene Vereinsarbeitsbücher"));
+            logbookName.setVisible(false);
         }
-        mainPanel.add(label, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+        int y=1;
+        mainPanel.add(label, new GridBagConstraints(0, y++, 1, 1, 1.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(10, 10, 0, 0), 0, 0));
 
         list = new ItemTypeHtmlList("LIST", null, null, null, IItemType.TYPE_PUBLIC, null, label.getText());
@@ -89,9 +125,10 @@ public class OpenProjectOrLogbookDialog extends BaseDialog implements IItemListe
         };
         list.setPopupActions(actions);
         list.registerItemListener(this);
-        list.setFieldGrid(1, 5, GridBagConstraints.CENTER, GridBagConstraints.NONE);
+        list.setFieldGrid(1, 5, GridBagConstraints.CENTER, GridBagConstraints.BOTH);
+        list.setFieldSize(660, 400);
         list.setPadding(10, 10, 0, 10);
-        list.displayOnGui(_parent, mainPanel, 0, 1);
+        list.displayOnGui(_parent, mainPanel, 0, y++,1.0,1.0);
 
         JButton newButton = new JButton();
         Mnemonics.setButton(this, newButton, International.getString("Neu"),
@@ -101,7 +138,7 @@ public class OpenProjectOrLogbookDialog extends BaseDialog implements IItemListe
                 newButton_actionPerformed(e);
             }
         });
-        mainPanel.add(newButton, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
+        mainPanel.add(newButton, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0,
                 GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 5, 5, 10), 0, 0));
         JButton openButton = new JButton();
         Mnemonics.setButton(this, openButton, International.getString("Öffnen"),
@@ -111,7 +148,7 @@ public class OpenProjectOrLogbookDialog extends BaseDialog implements IItemListe
                 openButton_actionPerformed(e);
             }
         });
-        mainPanel.add(openButton, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0,
+        mainPanel.add(openButton, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0,
                 GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 5, 5, 10), 0, 0));
 
         JButton configureButton = new JButton();
@@ -122,7 +159,7 @@ public class OpenProjectOrLogbookDialog extends BaseDialog implements IItemListe
                 configureButton_actionPerformed(e);
             }
         });
-        mainPanel.add(configureButton, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0,
+        mainPanel.add(configureButton, new GridBagConstraints(1, 4, 1, 1, 0.0, 0.0,
                 GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 5, 5, 10), 0, 0));
 
         JButton deleteButton = new JButton();
@@ -133,7 +170,7 @@ public class OpenProjectOrLogbookDialog extends BaseDialog implements IItemListe
                 deleteButton_actionPerformed(e);
             }
         });
-        mainPanel.add(deleteButton, new GridBagConstraints(1, 4, 1, 1, 0.0, 0.0,
+        mainPanel.add(deleteButton, new GridBagConstraints(1, 5, 1, 1, 0.0, 0.0,
                 GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 5, 5, 10), 0, 0));
 
         updateGui();
@@ -141,21 +178,116 @@ public class OpenProjectOrLogbookDialog extends BaseDialog implements IItemListe
 
     public void updateGui() {
         Hashtable<String,String> items = null;
-
+        String currentItem=null;
         if (type == Type.project) {
             items = Project.getProjects();
+             if (Daten.project != null) {
+             	currentItem=Daten.project.getName();
+             }
         }
         if (type == Type.logbook && Daten.project != null) {
             items = Daten.project.getLogbooks();
+            if (Daten.project.getCurrentLogbook()!=null){
+            	currentItem=Daten.project.getCurrentLogbook().getName();
+            }
         }
         if(type == Type.clubwork && Daten.project != null) {
             items = Daten.project.getClubworks();
+            if (Daten.project.getCurrentClubwork()!=null){
+            	currentItem=Daten.project.getCurrentClubwork().getName();
+            }
         }
 
         keys = items.keySet().toArray(new String[0]);
-        Arrays.sort(keys);
+        Arrays.sort(keys,new EfaSortStringComparator());
 
         list.setValues(keys, items);
+        
+        //select open project, logbook or clubwork
+        if (Daten.project != null && currentItem != null) {
+        	try {
+        		list.parseAndShowValue(currentItem);
+        	} catch (Exception e) {
+        		Logger.logdebug(e);
+        	}
+        }
+    }
+    
+    public void updateInfos() {
+        projectName.setText(International.getString("Projekt") + ": "
+                + (Daten.project != null ? Daten.project.getProjectName() : "- " + International.getString("Kein Projekt geöffnet.") + " -"));
+        
+        if (Daten.project != null) {
+	        logbookName.setText(International.getString("Fahrtenbuch") + ": "
+	                + (Daten.project.getCurrentLogbook() != null && Daten.project.getCurrentLogbook().isOpen()
+	                ? Daten.project.getCurrentLogbook().getName() : "- " + International.getString("Kein Fahrtenbuch geöffnet.") + " -"));
+
+	        clubworkName.setText(International.getString("Vereinsarbeitsbuch") + ": "
+	                + (Daten.project.getCurrentClubwork() != null && Daten.project.getCurrentClubwork().isOpen()
+	                ? Daten.project.getCurrentClubwork().getName() : "- " + International.getString("Kein Vereinsarbeitsbuch geöffnet.") + " -"));
+
+        }
+        
+        try {
+        	if (Daten.project != null) {
+        		//only update further information if we have an open project.
+        		//use a second line when an automatic logbook or clubwork change is set up.        	
+	            ProjectRecord r = Daten.project.getBoathouseRecord();
+	            if (r.getAutoNewLogbookName() != null && r.getAutoNewLogbookName().length() > 0
+	                    && r.getAutoNewLogbookDate() != null && r.getAutoNewLogbookDate().isSet()) {
+	                logbookName.setText("<html><body><center>"+ EfaUtil.escapeHtml(logbookName.getText()) + "<br>"+EfaUtil.escapeHtml("["
+	                        + International.getMessage("ab {timestamp}", r.getAutoNewLogbookDate().toString()) + ": "
+	                        + r.getAutoNewLogbookName() + "]")+"</center></body></html>");
+	            }
+	            
+	            if (r.getAutoNewClubworkName() != null && r.getAutoNewClubworkName().length() > 0
+	                    && r.getAutoNewClubworkDate() != null && r.getAutoNewClubworkDate().isSet()) {
+	                clubworkName.setText("<html><body><center>"+ EfaUtil.escapeHtml(clubworkName.getText()) + "<br>"+EfaUtil.escapeHtml("["
+	                        + International.getMessage("ab {timestamp}", r.getAutoNewClubworkDate().toString()) + ": "
+	                        + r.getAutoNewClubworkName() + "]")+"</center></body></html>");
+	            }
+        	}
+        } catch (Exception eignore) {
+            Logger.logdebug(eignore);
+        }
+    }    
+    
+    private void iniNorthPanel() {
+        JPanel northPanel = new RoundedPanel();
+        northPanel.setBackground(Daten.efaConfig.getHeaderBackgroundColor());
+        northPanel.setForeground(Daten.efaConfig.getHeaderForegroundColor());
+        Border border = new RoundedBorder(northPanel.getForeground());
+        northPanel.setBorder(border);
+        northPanel.setLayout(new GridBagLayout());
+
+        projectName = new JLabel();
+        northPanel.add(projectName,
+                new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+                        GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL,
+                        new Insets(4, 10, 4, 10), 0, 0));
+        projectName.setFont(projectName.getFont().deriveFont(Font.BOLD));
+        logbookName = new JLabel();
+        northPanel.add(logbookName,
+                new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+                        GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL,
+                        new Insets(4, 10, 4, 10), 0, 0));
+        logbookName.setFont(logbookName.getFont().deriveFont(Font.BOLD));
+
+        clubworkName = new JLabel();
+        northPanel.add(clubworkName,
+                new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+                        GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL,
+                        new Insets(4, 10, 4, 10), 0, 0));
+        clubworkName.setFont(clubworkName.getFont().deriveFont(Font.BOLD));
+
+        projectName.setForeground(northPanel.getForeground());
+        logbookName.setForeground(northPanel.getForeground());
+        clubworkName.setForeground(northPanel.getForeground());
+        
+        
+        updateInfos();
+        mainPanel.add(northPanel, new GridBagConstraints(0, 0, 2, 1, 0.0, 0.0,
+                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(10, 10, 0, 10), 0, 0));
     }
 
     public void itemListenerAction(IItemType item, AWTEvent event) {

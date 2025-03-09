@@ -20,6 +20,7 @@
        	 	<ChangeItem>Neu: efaCloud: Bei Einsatz von efaCloud: Auf dem Server muss MINDESTENS VERSION 2.3.3 oder höher installiert sein.</ChangeItem>
 			<ChangeItem>Neu: efaCloud: Erstellung von Projekten: Ergänzende Hinweise; Option zum Verhindern der Anlage von Status und Gewässern.</ChangeItem>
 			<ChangeItem>Neu: efaCloud: Bei Aktualisierung von Gewässern nach Update: Hinweis darauf, dass das Gewässerupdate nur bei einer Instanz im efaCloud-System erfolgen sollte.</ChangeItem>
+			<ChangeItem>Neu: efaCloud: Bei Aktualisierung von Gewässern (manueller Aufruf): Hinweis darauf, dass das Gewässerupdate nur bei einer Instanz im efaCloud-System erfolgen sollte.</ChangeItem>
 			<ChangeItem>Neu: efaCloud: Bei Anlage neuer Fahrtenbücher werden Hinweise zur Benennung der Fahrtenbücher gegeben.</ChangeItem>
 			<ChangeItem>New: efaCloud: Wenn das aktuelle Projekt ein efaCloud Projekt ist, wird ein Hinweis angezeigt.</ChangeItem>
 			<ChangeItem>BugFix: efaBase schließt sich nicht mehr bei Betätigung von ESC im Hauptfenster.</ChangeItem>
@@ -43,6 +44,7 @@
        	 	<ChangeItem>New: efaCloud: When using efaCloud, the server MUST HAVE INSTALLED AT LEAST efaCloud 2.3.3 or newer.</ChangeItem>
 			<ChangeItem>New: efaCloud: Creating new Projects: Added hints and an option to avoid creation of Statuses and Waters.</ChangeItem>
 			<ChangeItem>New: efaCloud: Update of Waters after an update: Added hint to inform that waters update should only be done on a single efa client of efaCloud system.</ChangeItem>
+			<ChangeItem>New: efaCloud: Update of Waters (manually): Added hint to inform that waters update should only be done on a single efa client of efaCloud system.</ChangeItem>
 			<ChangeItem>New: efaCloud: When creating new logbooks, a hint is shown stating how the logbooks name should look like.</ChangeItem>
 			<ChangeItem>New: efaCloud: When the current Project uses efaCloud, the Admin list dialog now shows an hint.</ChangeItem>
        	 	<ChangeItem>BugFix: efaBase does not close anymore when hitting ESC key in the main window.</ChangeItem>

@@ -517,6 +517,9 @@ public class Project extends StorageObject {
                                 description.append("<i>"+p.getProjectDescription() + "</i><br>");
                             }
                             
+                            if (p.getProjectStorageType() == IDataAccess.TYPE_EFA_CLOUD) {
+                            	description.append("efaCloud-"+International.getString("Benutzername")+": "+p.getProjectStorageUsername() + "<br>");
+                            }
                             if (p.getProjectStorageType() == IDataAccess.TYPE_EFA_REMOTE) {
                                 description.append(International.getString("Remote-Projektname") + ": "+p.getProjectRemoteProjectName()+"<br>");
                             } else {

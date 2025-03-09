@@ -126,6 +126,7 @@ public class OpenProjectOrLogbookDialog extends BaseDialog implements IItemListe
         list.setPopupActions(actions);
         list.registerItemListener(this);
         list.setFieldGrid(1, 5, GridBagConstraints.CENTER, GridBagConstraints.BOTH);
+        list.setFieldSize(660, 400);
         list.setPadding(10, 10, 0, 10);
         list.displayOnGui(_parent, mainPanel, 0, y++,1.0,1.0);
 

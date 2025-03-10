@@ -4340,6 +4340,10 @@ public class EfaBaseFrame extends BaseDialog implements IItemListener {
             // startBringToFront(true); not needed any more
         }
     }
+    
+    public boolean cancel() {
+    	return cancel(false);
+    }
 
     public boolean cancel(Boolean keyESCAction) {
     	

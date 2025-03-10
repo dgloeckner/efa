@@ -1,6 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <efaOnlineUpdate>
 	<Version>
+        <VersionID>2.4.1#14</VersionID>
+        <ReleaseDate>10.03.2025</ReleaseDate>
+        <DownloadUrl>TODO</DownloadUrl>
+        <DownloadSize>TODO</DownloadSize>
+		<MinimumJavaVersion>1.8</MinimumJavaVersion>
+		<MinimumEfaCloudVersion>2.3.3</MinimumEfaCloudVersion>
+        <ShowNotice lang="de">Wenn efaCloud eingesetzt wird, muss der Server mindestens Version 2.3.3 unterstützen.</ShowNotice>
+        <ShowNotice lang="en">If you use efaCloud, make sure your server at least supports efaCloud Version 2.3.3.</ShowNotice>
+        <Changes lang="de">
+        	<ChangeItem>BugFix: efaBase ließ sich nicht vollständig über Datei-&gt;Beenden schließen.</ChangeItem>
+        </Changes>
+        <Changes lang="en">
+        	<ChangeItem>BugFix: efaBase could not be closed via File-&gt;Quit, some fragments kept running in backround.</ChangeItem>
+        </Changes>
+	</Version>
+	<Version>
         <VersionID>2.4.1#12</VersionID>
         <ReleaseDate>09.03.2025</ReleaseDate>
         <DownloadUrl>TODO</DownloadUrl>

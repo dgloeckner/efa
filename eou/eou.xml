@@ -11,9 +11,13 @@
         <ShowNotice lang="en">If you use efaCloud, make sure your server at least supports efaCloud Version 2.3.3.</ShowNotice>
         <Changes lang="de">
         	<ChangeItem>BugFix: efaBase ließ sich nicht vollständig über Datei-&gt;Beenden schließen.</ChangeItem>
+        	<ChangeItem>BugFix: LookAndFeel: im maximierten Modus von efa wird die Titelzeile in allen Looks gleich angezeigt - mit einem blauen Hintergrund.</ChangeItem>
+        	<ChangeItem>BugFix: efaCloud: efaCloud Logdateien sind wieder auf max. 200kb Größe limitiert.</ChangeItem>
         </Changes>
         <Changes lang="en">
         	<ChangeItem>BugFix: efaBase could not be closed via File-&gt;Quit, some fragments kept running in backround.</ChangeItem>
+        	<ChangeItem>BugFix: LookAndFeel: if efa is maximized, the window title bar will look the same in all LookAndFeels - with a blue background.</ChangeItem>
+        	<ChangeItem>BugFix: efaCloud: efaCloud log files are again limited to 200kb size max.</ChangeItem>
         </Changes>
 	</Version>
 	<Version>

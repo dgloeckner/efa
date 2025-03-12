@@ -39,7 +39,7 @@ class SynchControl {
     static final long synch_upload_look_back_ms = 15 * 24 * 3600000L; // period in past to check for upload
     static final long surely_newer_after_ms = 60000L; // one-minute time difference accepted for timestamps server <-> client
     
-    private static final int SYNCHERRORS_LOG_MAX_SIZE = 5000000; //5 MB
+    private static final int SYNCHERRORS_LOG_MAX_SIZE = 200000; //200 kb. 
     private static final String FILENAME_PREVIOUS_SUFFIX = ".previous.log";
 
     long lastSynchStartedMillis;

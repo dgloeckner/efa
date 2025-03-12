@@ -448,9 +448,11 @@ public class EfaBoathouseFrame extends BaseFrame implements IItemListener {
                 	//so we do this manual menu background color only if we don't have EFAFLATLAF
                 	menuBar.setBackground(bgColor);
                 	menuBar.setForeground(Color.white);
-                }
+                } 
                 JLabel efaLabel = new JLabel();
                 efaLabel.setIcon(getIcon(ImagesAndIcons.IMAGE_EFA_ICON_SMALL ));
+                efaLabel.setBackground(bgColor);
+                efaLabel.setOpaque(true);
                 titleLabel.setText(Daten.EFA_LONGNAME);
                 titleLabel.setForeground(Color.white);
                 titleLabel.setFont(titleLabel.getFont().deriveFont(Font.BOLD,12f));
@@ -458,9 +460,11 @@ public class EfaBoathouseFrame extends BaseFrame implements IItemListener {
                 titleLabel.setHorizontalTextPosition(SwingConstants.LEFT);
                 titleLabel.setIconTextGap(20);
                 titleLabel.setBackground(bgColor);
+                titleLabel.setOpaque(true);
                 closeButton = new JButton();
                 closeButton.setIcon(getIcon(ImagesAndIcons.IMAGE_FRAME_CLOSE ));
                 closeButton.setBackground(bgColor);
+                closeButton.setOpaque(true);
                 closeButton.setForeground(Color.white);
                 closeButton.setFont(closeButton.getFont().deriveFont(10f));
                 closeButton.setBorder(null);
@@ -472,7 +476,7 @@ public class EfaBoathouseFrame extends BaseFrame implements IItemListener {
                 menuBar.add(efaLabel, BorderLayout.WEST);
                 menuBar.add(titleLabel, BorderLayout.CENTER);
                 menuBar.add(closeButton, BorderLayout.EAST);
-                menuBar.setBorder(new EmptyBorder(2,5,2,5));
+                menuBar.setBorder(BorderFactory.createLineBorder(bgColor,2));
                 menuBar.validate();
                 this.setJMenuBar(menuBar);
                 if (!Daten.isEfaFlatLafActive()) {
@@ -545,7 +549,7 @@ public class EfaBoathouseFrame extends BaseFrame implements IItemListener {
         boatsAvailableList.requestFocus();
     }
 
-    private void iniGuiBoatLists() {
+	private void iniGuiBoatLists() {
         // Toggle between Boats and Persons
         Mnemonics.setButton(this, toggleAvailableBoatsToBoats, International.getStringWithMnemonic("Boote"));
         Mnemonics.setButton(this, toggleAvailableBoatsToPersons, International.getStringWithMnemonic("Personen"));

@@ -102,7 +102,7 @@ public class TxRequestQueue implements TaskManager.RequestDispatcherIF {
     private static final int DONE_QUEUE_MAX_TXS = 50;
     private static final int DROPPED_QUEUE_MAX_TXS = 50;
     
-    private static final int EFACLOUD_LOG_MAX_SIZE = 5000000; //5 MB
+    private static final int EFACLOUD_LOG_MAX_SIZE = 200000; //200 kb. 
     private static final String FILENAME_PREVIOUS_SUFFIX = ".previous.log";    
 
     // Transaction queue indices and names.

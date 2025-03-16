@@ -406,7 +406,16 @@ public class EmailSenderThread extends Thread {
                
                 Thread.sleep((1+(errorCount*10)) * 60 * 1000);
             } catch(Exception e) {
-                Logger.logdebug(e);
+                Logger.log(Logger.ERROR, International.getString("Exception im emailSenderThread aufgetreten. Aktivieren Sie den DebugModus, um mehr Informationen zu erhalten.")+" "+e.toString());
+            	Logger.logdebug(e);
+                // if an hard error occurs, sleep some time. 
+                // otherwise, efa.log file may grow very fast in a very short time.
+                try {
+					Thread.sleep((1+(errorCount*10)) * 60 * 1000);
+				} catch (InterruptedException e1) {
+					EfaUtil.foo(); // do notihnig
+				}
+
             }
         }
     }

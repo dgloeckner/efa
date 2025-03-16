@@ -167,7 +167,8 @@ public class AdminTask extends Thread {
                     Waters.getWaterTemplateAuthor(International.getLanguageID())) ;
         			
         	if (Daten.project.getIsProjectStorageTypeEfaCloud()) {
-        		combinedMessage += "\n\n" 
+        		combinedMessage += "\n\n"
+        				+ International.getString("ACHTUNG")+"!\n"
         				+ International.getString("Bei einem EfaCloud-Projekt sollte diese Funktion nur auf einer einzigen Instanz durchgeführt werden. Die anderen Instanzen erhalten die Gewässer automatisch über die efaCloud-Synchronisation.");
         	}
         	

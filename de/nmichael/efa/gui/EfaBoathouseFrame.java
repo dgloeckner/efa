@@ -1784,6 +1784,8 @@ public class EfaBoathouseFrame extends BaseFrame implements IItemListener {
                     personsAvailableList.setSelectedIndex(0);
                 }
             }
+            this.revalidate(); // refresh the whole screen
+            this.repaint();
             if (Logger.isTraceOn(Logger.TT_GUI, 8)) {
                 Logger.log(Logger.DEBUG, Logger.MSG_GUI_DEBUGGUI, "updateBoatLists(" + listChanged + ") - done");
             }

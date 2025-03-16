@@ -104,6 +104,7 @@ public class OpenProjectOrLogbookDialog extends BaseDialog implements IItemListe
         label.setFont(label.getFont().deriveFont(Font.BOLD));;
         if (type == Type.project) {
             label.setText(International.getString("vorhandene Projekte"));
+            clubworkName.setVisible(false);
         }
         if (type == Type.logbook) {
             label.setText(International.getString("vorhandene Fahrtenbücher"));
@@ -211,6 +212,9 @@ public class OpenProjectOrLogbookDialog extends BaseDialog implements IItemListe
         		Logger.logdebug(e);
         	}
         }
+        updateInfos();
+        this.revalidate(); // refresh the whole screen
+        this.repaint();
     }
     
     public void updateInfos() {
@@ -226,6 +230,11 @@ public class OpenProjectOrLogbookDialog extends BaseDialog implements IItemListe
 	                + (Daten.project.getCurrentClubwork() != null && Daten.project.getCurrentClubwork().isOpen()
 	                ? Daten.project.getCurrentClubwork().getName() : "- " + International.getString("Kein Vereinsarbeitsbuch geöffnet.") + " -"));
 
+        } else {
+        	//no project open
+	        logbookName.setText(International.getString("Fahrtenbuch") + ": " + International.getString("Kein Fahrtenbuch geöffnet.") + " -");
+
+	        clubworkName.setText(International.getString("Vereinsarbeitsbuch") + ": " + International.getString("Kein Vereinsarbeitsbuch geöffnet.") + " -");
         }
         
         try {
@@ -250,6 +259,8 @@ public class OpenProjectOrLogbookDialog extends BaseDialog implements IItemListe
         } catch (Exception eignore) {
             Logger.logdebug(eignore);
         }
+        this.revalidate(); // refresh the whole screen
+        this.repaint();
     }    
     
     private void iniNorthPanel() {
@@ -436,14 +447,22 @@ public class OpenProjectOrLogbookDialog extends BaseDialog implements IItemListe
                         return;
                     }
                 }
+                
+                Logger.log(Logger.INFO, Logger.MSG_DATA_DELETE_OBJECT, International.getMessage("{typ} {name} wird von admin '{admin}' gelöscht.",
+                		International.getString("Projekt"),
+                		prj.getProjectName(),
+                		admin.getName()));
+                
                 boolean success = false;
                 if (Daten.project != null && Daten.project.getProjectName() != null &&
                         Daten.project.getProjectName().equals(prj.getProjectName())) {
-                    success = Daten.project.deleteProject();
-                    Daten.project = null;
-                } else {
-                    success = prj.deleteProject();
+                	// if the currently open project shall be deleted, close it first.
+                	Daten.project.closeAllStorageObjects();
+                	Daten.project=null;
                 }
+                
+                success = prj.deleteProject();
+
                 updateGui();
             } catch(Exception ex) {
                 Dialog.error(ex.toString());
@@ -453,6 +472,11 @@ public class OpenProjectOrLogbookDialog extends BaseDialog implements IItemListe
 
         if (type == Type.logbook) {
             try {
+            	
+                Logger.log(Logger.INFO, Logger.MSG_DATA_DELETE_OBJECT, International.getMessage("{typ} {name} wird von admin '{admin}' gelöscht.",
+                		International.getString("Fahrtenbuch"),
+                		name,
+                		admin.getName()));
                 Logbook logbook = Daten.project.getLogbook(name, false);
                 if (Daten.project.deleteLogbookRecord(name)) {
                     logbook.data().deleteStorageObject();
@@ -466,6 +490,10 @@ public class OpenProjectOrLogbookDialog extends BaseDialog implements IItemListe
 
         if (type == Type.clubwork) {
             try {
+                Logger.log(Logger.INFO, Logger.MSG_DATA_DELETE_OBJECT, International.getMessage("{typ} {name} wird von admin '{admin}' gelöscht.",
+                		International.getString("Vereinsarbeit"),
+                		name,
+                		admin.getName()));            	
                 Clubwork clubwork = Daten.project.getClubwork(name, false);
                 if (Daten.project.deleteClubworkBook(name)) {
                     clubwork.data().deleteStorageObject();

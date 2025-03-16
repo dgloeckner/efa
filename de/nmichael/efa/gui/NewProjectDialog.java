@@ -260,6 +260,15 @@ public class NewProjectDialog extends StepwiseDialog implements IItemListener {
         if (storType.getValue().equals(IDataAccess.TYPESTRING_EFA_CLOUD)) {
             storageType = IDataAccess.TYPE_EFA_CLOUD;
         }
+        
+        if (Daten.project != null && Daten.project.isOpen()) {
+			try {
+				Daten.project.closeAllStorageObjects();
+			} catch (Exception e1) {
+				Logger.logdebug(e1);
+			}
+        	Daten.project = null;
+        }
         // Note: The storageType of the project file itself is always TYPE_FILE_XML.
         // The storageType of the project's content (set through prj.setProjectStorageType(storageType)) may differ.
         Project prj = new Project(prjName.getValue());

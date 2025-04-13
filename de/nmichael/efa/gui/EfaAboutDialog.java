@@ -377,7 +377,8 @@ public class EfaAboutDialog extends BaseDialog {
         aboutEfaPanel.add(devNoteLabel, new GridBagConstraints(1, 8, 4, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 20), 0, 0));
         aboutEfaPanel.add(efaBirthdayLabel, new GridBagConstraints(0, 11, 4, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
         
-        versionLabel.setText(International.getString("Version") + " " + Daten.VERSION + "   (" + Daten.VERSIONID + ")");
+        versionLabel.setText(International.getString("Version") + " " + Daten.VERSION 
+        		+ "   (" + Daten.VERSIONID + " / " + Daten.VERSIONRELEASEDATE + ")");
 	}
 
     void label_mouseEntered(MouseEvent e) {

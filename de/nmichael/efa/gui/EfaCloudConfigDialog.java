@@ -21,6 +21,7 @@ import de.nmichael.efa.ex.EfaException;
 import de.nmichael.efa.gui.util.EfaMenuButton;
 import de.nmichael.efa.util.International;
 import de.nmichael.efa.util.LogString;
+import de.nmichael.efa.util.Logger;
 
 import javax.swing.*;
 import java.awt.*;
@@ -264,7 +265,14 @@ public class EfaCloudConfigDialog extends BaseTabbedDialog implements IItemListe
                     String prjName = pr.getName();
                     try {
                         // close the project
+                        try {
+							pr.closeAllStorageObjects();
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							Logger.logdebug(e);
+						}
                         pr.close();
+                        Daten.project=null;
                         // if an efaCloud configuration was mistyped, the user will deactivate efaCloud and
                         // reactivate it afterwards. Then the queue is running and must be closed to load the new
                         // confiuguration.

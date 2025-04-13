@@ -11,15 +11,18 @@
 package de.nmichael.efa.gui;
 
 import java.awt.Frame;
+import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 
 import javax.swing.JDialog;
+import javax.swing.SwingConstants;
 
 import de.nmichael.efa.Daten;
 import de.nmichael.efa.core.items.IItemType;
 import de.nmichael.efa.core.items.ItemTypeBoolean;
 import de.nmichael.efa.core.items.ItemTypeDate;
+import de.nmichael.efa.core.items.ItemTypeLabel;
 import de.nmichael.efa.core.items.ItemTypeString;
 import de.nmichael.efa.core.items.ItemTypeStringList;
 import de.nmichael.efa.data.ProjectRecord;
@@ -37,6 +40,7 @@ public class NewLogbookDialog extends StepwiseDialog {
     private static final String LOGBOOKNAME        = "LOGBOOKNAME";
     private static final String LOGBOOKNAMEHINT    = "LOGBOOKNAMEHINT";    
     private static final String LOGBOOKDESCRIPTION = "LOGBOOKDESCRIPTION";
+    private static final String LOGBOOKNAMESTEP1   = "LOGBOOKNAMESTEP1";
     private static final String DATEFROM           = "DATEFROM";
     private static final String DATETO             = "DATETO";
     private static final String AUTOMATICLOGSWITCH = "AUTOMATICLOGSWITCH";
@@ -97,7 +101,7 @@ public class NewLogbookDialog extends StepwiseDialog {
 
         if (Daten.project.getNumberOfBoathouses()>1 || Daten.project.getIsProjectStorageTypeEfaCloud()) {
             items.add(EfaGuiUtils.createHintWordWrap(LOGBOOKNAMEHINT, IItemType.TYPE_PUBLIC, CATEGORY_STEP_0,
-            		International.getString("Bei Nutzung von efaCloud oder mehreren Fahrtenbüchern MUSS der Fahrtenbuchname dem Aufbau JJJJ_Freitext entsprechen, z.B. 2025_Bootshausname")
+            		International.getString("Bei Nutzung von efaCloud oder mehreren Bootshäusern MUSS der Fahrtenbuchname dem Aufbau JJJJ_Freitext entsprechen, z.B. 2025_Bootshausname")
             		,2,10,10,500));
         } else {
             items.add(EfaGuiUtils.createHintWordWrap(LOGBOOKNAMEHINT, IItemType.TYPE_PUBLIC, CATEGORY_STEP_0, 
@@ -113,7 +117,19 @@ public class NewLogbookDialog extends StepwiseDialog {
         item = new ItemTypeString(LOGBOOKDESCRIPTION, "", IItemType.TYPE_PUBLIC, CATEGORY_STEP_0, International.getString("Beschreibung"));
         items.add(item);
 
+        if (Daten.project.getIsProjectStorageTypeEfaCloud()) {
+            items.add(EfaGuiUtils.createHintWordWrap(LOGBOOKNAMEHINT+"1", IItemType.TYPE_PUBLIC, CATEGORY_STEP_0,
+            		International.getString("Bei Nutzung von efaCloud mit mehreren Bootshäusern muss das Fahrtenbuch auch beim Referenzuser angelegt sein. Sonst ist kein Upload von Fahrten möglich.")
+            		,2,10,10,500));
+        }        
+        
         // Items for Step 1
+        ItemTypeLabel newLogbookNameLabel = new ItemTypeLabel(LOGBOOKNAMESTEP1, IItemType.TYPE_PUBLIC, CATEGORY_STEP_1, buildLogbookName());
+        newLogbookNameLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        newLogbookNameLabel.setFieldGrid(3, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL);
+        newLogbookNameLabel.setBoldFont(true);
+        items.add(newLogbookNameLabel);
+        
         item = new ItemTypeDate(DATEFROM, new DataTypeDate(1, 1, EfaUtil.string2int(year, 2010)), IItemType.TYPE_PUBLIC, CATEGORY_STEP_1, International.getString("Beginn des Zeitraums"));
         ((ItemTypeDate)item).setNotNull(true);
         items.add(item);
@@ -121,7 +137,8 @@ public class NewLogbookDialog extends StepwiseDialog {
         ((ItemTypeDate)item).setNotNull(true);
         items.add(item);
 
-        // Items for Step 2
+
+        // Items for Step 2name, type, category, description
         item = new ItemTypeBoolean(AUTOMATICLOGSWITCH, false, IItemType.TYPE_PUBLIC, CATEGORY_STEP_2,
                 International.getMessage("Fahrtenbuchwechsel automatisch zum {datum}", "?"));
         items.add(item);
@@ -148,6 +165,7 @@ public class NewLogbookDialog extends StepwiseDialog {
 
         if (step == 0) {
             ItemTypeString item = (ItemTypeString)getItemByName(LOGBOOKNAME);
+            item.getValueFromGui();
             String name = item.getValue();
             if (Daten.project.getLoogbookRecord(name) != null) {
                     Dialog.error(LogString.fileAlreadyExists(name, International.getString("Fahrtenbuch")));
@@ -166,6 +184,10 @@ public class NewLogbookDialog extends StepwiseDialog {
                     logFromTo.setValueDate(new DataTypeDate(31, 12, year));
                 }
             }
+            
+            //update logbookname for next gui step
+            ItemTypeLabel logbookname = (ItemTypeLabel)getItemByName(LOGBOOKNAMESTEP1);
+            logbookname.setDescription(buildLogbookName());
         }
 
         if (step == 1) {
@@ -242,6 +264,13 @@ public class NewLogbookDialog extends StepwiseDialog {
     public String newLogbookDialog() {
         showDialog();
         return getNewLogbookName();
+    }
+    
+    private String buildLogbookName() {
+        ItemTypeString newLogbook = (ItemTypeString)getItemByName(LOGBOOKNAME);
+        newLogbook.getValueFromGui();
+        String newLogbookName = newLogbook.getValue();
+    	return International.getString("Fahrtenbuch")+": \""+newLogbookName+"\"";
     }
 
 }

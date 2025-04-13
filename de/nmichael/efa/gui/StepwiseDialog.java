@@ -23,6 +23,8 @@ import javax.swing.*;
 public abstract class StepwiseDialog extends BaseDialog {
 
 	private static final long serialVersionUID = 7125589712864431436L;
+	private static final int INPUTSECTION_WIDTH = 600;
+	private static final int INPUTSECTION_HEIGHT = 360;
 	JPanel stepPanel;
     JPanel controlPanel;
     JPanel descriptionPanel;
@@ -151,9 +153,9 @@ public abstract class StepwiseDialog extends BaseDialog {
         inputPanelWrapper = new JPanel();
         inputPanelWrapper.setLayout(new BorderLayout());
         inputPanelWrapper.setBorder(new javax.swing.border.EmptyBorder(20,20,20,20));
-        inputPanelWrapper.setMinimumSize(new Dimension(600,300));
+        inputPanelWrapper.setMinimumSize(new Dimension(INPUTSECTION_WIDTH,INPUTSECTION_HEIGHT));
         inputScrollPane = new JScrollPane();
-        inputScrollPane.setPreferredSize(new Dimension(660,300));
+        inputScrollPane.setPreferredSize(new Dimension(INPUTSECTION_WIDTH+60,INPUTSECTION_HEIGHT+20));
         inputPanelWrapper.add(inputScrollPane, BorderLayout.CENTER);
 
         // Add Panels to basePanel and mainPanel

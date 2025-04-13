@@ -361,6 +361,7 @@ public class Project extends StorageObject {
             return true;
         }
         if (getProjectStorageType() == IDataAccess.TYPE_EFA_CLOUD) {
+        	//only start TxQueue if we surely want to open this project for further usage
             TxRequestQueue.getInstance(getProjectRecord().getEfaCloudURL(), getProjectStorageUsername(),
                     getProjectStoragePassword(), getProjectStorageLocation());
         }
@@ -414,39 +415,56 @@ public class Project extends StorageObject {
             // we might get lots of exceptions, don't log them
             Logger.setLogExceptions(false);
 
-            // make sure that persistenceCache is filled properly
-            try {
-                openAllData();
-                String[] logbookNames = getAllLogbookNames();
-                for (String logbookName : logbookNames) {
-                    getLogbook(logbookName, false);
-                }
-                String[] clubworkNames = getAllClubworkNames();
-                for (String clubworkName : clubworkNames) {
-                    getClubwork(clubworkName, false);
-                }
-            } catch (Exception eignore) {
-                Logger.logdebug(eignore);
+        	/*   
+	     	   READ ME!!
+	     	   we don't need to load all open data for efaCloud (and, in peticular, SHOULD NOT):
+	     	   - first, efaCloud project data files remain on disk. only the project file itself gets deleted.
+	     	     so, no need to load all data to be able to delete it for efaCloud projects.
+	     	   - second, opening the efaCloud project with openAllData() initiates the singleton TXQueue instance
+	     	     with the data of the project to delete. This OVERWRITES ANY TXQueue elements for a currently active efaCloud project,
+	     	     leading to very unreasonable behaviour of efa. Also the overwritten TXQueue stays active and creates efaCloud logs
+	     	     even for non-efaCloud projects. 
+	     	   So, openAllData is only used for non-efaCloud projects 
+        	*/ 
+            if (getProjectStorageType() == IDataAccess.TYPE_FILE_XML ||
+            		getProjectStorageType() == IDataAccess.TYPE_EFA_REMOTE) {
+	            //make sure that persistenceCache is filled properly
+	            try {
+	                this.openAllData();
+	                String[] logbookNames = getAllLogbookNames();
+	                for (String logbookName : logbookNames) {
+	                    getLogbook(logbookName, false);
+	                }
+	                String[] clubworkNames = getAllClubworkNames();
+	                for (String clubworkName : clubworkNames) {
+	                    getClubwork(clubworkName, false);
+	                }
+	            } catch (Exception eignore) {
+	                Logger.logdebug(eignore);
+	            }
+	
+	            setPreModifyRecordCallbackEnabled(false);
+	            _inDeleteProject = true;
+	            if (getProjectStorageType() == IDataAccess.TYPE_FILE_XML) {
+	                String[] keys = persistenceCache.keySet().toArray(new String[0]);
+	                for (String key : keys) {
+	                    StorageObject p = persistenceCache.get(key);
+	                    try {
+	                        p.data().deleteStorageObject();
+	                    } catch (Exception eignore) {
+	                        Logger.logdebug(eignore);
+	                        try {
+	                            (new File(((DataFile) p.data()).getFilename())).delete();
+	                        } catch (Exception eignore2) {
+	                        }
+	                    }
+	                }
+	            }
+            } else if (getProjectStorageType() == IDataAccess.TYPE_EFA_CLOUD) {
+            	// ensure that the data file for the project is loaded
+            	this.open(false);
             }
-
-            setPreModifyRecordCallbackEnabled(false);
-            _inDeleteProject = true;
-            if (getProjectStorageType() == IDataAccess.TYPE_FILE_XML) {
-                String[] keys = persistenceCache.keySet().toArray(new String[0]);
-                for (String key : keys) {
-                    StorageObject p = persistenceCache.get(key);
-                    try {
-                        p.data().deleteStorageObject();
-                    } catch (Exception eignore) {
-                        Logger.logdebug(eignore);
-                        try {
-                            (new File(((DataFile) p.data()).getFilename())).delete();
-                        } catch (Exception eignore2) {
-                        }
-                    }
-                }
-            }
-
+            
             data().deleteStorageObject();
             if (projectDir != null) {
                 (new File(projectDir)).delete(); // delete project directory
@@ -975,7 +993,10 @@ public class Project extends StorageObject {
     }
 
     public void closeAllStorageObjects() throws Exception {
-        // close all of this project's storage objects
+
+        Logger.log(Logger.INFO, Logger.MSG_EVT_PROJECTCLOSED,
+                LogString.fileClosing(this.getProjectName(), International.getString("Projekt")));    	
+    	// close all of this project's storage objects
         Set<String> keys = persistenceCache.keySet();
         for (String key : keys) {
             closePersistence(persistenceCache.get(key));

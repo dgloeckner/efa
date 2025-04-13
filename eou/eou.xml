@@ -2,7 +2,7 @@
 <efaOnlineUpdate>
 	<Version>
         <VersionID>2.4.1#14</VersionID>
-        <ReleaseDate>10.03.2025</ReleaseDate>
+        <ReleaseDate>16.03.2025</ReleaseDate>
         <DownloadUrl>TODO</DownloadUrl>
         <DownloadSize>TODO</DownloadSize>
 		<MinimumJavaVersion>1.8</MinimumJavaVersion>
@@ -12,12 +12,20 @@
         <Changes lang="de">
         	<ChangeItem>BugFix: efaBase ließ sich nicht vollständig über Datei-&gt;Beenden schließen.</ChangeItem>
         	<ChangeItem>BugFix: LookAndFeel: im maximierten Modus von efa wird die Titelzeile in allen Looks gleich angezeigt - mit einem blauen Hintergrund.</ChangeItem>
+        	<ChangeItem>BugFix: Beim Email-Versand auftretende Fehler verursachen keine vollaufenden efa.log Dateien mehr.</ChangeItem>
+        	<ChangeItem>BugFix: Admin-Dialog: Anzahl der Nachrichten wird bei geschlossenen Projekten auf der Schaltfläche korrekt dargestellt.</ChangeItem>
         	<ChangeItem>BugFix: efaCloud: efaCloud Logdateien sind wieder auf max. 200kb Größe limitiert.</ChangeItem>
+        	<ChangeItem>BugFix: efaCloud: Löschen von efaCloud Projekten verwirrt nicht mehr die efaCloud TX-Synchronisation.</ChangeItem>
+        	<ChangeItem>BugFix: efaCloud: Bug in efa 2.4.1#12 bei Migration von Projekten nach efaCloud behoben.</ChangeItem>
         </Changes>
         <Changes lang="en">
         	<ChangeItem>BugFix: efaBase could not be closed via File-&gt;Quit, some fragments kept running in backround.</ChangeItem>
         	<ChangeItem>BugFix: LookAndFeel: if efa is maximized, the window title bar will look the same in all LookAndFeels - with a blue background.</ChangeItem>
+        	<ChangeItem>BugFix: Avoid big efa.log protocols when errors occurr while sending email notifications.</ChangeItem>
+        	<ChangeItem>BugFix: Admin-Dialog: Number of unread messages is shown correctly on the button, when project has been closed.</ChangeItem>
         	<ChangeItem>BugFix: efaCloud: efaCloud log files are again limited to 200kb size max.</ChangeItem>
+        	<ChangeItem>BugFix: efaCloud: Deleting efaCloud projects no longer disturbs efaCloud TX-Synchronisation.</ChangeItem>
+        	<ChangeItem>BugFix: efaCloud: Bug in efa 2.4.1#12 fixed which avoided migration of local projects to efaCloud.</ChangeItem>
         </Changes>
 	</Version>
 	<Version>

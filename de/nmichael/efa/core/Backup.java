@@ -551,7 +551,8 @@ public class Backup {
 	                	//re-open project if NO config files were affected
 	                	//this automatically starts the audit task
 	                	logMsg(Logger.INFO, Logger.MSG_BACKUP_REOPENINGFILES, LogString.fileOpening(pName, International.getString("Projekt")));
-		                Daten.project.openProject(pName, true);
+	                	//use static project.openProject instead of Daten.project.openProject (which may be null)
+		                Project.openProject(pName, true);
 		                logMsg(Logger.INFO, Logger.MSG_EVT_PROJECTOPENED, LogString.fileOpened(pName, International.getString("Projekt")));
 	                } else {
 	                    // if config data is restored, a restart of efa is neccessary.

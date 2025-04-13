@@ -202,6 +202,7 @@ public class Logger {
     public static final String MSG_DATA_NOLOCKHELD  = "DAT055";
     public static final String MSG_DATA_RECOVERYINFO  = "DAT056";
     public static final String MSG_DATA_AUDIT_STATUSUPDATED = "DAT057";
+    public static final String MSG_DATA_DELETE_OBJECT = "DAT058";
     
     public static final String MSG_REFA_SERVERSTATUS                 = "RMT001";
     public static final String MSG_REFA_SERVERERROR                  = "RMT002";
@@ -290,6 +291,7 @@ public class Logger {
     public static final String MSG_EVT_ERRORRECORDINVALIDATTIME = "EVT046";
     public static final String MSG_EVT_PERSONADDED = "EVT047";
     public static final String MSG_EVT_CLUBWORKOPENED = "EVT048";
+    public static final String MSG_EVT_PROJECTCLOSED = "EVT049";
 
     // Backup
     public static final String MSG_BCK_BACKUPSTARTED = "BCK001";
@@ -732,7 +734,7 @@ public class Logger {
 
             if (msgToAdmin && Daten.project != null) {
 
-                Messages messages = (Daten.project != null && 
+                Messages messages = (Daten.project != null &&  Daten.project.isOpen() &&
                         !Daten.project.isInOpeningProject() &&
                         Daten.project.getProjectStorageType() != IDataAccess.TYPE_EFA_REMOTE ?
                            Daten.project.getMessages(false) : null);

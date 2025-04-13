@@ -1,6 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <efaOnlineUpdate>
 	<Version>
+  		<VersionID>2.4.1#15</VersionID>
+  		<ReleaseDate>13.04.2025</ReleaseDate>
+        <DownloadUrl>TODO</DownloadUrl>
+        <DownloadSize>TODO</DownloadSize>
+		<MinimumJavaVersion>1.8</MinimumJavaVersion>
+		<MinimumEfaCloudVersion>2.3.3</MinimumEfaCloudVersion>
+        <ShowNotice lang="de">Wenn efaCloud eingesetzt wird, muss der Server mindestens Version 2.3.3 unterstützen. EfaCloud 2.4.0_11 und höher werden empfohlen.</ShowNotice>
+        <ShowNotice lang="en">If you use efaCloud, make sure your server at least supports efaCloud Version 2.3.3. It is recommended to upgrade to EfaCloud 2.4.0_11 or above.</ShowNotice>
+        <Changes lang="de">
+        	<ChangeItem>BugFix:'Über efa' Dialog zeigt das Build-Datum an</ChangeItem>
+        	<ChangeItem>BugFix: Wechsel zwischen den Projekten: Admin-Dialog zeigt zuverlässig an, wenn kein Vereinsarbeitsbuch geöffnet ist.</ChangeItem>
+        	<ChangeItem>BugFix: efaCloud: Anlage neuer Projekte und Fahrtenbücher mit mehr Hinweisen zur korrekten Konfiguration.</ChangeItem>
+        </Changes>
+        <Changes lang="en">
+        	<ChangeItem>BugFix:'About efa' dialogue shows the build date.</ChangeItem>
+        	<ChangeItem>BugFix: Changing the current project: Admin-Dialog shows if there is no currently loaded clubwork book.</ChangeItem>
+        	<ChangeItem>BugFix: efaCloud: Anlage neuer Projekte und Fahrtenbücher mit mehr Hinweisen zur korrekten Konfiguration.</ChangeItem>
+        </Changes>	
+	</Version>
+	<Version>
         <VersionID>2.4.1#14</VersionID>
         <ReleaseDate>16.03.2025</ReleaseDate>
         <DownloadUrl>TODO</DownloadUrl>

@@ -184,7 +184,7 @@ public class NewProjectDialog extends StepwiseDialog implements IItemListener {
                 if (item.getValue().equals(IDataAccess.TYPESTRING_EFA_CLOUD)) {
                 	String hint1 = International.getString("Folgende Optionen nur dann aktivieren, wenn der efaCloud-Server noch keine Daten hat.");
                 	items.add(EfaGuiUtils.createHintWordWrap(GUIITEM_CREATE_STATUS_LIST_HINT, IItemType.TYPE_PUBLIC, CATEGORY_STEP_3,
-                			hint1,3,10,5,500));
+                			hint1,3,10,5,630));
                 	items.add(new ItemTypeBoolean(GUIITEM_CREATE_STATUS_LIST, false,
                             IItemType.TYPE_PUBLIC, CATEGORY_STEP_3,
                             International.getString("Status-Einträge für Personen (Gast, Mitglied) erstellen")));

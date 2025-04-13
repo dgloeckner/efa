@@ -225,6 +225,8 @@ public class AdminDialog extends BaseDialog implements IItemListener {
                 ? efaBoathouseFrame.getLogbook().getName() : "- " + International.getString("Kein Fahrtenbuch geöffnet.") + " -"));
         if (efaBoathouseFrame.getClubwork() != null && efaBoathouseFrame.getClubwork().isOpen()) {
             clubworkName.setText(International.getString("Vereinsarbeitsbuch") + ": " + efaBoathouseFrame.getClubwork().getName());
+        } else {
+        	clubworkName.setText(International.getString("Kein Vereinsarbeitsbuch geöffnet."));
         }
 
         try {

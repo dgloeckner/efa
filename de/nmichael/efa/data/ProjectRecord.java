@@ -812,7 +812,7 @@ public class ProjectRecord extends DataRecord  {
                     if (getStorageType() == IDataAccess.TYPE_EFA_CLOUD) {
 	                	v.add(item = EfaGuiUtils.createHintWordWrap(ProjectRecord.STORAGEUSERNAME+"_HINT", IItemType.TYPE_PUBLIC, category, 
 	                			International.getString("Jede efa-Installation in einem efaCloud-System benötigt einen eigenen Benutzernamen (efaCloud-UserID). Legen Sie in efaCloud ggfs. einen neuen Benutzer an, und tragen sie seine numerische UserID hier ein. Weitere Informationen finden Sie im efa-Dokuwiki."), 
-	                			3, 10, 10,500));
+	                			3, 10, 10,630));
                     }
                 	
                     v.add(item = new ItemTypeString(ProjectRecord.STORAGEUSERNAME, getStorageUsername(),

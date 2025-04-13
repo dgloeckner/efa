@@ -221,7 +221,7 @@ public class TableBuilder {
     	tablenamesWithEcrids.add("efa2boats");
     	tablenamesWithEcrids.add("efa2boatstatus");
     	tablenamesWithEcrids.add("efa2crews");
-    	tablenamesWithEcrids.add("efa2destinantions");
+    	tablenamesWithEcrids.add("efa2destinations");
     	tablenamesWithEcrids.add("efa2fahrtenabzeichen");
     	tablenamesWithEcrids.add("efa2groups");
     	tablenamesWithEcrids.add("efa2logbook");

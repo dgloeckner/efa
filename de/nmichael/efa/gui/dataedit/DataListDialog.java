@@ -340,7 +340,7 @@ public abstract class DataListDialog extends BaseDialog implements IItemListener
             table.setMinColumnWidths(minColumnWidths);
         }
         table.setButtonPanelPosition(buttonPanelPosition);
-        table.setFieldSize(600, 500);
+        table.setFieldSize(Math.max((buttonPanelPosition==BorderLayout.NORTH ? 850 : 600), getSumColumnWidths()), 500);
         //table shall not have a huge distance from a toolbar above (NORTH position)
         table.setPadding(0, 0, (buttonPanelPosition.equals(BorderLayout.NORTH) ? 0 : 10), 0);
         table.displayOnGui(this, mainTablePanel, BorderLayout.CENTER);
@@ -362,6 +362,19 @@ public abstract class DataListDialog extends BaseDialog implements IItemListener
         this.validate();
     }
 
+    private int getSumColumnWidths() {
+    	int resValue=0;
+    	if (minColumnWidths != null && minColumnWidths.length>0)
+    		for (int i=0; i<minColumnWidths.length;i++) {
+    			if (minColumnWidths[i]>0) {
+    				resValue+=minColumnWidths[i];
+    			} else if (minColumnWidths[i]<0){
+    				resValue+=50;
+    			}
+    		}
+    	return resValue;
+    }
+    
     /**
      * Instanciates the table variable to the specific subtype of ItemTypeDataRecord that is needed
      * by the subclass of DataListDialog.

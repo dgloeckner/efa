@@ -1419,8 +1419,24 @@ public class EfaBaseFrame extends BaseDialog implements IItemListener {
             }
         }
         updateTimeInfoFields();
+        setWarningsForUnsetFields();
     }
 
+    /**
+     * sets Warning Icons for fields that shall be non-null in efaBase or Admin Mode.
+     */
+    private void setWarningsForUnsetFields() {
+    	if (isModeBase() || isModeAdmin() ) {
+    		Icon warning =  ImagesAndIcons.getIcon(ImagesAndIcons.IMAGE_WARNING);
+    		date.setIcon     (date.isSet() ? null : warning);
+    		starttime.setIcon(starttime.isSet() ? null : warning);
+    		endtime.setIcon  (endtime.isSet() ? null : warning);
+    		distance.setIcon ((distance.getValue().getRoundedValueInKilometers()>0) ? null : warning );
+    		crew[0].setIcon  (crew[0].getValue() != null && !crew[0].getValue().isEmpty() ? null : warning);
+    		boat.setIcon(    (boat.getValue() != null && !boat.getValue().isEmpty() ? null : warning));    		
+    	}
+    }
+    
     /**
      * Creates a new LogbookRecord if necessary and set it's attributes from the GUI fields.
      * It works for both efaBaseFrame AND efaBaseFrameMultisession, as the variable parts
@@ -1614,6 +1630,7 @@ public class EfaBaseFrame extends BaseDialog implements IItemListener {
             finishBoathouseAction(success);
         }
         autoCompleteListPersons.reset();
+        this.setWarningsForUnsetFields();
         return success;
     }
 
@@ -1637,8 +1654,30 @@ public class EfaBaseFrame extends BaseDialog implements IItemListener {
             
             if (mode == MODE_BOATHOUSE_START || mode == MODE_BOATHOUSE_START_CORRECT || mode == MODE_BOATHOUSE_START_MULTISESSION) {
                 currentRecord.setSessionIsOpen(true);
-            } else {
+            } else if (mode == MODE_BOATHOUSE_FINISH || mode == MODE_BOATHOUSE_LATEENTRY || mode == MODE_BOATHOUSE_LATEENTRY_MULTISESSION){
                 currentRecord.setSessionIsOpen(false); // all other updates to an open entry (incl. Admin Mode) will mark it as finished
+            } else if (mode == MODE_BASE || mode == MODE_ADMIN){
+            	if (isNewRecord || currentRecord == null) {
+            		// created a new record in efaBase or in efaBoathouse in admin mode.
+            		// then this record does not have an open session, like a boat on the water or such.
+            		// so we set openSession to false
+            		currentRecord.setSessionIsOpen(false);
+            	} else {
+            		//otherwise, leave SessionIsOpen unchanged, 
+            		//as the record was just edited for some reason
+            		EfaUtil.foo();
+            	}
+            } else {
+            	/* other modes are
+
+				    MODE_BOATHOUSE = 1; // just kiosk mode for efaBoathouse, not a valid efaBaseFrame for editing record
+					MODE_BOATHOUSE_ABORT = 6; // abort sessions without a dialog
+				    MODE_ADMIN_SESSIONS = 8; // not used anyway
+				    
+            		//so, leave SessionIsOpen unchanged as there is no good reason to close it. 
+				    
+            	 */
+            	EfaUtil.foo();
             }
 
             if (isNewRecord || changeEntryNo) {

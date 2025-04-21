@@ -10,17 +10,37 @@
 
 package de.nmichael.efa.data;
 
+import java.awt.AWTEvent;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.util.UUID;
+import java.util.Vector;
+
 import de.nmichael.efa.Daten;
 import de.nmichael.efa.core.config.AdminRecord;
 import de.nmichael.efa.core.config.EfaTypes;
-import de.nmichael.efa.data.storage.*;
-import de.nmichael.efa.data.types.*;
-import de.nmichael.efa.core.items.*;
-import de.nmichael.efa.gui.util.*;
-import de.nmichael.efa.util.*;
-
-import java.awt.GridBagConstraints;
-import java.util.*;
+import de.nmichael.efa.core.items.IItemListener;
+import de.nmichael.efa.core.items.IItemType;
+import de.nmichael.efa.core.items.ItemTypeBoolean;
+import de.nmichael.efa.core.items.ItemTypeButton;
+import de.nmichael.efa.core.items.ItemTypeLabelHeader;
+import de.nmichael.efa.core.items.ItemTypeString;
+import de.nmichael.efa.core.items.ItemTypeStringList;
+import de.nmichael.efa.data.storage.DataKey;
+import de.nmichael.efa.data.storage.DataRecord;
+import de.nmichael.efa.data.storage.IDataAccess;
+import de.nmichael.efa.data.storage.MetaData;
+import de.nmichael.efa.data.types.DataTypeDate;
+import de.nmichael.efa.data.types.DataTypeIntString;
+import de.nmichael.efa.data.types.DataTypeTime;
+import de.nmichael.efa.ex.EfaModifyException;
+import de.nmichael.efa.gui.EfaGuiUtils;
+import de.nmichael.efa.gui.ImagesAndIcons;
+import de.nmichael.efa.gui.util.TableItem;
+import de.nmichael.efa.gui.util.TableItemHeader;
+import de.nmichael.efa.util.EfaUtil;
+import de.nmichael.efa.util.International;
+import de.nmichael.efa.util.Logger;
 
 // @i18n complete
 
@@ -389,18 +409,20 @@ public class BoatStatusRecord extends DataRecord {
                     IItemType.TYPE_PUBLIC, CAT_STATUS,
                     International.getString("nur anzeigen in Bootshaus")));
         }
-        if (getCurrentStatus() != null && getCurrentStatus().equals(STATUS_ONTHEWATER)) {
-            v.add(item = new ItemTypeLabel(BoatStatusRecord.ENTRYNO,
-                    IItemType.TYPE_PUBLIC, CAT_STATUS,
+        if ((getCurrentStatus() != null && getCurrentStatus().equals(STATUS_ONTHEWATER))
+        		|| (getEntryNo()!=null || (getLogbook() != null && getLogbook().trim().length()>0))){
+            v.add(item = EfaGuiUtils.createHintWordWrap(BoatStatusRecord.ENTRYNO, IItemType.TYPE_PUBLIC, CAT_STATUS,
                     International.getMessage("Eintrag in Lfd. Nr. {entryNo} in Fahrtenbuch {logbook}", 
-                    (getEntryNo() != null ? getEntryNo().toString() : "NOENTRYNO"), getLogbook())));
+                            (getEntryNo() != null ? getEntryNo().toString() : "("+International.getString("leer")+")"), getLogbook()),3,5,5,600));
+            item.setFieldGrid(2, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL);
+
         }
         v.add(item = new ItemTypeString(BoatStatusRecord.COMMENT, getComment(),
                 IItemType.TYPE_PUBLIC, CAT_STATUS, International.getString("Bemerkung")));
         
         return v;
     }
-
+    
     public TableItemHeader[] getGuiTableHeader() {
     	boolean multipleBoathouses = false;
         try {
@@ -575,6 +597,5 @@ public class BoatStatusRecord extends DataRecord {
                 + (enddate != null && enddate.length() > 0 ? " " + International.getMessage("bis {timestamp}", enddate) : "")
                 + " " + International.getMessage("mit {crew}", person);
     }
-
 
 }

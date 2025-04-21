@@ -7,8 +7,8 @@
         <DownloadSize>TODO</DownloadSize>
 		<MinimumJavaVersion>1.8</MinimumJavaVersion>
 		<MinimumEfaCloudVersion>2.3.3</MinimumEfaCloudVersion>
-        <ShowNotice lang="de">Wenn efaCloud eingesetzt wird, muss der Server mindestens Version 2.3.3 unterstützen. EfaCloud 2.4.0_11 und höher werden empfohlen.</ShowNotice>
-        <ShowNotice lang="en">If you use efaCloud, make sure your server at least supports efaCloud Version 2.3.3. It is recommended to upgrade to EfaCloud 2.4.0_11 or above.</ShowNotice>
+        <ShowNotice lang="de">Wenn efaCloud eingesetzt wird, muss der Server mindestens Version 2.3.3 unterstützen. EfaCloud 2.4.0_10 und höher werden empfohlen.</ShowNotice>
+        <ShowNotice lang="en">If you use efaCloud, make sure your server at least supports efaCloud Version 2.3.3. It is recommended to upgrade to EfaCloud 2.4.0_10 or above.</ShowNotice>
         <Changes lang="de">
         	<ChangeItem>Neu: Bootsstatus-Dialog im Querformat und zeigt die zugeordnete Fahrt-Nr und Fahrtenbuchname zum Bootsstatus.</ChangeItem>
         	<ChangeItem>Bugfix: Fahrt anlegen/Nacherfassen: Ist eine Fahrt&gt;30km, und ist nur eine Fahrtart zur Auswahl möglich, unterbleibt die Abfrage der Fahrtart.</ChangeItem>
@@ -25,8 +25,8 @@
         <DownloadSize>TODO</DownloadSize>
 		<MinimumJavaVersion>1.8</MinimumJavaVersion>
 		<MinimumEfaCloudVersion>2.3.3</MinimumEfaCloudVersion>
-        <ShowNotice lang="de">Wenn efaCloud eingesetzt wird, muss der Server mindestens Version 2.3.3 unterstützen. EfaCloud 2.4.0_11 und höher werden empfohlen.</ShowNotice>
-        <ShowNotice lang="en">If you use efaCloud, make sure your server at least supports efaCloud Version 2.3.3. It is recommended to upgrade to EfaCloud 2.4.0_11 or above.</ShowNotice>
+        <ShowNotice lang="de">Wenn efaCloud eingesetzt wird, muss der Server mindestens Version 2.3.3 unterstützen. EfaCloud 2.4.0_10 und höher werden empfohlen.</ShowNotice>
+        <ShowNotice lang="en">If you use efaCloud, make sure your server at least supports efaCloud Version 2.3.3. It is recommended to upgrade to EfaCloud 2.4.0_10 or above.</ShowNotice>
         <Changes lang="de">
         	<ChangeItem>BugFix:'Über efa' Dialog zeigt das Build-Datum an</ChangeItem>
         	<ChangeItem>BugFix: Wechsel zwischen den Projekten: Admin-Dialog zeigt zuverlässig an, wenn kein Vereinsarbeitsbuch geöffnet ist.</ChangeItem>

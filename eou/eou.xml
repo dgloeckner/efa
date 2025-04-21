@@ -15,7 +15,7 @@
         </Changes>
         <Changes lang="en">
         	<ChangeItem>New: Dialog for editing BoatStatus in landscape mode; shows a new column for Trip number and Logbook-Date.</ChangeItem>
-        	<ChangeItem>Bugfix: Fahrt anlegen/Nacherfassen: Ist eine Fahrt&gt;30km, und ist nur eine Fahrtart zur Auswahl möglich, unterbleibt die Abfrage der Fahrtart.</ChangeItem>
+        	<ChangeItem>Bugfix: Session start: if a trip is &gt;30km, and only a single trip type is available, no dialog for confirming the trip type is shown.</ChangeItem>
         </Changes>	
 	</Version>
 	<Version>

@@ -136,6 +136,20 @@ public class BoatStatus extends StorageObject {
     public void preModifyRecordCallback(DataRecord record, boolean add, boolean update, boolean delete) throws EfaModifyException {
         if (add || update) {
             assertFieldNotEmpty(record, BoatStatusRecord.BOATID);
+
+            BoatStatusRecord r = ((BoatStatusRecord)record);
+            // if the current state of the Boat is not ON_THE_WATER, we should clear
+            // logbook and EntryNo, as they should point to an logbookentry only when the
+            // boat is on the water.
+            String curState = r.getCurrentStatus();
+            if (curState != null && ! curState.equals(BoatStatusRecord.STATUS_ONTHEWATER)) {
+            	if (r.getLogbook()!=null) {
+            		r.setLogbook(null);
+            	}
+            	if (r.getEntryNo()!=null) {
+            		r.setEntryNo(null);
+            	}
+            }
         }
     }
 

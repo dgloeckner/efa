@@ -371,4 +371,11 @@ public abstract class ItemTypeLabelValue extends ItemType {
         this.yOffset = y;
     }
     
+    public void setIcon(Icon iValue) {
+    	if (label!=null) {
+	    	label.setIcon(iValue);
+	    	label.setIconTextGap(1);
+	    	label.setHorizontalTextPosition(SwingConstants.LEFT);
+    	}
+    }
 }

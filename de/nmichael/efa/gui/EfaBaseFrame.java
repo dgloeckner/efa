@@ -2459,11 +2459,17 @@ public class EfaBaseFrame extends BaseDialog implements IItemListener {
                     for (String type : sessTypeSelection) {
                         sessTypeDisplay.add(Daten.efaTypes.getValue(EfaTypes.CATEGORY_SESSION, type));
                     }
-                    int res = (Dialog.auswahlDialog(International.getString("Fahrtart"),
-                            International.getMessage("Ist diese Fahrt ein(e) {sessiontype}?", "..."),
-                            sessTypeDisplay.toArray(new String[0])));
-                    if (res >= 0 && res < sessTypeSelection.size()) {
-                        newSessType = sessTypeSelection.get(res);
+                    if (sessTypeDisplay.size()>0) {
+                    	if (sessTypeDisplay.size()>1) {
+	                    	int res = (Dialog.auswahlDialog(International.getString("Fahrtart"),
+		                            International.getMessage("Ist diese Fahrt ein(e) {sessiontype}?", "..."),
+		                            sessTypeDisplay.toArray(new String[0])));
+		                    if (res >= 0 && res < sessTypeSelection.size()) {
+		                        newSessType = sessTypeSelection.get(res);
+		                    }
+                    	} else {
+                    		newSessType=sessTypeDisplay.get(0);
+                    	}
                     }
                 }
             }

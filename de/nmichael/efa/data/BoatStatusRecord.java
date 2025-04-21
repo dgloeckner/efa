@@ -54,7 +54,8 @@ public class BoatStatusRecord extends DataRecord {
     public static final int COLUMN_ID_BOAT_NAME = 0;
     public static final int COLUMN_ID_BOAT_BASE_STATUS = 1;
     public static final int COLUMN_ID_BOAT_CURRENT_STATUS = 2;
-    public static final int COLUMN_ID_BOAT_COMMENT = 3;
+    public static final int COLUMN_ID_BOAT_SESSION_LOGBOOK = 3;
+    public static final int COLUMN_ID_BOAT_COMMENT = 4;
     
     protected static String CAT_STATUS       = "%06%" + International.getString("Bootsstatus");
     
@@ -408,7 +409,7 @@ public class BoatStatusRecord extends DataRecord {
             EfaUtil.foo();
         }
 
-        int cols = 5;
+        int cols = 6;
         if (multipleBoathouses) {cols++;}
 
         TableItemHeader[] header = new TableItemHeader[cols];
@@ -419,6 +420,7 @@ public class BoatStatusRecord extends DataRecord {
         }
         header[col++] = new TableItemHeader(International.getString("Basis-Status"));
         header[col++] = new TableItemHeader(International.getString("aktueller Status"));
+        header[col++] = new TableItemHeader(International.getString("Fahrt")+"/"+International.getString("Fahrtenbuch"));
         header[col++] = new TableItemHeader(International.getString("Bemerkung"));
         header[col++] = new TableItemHeader(International.getString("Eigentümer"));
         return header;
@@ -431,7 +433,7 @@ public class BoatStatusRecord extends DataRecord {
         } catch(Exception eingore) {
             EfaUtil.foo();
         }
-        int cols = 5;
+        int cols = 6;
         if (multipleBoathouses) {
             cols++;
         }
@@ -443,11 +445,28 @@ public class BoatStatusRecord extends DataRecord {
         }        
         items[col++] = new TableItem(getStatusDescription(getBaseStatus()));
         items[col++] = new TableItem(getStatusDescription(getCurrentStatus()));
+        items[col++] = new TableItem(getEntryNoAndLogbook());
         items[col++] = new TableItem(getComment());
         items[col++] = new TableItem(getBoatOwner());
         return items;
     }
 
+    
+    private String getEntryNoAndLogbook() {
+        String retVal="";
+        if (getEntryNo() != null) { 
+        	retVal+=getEntryNo().toString().trim();
+        } 
+        if (getLogbook() != null) {
+        	if (retVal.length()>0) {
+        		retVal+= " / ";
+        	}
+        	retVal+=getLogbook();
+        }
+        
+        return retVal;    	
+    }
+    
     /**
      * @return Empty if boat is not to be shown exclusively in a single boathouse, else it retruns the respective name of the boathouse.
      */

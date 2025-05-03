@@ -101,6 +101,7 @@ public class EfaCloudStorage extends XMLFile {
                     Ecrid.iEcrids.put(ecrid, dataRecord);
                 } catch (EfaException e) {
                     // if the local storage fails, synchronisation will fix the problem later.
+                	Logger.logdebug(e);
                 }
             }
             // the data record must not have an autoincrement field, this is to be set by the server.
@@ -303,6 +304,64 @@ public class EfaCloudStorage extends XMLFile {
             ret.add(dataRecord);
         }
         return ret;
+    }
+    
+    
+    protected void handlePostOpenStorageObject() {
+        if (isEfaCloudAndTableWithEcrid()) {
+        	Ecrid.addAll(this.getPersistence());
+        }
+    }
+    
+    protected void handlePostCloseStorageObject() {
+        //remove all ecrids from the ecrid cache from the current storage object
+        if (isEfaCloudAndTableWithEcrid()) {
+        	Ecrid.removeAll(this.getPersistence());
+        }        	
+    }
+    
+    protected void handleInModifyRecord(DataRecord record, DataRecord newRecord, DataRecord currentRecord, DataKey key, boolean add, boolean update, boolean delete) {
+        if (isEfaCloudAndTableWithEcrid()) {
+        	String myEcrid = record.getAsString(Ecrid.ECRID_FIELDNAME);        	
+
+        	if ((add|update) && (myEcrid != null)) {
+	        	//if we are updating local record, we need to update the ecrid cache with the new Record.
+	        	//but only if an ecrid exists for the current record.
+	        	if (Ecrid.iEcrids.containsKey(myEcrid)) {
+	        		DataRecord removed=Ecrid.iEcrids.remove(myEcrid);
+	        	}
+	        	Ecrid.iEcrids.put(myEcrid, newRecord);
+	        	
+        	} else if (delete && (myEcrid != null) ) {
+                //handle ecrids, if available
+        		DataRecord removed=Ecrid.iEcrids.remove(myEcrid);
+        	}
+        }
+    }
+    
+    protected void handlePostModifyRecord(DataRecord record, DataRecord newRecord, DataKey key, boolean add, boolean update, boolean delete) {
+        // check whether an efacloud server shall also be updated, and trigger update, if
+        // needed.
+        StorageObject rp = record.getPersistence();
+        // check whether this is an efa Cloud storage object, and the record is not a server copy anyway
+        if (rp.dataAccess.getStorageType() == IDataAccess.TYPE_EFA_CLOUD && !inOpeningStorageObject && !record.isCopyFromServer) {
+            // if so, trigger server modification
+            
+        	//Some code no longer neccessary as we are within efaCloudStorage
+        	/* EfaCloudStorage efaCloudStorage = (EfaCloudStorage) rp.dataAccess;
+             * efaCloudStorage.*/ 
+        	modifyServerRecord(add || update ? newRecord : record, add, update, delete, false);
+        }
+    }
+    
+
+    
+    
+    private boolean isEfaCloudAndTableWithEcrid() {
+        String fName = filename.substring(filename.lastIndexOf('.') + 1);
+        return ((Daten.project != null) 
+        		&& (Daten.project.getProjectStorageType() == IDataAccess.TYPE_EFA_CLOUD)
+        		&& TableBuilder.tablenamesWithEcrids.contains(fName)); 
     }
 
 }

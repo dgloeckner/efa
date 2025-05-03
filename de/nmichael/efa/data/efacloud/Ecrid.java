@@ -5,6 +5,7 @@ import de.nmichael.efa.data.storage.DataKeyIterator;
 import de.nmichael.efa.data.storage.DataRecord;
 import de.nmichael.efa.data.storage.StorageObject;
 import de.nmichael.efa.ex.EfaException;
+import de.nmichael.efa.util.Logger;
 
 import java.security.SecureRandom;
 import java.util.HashMap;
@@ -58,6 +59,26 @@ public class Ecrid {
         } catch (EfaException e) {
             // do nothing
         }
+    }
+    
+    public static void removeAll(StorageObject storageObject) {
+        try {
+            DataKeyIterator dataKeyIterator = storageObject.data().getStaticIterator();
+            DataKey dataKey = dataKeyIterator.getFirst();
+            while (dataKey != null) {
+                DataRecord dataRecord = storageObject.data().get(dataKey);
+                if (dataRecord.isField(ECRID_FIELDNAME)) {
+                    String ecrid = dataRecord.getAsText(ECRID_FIELDNAME);
+                    if ((ecrid != null) && (ecrid.length() == 12)) {
+                        iEcrids.remove(ecrid);
+                    }
+                    dataKey = dataKeyIterator.getNext();
+                }
+            }
+        } catch (EfaException e) {
+            // do nothing
+        	Logger.logdebug(e);
+        }    	
     }
 
 }

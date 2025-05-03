@@ -20,6 +20,7 @@ import de.nmichael.efa.Daten;
 import de.nmichael.efa.core.config.AdminRecord;
 import de.nmichael.efa.core.config.EfaCloudUsers;
 import de.nmichael.efa.core.config.EfaTypes;
+import de.nmichael.efa.data.efacloud.Ecrid;
 import de.nmichael.efa.data.efacloud.TxRequestQueue;
 import de.nmichael.efa.data.storage.Audit;
 import de.nmichael.efa.data.storage.DataAccess;
@@ -996,14 +997,29 @@ public class Project extends StorageObject {
 
         Logger.log(Logger.INFO, Logger.MSG_EVT_PROJECTCLOSED,
                 LogString.fileClosing(this.getProjectName(), International.getString("Projekt")));    	
-    	// close all of this project's storage objects
+
+        // Close the message queue to the efacloud server
+        // this is neccessary at this point as we close the persistence files next.
+        // no efacloud action shall take place when files are getting closed.
+        if ((getProjectStorageType() == IDataAccess.TYPE_EFA_CLOUD) && (TxRequestQueue.getInstance() != null)) {
+            TxRequestQueue.getInstance().cancel();
+        }        
+        
+        //for debug purposes:show number of Ecrids before closing the files.
+        Logger.log(Logger.DEBUG, "Anzahl Ecrids:"+Ecrid.iEcrids.size());
+        
+        // close all of this project's storage objects
         Set<String> keys = persistenceCache.keySet();
         for (String key : keys) {
             closePersistence(persistenceCache.get(key));
         }
-        // Close the message queue to the efacloud server
-        if ((getProjectStorageType() == IDataAccess.TYPE_EFA_CLOUD) && (TxRequestQueue.getInstance() != null)) {
-            TxRequestQueue.getInstance().cancel();
+        //for debug purposes: show number of ecrids after closing the files. Should be zero.
+        //anyway, show all ecrids including the data records represented by them.
+        Logger.log(Logger.DEBUG, "Anzahl Ecrids:"+Ecrid.iEcrids.size());
+        
+        Set<String> myStringSet =Ecrid.iEcrids.keySet();
+        for (String id : myStringSet) {
+            Logger.log(Logger.DEBUG, id + " " + Ecrid.iEcrids.get(id).toString());
         }
         // close the project storage object itself
         closePersistence(this);

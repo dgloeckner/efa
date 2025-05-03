@@ -154,6 +154,10 @@ public class EfaBoathouseBackgroundTask extends Thread {
                      if (Logger.isTraceOn(Logger.TT_BACKGROUND, 5)) {
                          Logger.log(Logger.DEBUG, Logger.MSG_DEBUG_EFABACKGROUNDTASK, "EfaBoathouseBackgroundTask: doing nothing as admin mode is active.");
                      }
+                } else if (Daten.isShutdownRequested) {
+                    if (Logger.isTraceOn(Logger.TT_BACKGROUND, 5)) {
+                        Logger.log(Logger.DEBUG, Logger.MSG_DEBUG_EFABACKGROUNDTASK, "EfaBoathouseBackgroundTask: doing nothing as shutdown is requested.");
+                    }
                 } else {
                 	
                 // find out whether a project is open, and whether it's local or remote

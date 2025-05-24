@@ -1020,11 +1020,13 @@ public class Project extends StorageObject {
 
         if (Logger.isTraceOn(Logger.TT_CLOUD, 1)) {
         	Logger.log(Logger.DEBUG, Logger.MSG_DEBUG_EFACLOUD, "Ecrid index size after closing persistence:"+Ecrid.iEcrids.size());
-        	Logger.log(Logger.DEBUG, Logger.MSG_DEBUG_EFACLOUD, "Ecrid index contents:");
-            Set<String> myStringSet =Ecrid.iEcrids.keySet();
-            for (String id : myStringSet) {
-                Logger.log(Logger.DEBUG, Logger.MSG_DEBUG_EFACLOUD, id + " " + Ecrid.iEcrids.get(id).getKeyAsTextDescription() +" " + Ecrid.iEcrids.get(id).getClass().getName());
-            }
+        	if (Ecrid.iEcrids.size()>0) {
+	        	Logger.log(Logger.DEBUG, Logger.MSG_DEBUG_EFACLOUD, "Ecrid index contents:");
+	            Set<String> myStringSet =Ecrid.iEcrids.keySet();
+	            for (String id : myStringSet) {
+	                Logger.log(Logger.DEBUG, Logger.MSG_DEBUG_EFACLOUD, id + " " + Ecrid.iEcrids.get(id).getKeyAsTextDescription() +" " + Ecrid.iEcrids.get(id).getClass().getName());
+	            }
+        	}
         }
 
         // close the project storage object itself

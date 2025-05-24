@@ -316,6 +316,9 @@ public class EfaCloudStorage extends XMLFile {
      */
     protected void handlePostOpenStorageObject() {
         if (isEfaCloudAndTableWithEcrid()) {
+            if (Logger.isTraceOn(Logger.TT_CLOUD, 1)) {
+            	Logger.log(Logger.DEBUG, "Loading ecrids for: "+this.filename);
+            }        	
         	Ecrid.addAll(this.getPersistence());
         }
     }

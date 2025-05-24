@@ -578,6 +578,9 @@ public class Project extends StorageObject {
                             		+ description.toString()
                             		+ (currentProject ? "</font>" : "")
                             		+"</td></tr></table></html>");
+                            if ((p!=null) && (p.isOpen())) {
+                            	p.close();
+                            }
                         } catch (Exception e1) {
                         }
                     }

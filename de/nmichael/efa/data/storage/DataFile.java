@@ -208,6 +208,7 @@ public abstract class DataFile extends DataAccess {
         try {
             boolean recovered = false;
             fileWriter = null;
+        	Logger.log(Logger.DEBUG, "Opening Datastorage: "+filename);
             try {
                 recovered = tryOpenStorageObject(filename, false);
             } catch(Exception e1) {
@@ -293,6 +294,7 @@ public abstract class DataFile extends DataAccess {
             return;
         }
         try {
+        	Logger.log(Logger.DEBUG, "Closing Datastorage: "+filename);
             if (fileWriter == null) {
                 Logger.log(Logger.ERROR, Logger.MSG_DATA_CLOSEFAILED, LogString.fileCloseFailed(filename, storageLocation,
                         "File appears to be already closed (fileWriter==null)"));

@@ -258,6 +258,14 @@ public abstract class DataFile extends DataAccess {
     protected void handlePostOpenStorageObject() {
     	
     }
+    
+    /**
+     * Method where subclasses of DataFile can run additional actions short after actually closing the data file.
+     * Empty by default.
+     */    
+    protected void handleBeforeClosingStorageObject() {
+    	
+    }    
 
     private boolean shouldWriteMirrorFile() {
         try {
@@ -288,14 +296,14 @@ public abstract class DataFile extends DataAccess {
             if (fileWriter == null) {
                 Logger.log(Logger.ERROR, Logger.MSG_DATA_CLOSEFAILED, LogString.fileCloseFailed(filename, storageLocation,
                         "File appears to be already closed (fileWriter==null)"));
-                this.handlePostCloseStorageObject();                
+                this.handleBeforeClosingStorageObject();                
                 clearAllData();
                 isOpen = false;
                 closeJournal();
                 return;
             }
             fileWriter.save(true, false);
-            this.handlePostCloseStorageObject();
+            this.handleBeforeClosingStorageObject();
             clearAllData();
             isOpen = false;
             closeJournal();
@@ -308,14 +316,6 @@ public abstract class DataFile extends DataAccess {
         }
     }
    
-    /**
-     * Method where subclasses of DataFile can run additional actions short after actually closing the data file.
-     * Empty by default.
-     */    
-    protected void handlePostCloseStorageObject() {
-    	
-    }    
-
     protected boolean createBackupFile(String originalFilename) {
         String backup0 = originalFilename + BACKUP_MOSTRECENT; // most recent backup
         String backup1 = originalFilename + BACKUP_OLDVERSION; // previous backup

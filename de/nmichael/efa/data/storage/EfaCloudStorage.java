@@ -16,6 +16,7 @@ import de.nmichael.efa.data.*;
 import de.nmichael.efa.data.efacloud.*;
 import de.nmichael.efa.ex.EfaException;
 import de.nmichael.efa.util.Dialog;
+import de.nmichael.efa.util.EfaUtil;
 import de.nmichael.efa.util.International;
 import de.nmichael.efa.util.Logger;
 
@@ -93,6 +94,9 @@ public class EfaCloudStorage extends XMLFile {
             String ecrid = dataRecord.getAsText(Ecrid.ECRID_FIELDNAME);
             if ((ecrid == null) || (ecrid.isEmpty())) {
                 ecrid = Ecrid.generate();
+                if (Logger.isTraceOn(Logger.TT_CLOUD, 1)) {
+                	Logger.log(Logger.DEBUG, Logger.MSG_DEBUG_EFACLOUD, "Creating eCrid: "+ecrid +" " + dataRecord.getKeyAsTextDescription() +" " + dataRecord.getClass().getName() + (dataRecord.metaData.isVersionized() ? " (" +dataRecord.getValidFromTimeString()+ " - " + dataRecord.getValidUntilTimeString() +  ")": ""));
+                }
                 dataRecord.setFromText(Ecrid.ECRID_FIELDNAME, ecrid);
                 apiRecord.setFromText(Ecrid.ECRID_FIELDNAME, ecrid);
                 // store the same ecrid locally
@@ -306,20 +310,37 @@ public class EfaCloudStorage extends XMLFile {
         return ret;
     }
     
-    
+    /**
+     * Special efacloud code which needs to be run after opening a datafile.
+     * All ecrids in the newly opened file need to be put into the ecrid cache.
+     */
     protected void handlePostOpenStorageObject() {
         if (isEfaCloudAndTableWithEcrid()) {
         	Ecrid.addAll(this.getPersistence());
         }
     }
     
-    protected void handlePostCloseStorageObject() {
+    /**
+     * Special efacloud code which needs to be run right before closing a datafile.
+     * All ecrids of the datafile need to be removed from the ecrid index to avoid excessive memory consumption.
+     */
+    protected void handleBeforeClosingStorageObject() {
         //remove all ecrids from the ecrid cache from the current storage object
         if (isEfaCloudAndTableWithEcrid()) {
         	Ecrid.removeAll(this.getPersistence());
         }        	
     }
     
+    /**
+     * Special efacloud code which needs to be run when modifying a record.
+     * This is mostly handling the ecrid index.
+     * 
+     * When adding a new record, it is added to the ecrid index.
+     * When updating an exiting record, it is removed from the ecrid index and added (again),
+     * so that the ecrid index points to the newest record.
+     * When deleting an existing record, the record is removed from the ecrid index.
+     * 
+     */
     protected void handleInModifyRecord(DataRecord record, DataRecord newRecord, DataRecord currentRecord, DataKey key, boolean add, boolean update, boolean delete) {
         if (isEfaCloudAndTableWithEcrid()) {
         	String myEcrid = record.getAsString(Ecrid.ECRID_FIELDNAME);        	
@@ -335,22 +356,24 @@ public class EfaCloudStorage extends XMLFile {
         	} else if (delete && (myEcrid != null) ) {
                 //handle ecrids, if available
         		DataRecord removed=Ecrid.iEcrids.remove(myEcrid);
+        	} else if (delete && myEcrid == null) {
+        		EfaUtil.foo();// should not take place
         	}
         }
     }
     
+    /**
+     * Special efacloud code which needs to be run when modifying a record, in a late stage of DataFile.modifyRecord.
+     * 
+     */
     protected void handlePostModifyRecord(DataRecord record, DataRecord newRecord, DataKey key, boolean add, boolean update, boolean delete) {
-        // check whether an efacloud server shall also be updated, and trigger update, if
-        // needed.
+        // check whether an efacloud server shall also be updated, and trigger update, if needed.
         StorageObject rp = record.getPersistence();
+        
         // check whether this is an efa Cloud storage object, and the record is not a server copy anyway
         if (rp.dataAccess.getStorageType() == IDataAccess.TYPE_EFA_CLOUD && !inOpeningStorageObject && !record.isCopyFromServer) {
             // if so, trigger server modification
-            
-        	//Some code no longer neccessary as we are within efaCloudStorage
-        	/* EfaCloudStorage efaCloudStorage = (EfaCloudStorage) rp.dataAccess;
-             * efaCloudStorage.*/ 
-        	modifyServerRecord(add || update ? newRecord : record, add, update, delete, false);
+        	this.modifyServerRecord(add || update ? newRecord : record, add, update, delete, false);
         }
     }
     
@@ -359,9 +382,17 @@ public class EfaCloudStorage extends XMLFile {
     
     private boolean isEfaCloudAndTableWithEcrid() {
         String fName = filename.substring(filename.lastIndexOf('.') + 1);
-        return ((Daten.project != null) 
+        
+        boolean retVal = ((Daten.project != null) 
         		&& (Daten.project.getProjectStorageType() == IDataAccess.TYPE_EFA_CLOUD)
-        		&& TableBuilder.tablenamesWithEcrids.contains(fName)); 
+        		&& TableBuilder.tablenamesWithEcrids.contains(fName));
+        
+        if (retVal==false) {// just for debug purposes some logging
+            if (Logger.isTraceOn(Logger.TT_CLOUD, 1)) {
+            	Logger.log(Logger.DEBUG, "No Table with eCrid: "+filename+" "+fName+ "project is null ?"+(Daten.project == null));
+            }
+        }
+        return retVal;
     }
 
 }

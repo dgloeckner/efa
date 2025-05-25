@@ -579,7 +579,7 @@ public class Project extends StorageObject {
                             		+ (currentProject ? "</font>" : "")
                             		+"</td></tr></table></html>");
                             if ((p!=null) && (p.isOpen())) {
-                            	p.close();
+                            	p.close();// it's a good idea to close a project which has been opened before - just for filehandling issues
                             }
                         } catch (Exception e1) {
                         }

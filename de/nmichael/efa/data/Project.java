@@ -1010,7 +1010,7 @@ public class Project extends StorageObject {
         
         if (Logger.isTraceOn(Logger.TT_CLOUD, 1)) {
 	        //for debug purposes:show number of Ecrids before closing the files.
-	        Logger.log(Logger.DEBUG, Logger.MSG_DEBUG_EFACLOUD, "Ecrid index size before closing persistence:"+Ecrid.iEcrids.size());
+	        Logger.log(Logger.DEBUG, Logger.MSG_DEBUG_EFACLOUD, "EcridIndex size before closing persistence:"+Ecrid.iEcrids.size());
         }        
         // close all of this project's storage objects
         Set<String> keys = persistenceCache.keySet();
@@ -1019,9 +1019,9 @@ public class Project extends StorageObject {
         }
 
         if (Logger.isTraceOn(Logger.TT_CLOUD, 1)) {
-        	Logger.log(Logger.DEBUG, Logger.MSG_DEBUG_EFACLOUD, "Ecrid index size after closing persistence:"+Ecrid.iEcrids.size());
+        	Logger.log(Logger.DEBUG, Logger.MSG_DEBUG_EFACLOUD, "EcridIndex size after closing persistence:"+Ecrid.iEcrids.size());
         	if (Ecrid.iEcrids.size()>0) {
-	        	Logger.log(Logger.DEBUG, Logger.MSG_DEBUG_EFACLOUD, "Ecrid index contents:");
+	        	Logger.log(Logger.DEBUG, Logger.MSG_DEBUG_EFACLOUD, "EcridIndex contents:");
 	            Set<String> myStringSet =Ecrid.iEcrids.keySet();
 	            for (String id : myStringSet) {
 	                Logger.log(Logger.DEBUG, Logger.MSG_DEBUG_EFACLOUD, id + " " + Ecrid.iEcrids.get(id).getKeyAsTextDescription() +" " + Ecrid.iEcrids.get(id).getClass().getName());

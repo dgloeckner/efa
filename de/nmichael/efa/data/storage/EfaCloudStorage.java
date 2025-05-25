@@ -103,6 +103,9 @@ public class EfaCloudStorage extends XMLFile {
                 try {
                     modifyLocalRecord(dataRecord, false, true, false);
                     Ecrid.iEcrids.put(ecrid, dataRecord);
+    				if (Logger.isTraceOn(Logger.TT_CLOUD, 6)) {
+						Logger.log(Logger.DEBUG, Logger.MSG_DEBUG_EFACLOUD, "EcridIndex: Adding (1) '" + ecrid + "': " + dataRecord.getKeyAsTextDescription() + " "+ dataRecord.getClass().getName()+ (dataRecord.metaData.isVersionized()? " (" + dataRecord.getValidFromTimeString() + " - "+ dataRecord.getValidUntilTimeString() + ")": ""));
+					}                    
                 } catch (EfaException e) {
                     // if the local storage fails, synchronisation will fix the problem later.
                 	Logger.logdebug(e);
@@ -330,6 +333,9 @@ public class EfaCloudStorage extends XMLFile {
     protected void handleBeforeClosingStorageObject() {
         //remove all ecrids from the ecrid cache from the current storage object
         if (isEfaCloudAndTableWithEcrid()) {
+			if (Logger.isTraceOn(Logger.TT_CLOUD, 1)) {
+				Logger.log(Logger.DEBUG, "Removing ecrids for: " + this.filename);
+			}        	
         	Ecrid.removeAll(this.getPersistence());
         }        	
     }
@@ -353,12 +359,38 @@ public class EfaCloudStorage extends XMLFile {
 	        	//but only if an ecrid exists for the current record.
 	        	if (Ecrid.iEcrids.containsKey(myEcrid)) {
 	        		DataRecord removed=Ecrid.iEcrids.remove(myEcrid);
-	        	}
+					if (Logger.isTraceOn(Logger.TT_CLOUD, 6)) {
+						Logger.log(Logger.DEBUG, Logger.MSG_DEBUG_EFACLOUD, "EcridIndex: Update '" + myEcrid + "': " + removed.getKeyAsTextDescription() + " "
+										+ removed.getClass().getName()
+										+ (removed.metaData.isVersionized()
+												? " (" + removed.getValidFromTimeString() + " - "
+														+ removed.getValidUntilTimeString() + ")"
+												: ""));
+					}
+				} else {
+					if (Logger.isTraceOn(Logger.TT_CLOUD, 6)) {
+						Logger.log(Logger.DEBUG, Logger.MSG_DEBUG_EFACLOUD, "EcridIndex: Adding (2) '" + myEcrid + "': " + newRecord.getKeyAsTextDescription() + " "
+										+ newRecord.getClass().getName()
+										+ (newRecord.metaData.isVersionized()
+												? " (" + newRecord.getValidFromTimeString() + " - "
+														+ newRecord.getValidUntilTimeString() + ")"
+												: ""));
+					}
+				}
+	        	
 	        	Ecrid.iEcrids.put(myEcrid, newRecord);
 	        	
         	} else if (delete && (myEcrid != null) ) {
                 //handle ecrids, if available
         		DataRecord removed=Ecrid.iEcrids.remove(myEcrid);
+				if (Logger.isTraceOn(Logger.TT_CLOUD, 6)) {
+					Logger.log(Logger.DEBUG, Logger.MSG_DEBUG_EFACLOUD, "EcridIndex: Removing '" + myEcrid + "': " + removed.getKeyAsTextDescription() + " "
+									+ removed.getClass().getName()
+									+ (removed.metaData.isVersionized()
+											? " (" + removed.getValidFromTimeString() + " - "
+													+ removed.getValidUntilTimeString() + ")"
+											: ""));
+				}        		
         	} else if (delete && myEcrid == null) {
         		EfaUtil.foo();// should not take place
         	}

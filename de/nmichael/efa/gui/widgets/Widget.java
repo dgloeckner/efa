@@ -73,7 +73,7 @@ public abstract class Widget implements IWidget {
                         International.getString("links"),
                         International.getString("rechts"),
                         International.getString("mitte"),
-                        International.getString("MultiWidget")
+                        International.getString("Multi-Widget")
                     },
                     IItemType.TYPE_PUBLIC, "",
                     International.getString("Position")));

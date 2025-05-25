@@ -20,6 +20,7 @@ import de.nmichael.efa.Daten;
 import de.nmichael.efa.core.config.AdminRecord;
 import de.nmichael.efa.core.config.EfaCloudUsers;
 import de.nmichael.efa.core.config.EfaTypes;
+import de.nmichael.efa.data.efacloud.Ecrid;
 import de.nmichael.efa.data.efacloud.TxRequestQueue;
 import de.nmichael.efa.data.storage.Audit;
 import de.nmichael.efa.data.storage.DataAccess;
@@ -577,6 +578,9 @@ public class Project extends StorageObject {
                             		+ description.toString()
                             		+ (currentProject ? "</font>" : "")
                             		+"</td></tr></table></html>");
+                            if ((p!=null) && (p.isOpen())) {
+                            	p.close();// it's a good idea to close a project which has been opened before - just for filehandling issues
+                            }
                         } catch (Exception e1) {
                         }
                     }
@@ -996,15 +1000,35 @@ public class Project extends StorageObject {
 
         Logger.log(Logger.INFO, Logger.MSG_EVT_PROJECTCLOSED,
                 LogString.fileClosing(this.getProjectName(), International.getString("Projekt")));    	
-    	// close all of this project's storage objects
+
+        // Close the message queue to the efacloud server
+        // this is neccessary at this point as we close the persistence files next.
+        // no efacloud action shall take place when files are getting closed.
+        if ((getProjectStorageType() == IDataAccess.TYPE_EFA_CLOUD) && (TxRequestQueue.getInstance() != null)) {
+            TxRequestQueue.getInstance().cancel();
+        }        
+        
+        if (Logger.isTraceOn(Logger.TT_CLOUD, 1)) {
+	        //for debug purposes:show number of Ecrids before closing the files.
+	        Logger.log(Logger.DEBUG, Logger.MSG_DEBUG_EFACLOUD, "EcridIndex size before closing persistence:"+Ecrid.iEcrids.size());
+        }        
+        // close all of this project's storage objects
         Set<String> keys = persistenceCache.keySet();
         for (String key : keys) {
             closePersistence(persistenceCache.get(key));
         }
-        // Close the message queue to the efacloud server
-        if ((getProjectStorageType() == IDataAccess.TYPE_EFA_CLOUD) && (TxRequestQueue.getInstance() != null)) {
-            TxRequestQueue.getInstance().cancel();
+
+        if (Logger.isTraceOn(Logger.TT_CLOUD, 1)) {
+        	Logger.log(Logger.DEBUG, Logger.MSG_DEBUG_EFACLOUD, "EcridIndex size after closing persistence:"+Ecrid.iEcrids.size());
+        	if (Ecrid.iEcrids.size()>0) {
+	        	Logger.log(Logger.DEBUG, Logger.MSG_DEBUG_EFACLOUD, "EcridIndex contents:");
+	            Set<String> myStringSet =Ecrid.iEcrids.keySet();
+	            for (String id : myStringSet) {
+	                Logger.log(Logger.DEBUG, Logger.MSG_DEBUG_EFACLOUD, id + " " + Ecrid.iEcrids.get(id).getKeyAsTextDescription() +" " + Ecrid.iEcrids.get(id).getClass().getName());
+	            }
+        	}
         }
+
         // close the project storage object itself
         closePersistence(this);
     }

@@ -11,8 +11,6 @@
 package de.nmichael.efa.data.storage;
 
 import de.nmichael.efa.*;
-import de.nmichael.efa.data.efacloud.Ecrid;
-import de.nmichael.efa.data.efacloud.TableBuilder;
 import de.nmichael.efa.util.*;
 import de.nmichael.efa.ex.EfaException;
 import java.util.*;
@@ -242,10 +240,9 @@ public abstract class DataFile extends DataAccess {
             if (recovered || shouldWriteMirrorFile()) {
                 saveStorageObject();
             }
-            String fName = filename.substring(filename.lastIndexOf('.') + 1);
-            if ((Daten.project != null) && (Daten.project.getProjectStorageType() == IDataAccess.TYPE_EFA_CLOUD)
-                && TableBuilder.tablenamesWithEcrids.contains(fName))
-                    Ecrid.addAll(this.getPersistence());
+            
+            this.handlePostOpenStorageObject();
+
         } catch(Exception e) {
             if (logex) {
                 Logger.log(e);
@@ -253,6 +250,22 @@ public abstract class DataFile extends DataAccess {
             throw new EfaException(Logger.MSG_DATA_OPENFAILED, LogString.fileOpenFailed(tryfilename, storageLocation, e.toString()), Thread.currentThread().getStackTrace());
         }
     }
+    
+    /**
+     * Method where subclasses of DataFile can run additional actions after opening the data file.
+     * Empty by default.
+     */
+    protected void handlePostOpenStorageObject() {
+    	
+    }
+    
+    /**
+     * Method where subclasses of DataFile can run additional actions short after actually closing the data file.
+     * Empty by default.
+     */    
+    protected void handleBeforeClosingStorageObject() {
+    	
+    }    
 
     private boolean shouldWriteMirrorFile() {
         try {
@@ -283,12 +296,14 @@ public abstract class DataFile extends DataAccess {
             if (fileWriter == null) {
                 Logger.log(Logger.ERROR, Logger.MSG_DATA_CLOSEFAILED, LogString.fileCloseFailed(filename, storageLocation,
                         "File appears to be already closed (fileWriter==null)"));
+                this.handleBeforeClosingStorageObject();                
                 clearAllData();
                 isOpen = false;
                 closeJournal();
                 return;
             }
             fileWriter.save(true, false);
+            this.handleBeforeClosingStorageObject();
             clearAllData();
             isOpen = false;
             closeJournal();
@@ -300,7 +315,7 @@ public abstract class DataFile extends DataAccess {
             fileWriter = null;
         }
     }
-
+   
     protected boolean createBackupFile(String originalFilename) {
         String backup0 = originalFilename + BACKUP_MOSTRECENT; // most recent backup
         String backup1 = originalFilename + BACKUP_OLDVERSION; // previous backup
@@ -581,22 +596,16 @@ public abstract class DataFile extends DataAccess {
                             }
                         }
                     }
+                    this.handleInModifyRecord(record, newRecord, currentRecord, key, add, update, delete);                    
                 }
             } finally {
-                if (lockID <= 0 && myLock > 0) {
+                this.handlePostModifyRecord(record, newRecord, key, add, update, delete);
+            	if (lockID <= 0 && myLock > 0) {
                     releaseLocalLock(myLock);
                 }
             }
 
-            // check whether an efacloud server shall also be updated, and trigger update, if
-            // needed.
-            StorageObject rp = record.getPersistence();
-            // check whether this is an efa Cloud storage object, and the record is not a server copy anyway
-            if (rp.dataAccess.getStorageType() == IDataAccess.TYPE_EFA_CLOUD && !inOpeningStorageObject && !record.isCopyFromServer) {
-                // if so, trigger server modification
-                EfaCloudStorage efaCloudStorage = (EfaCloudStorage) rp.dataAccess;
-                efaCloudStorage.modifyServerRecord(add || update ? newRecord : record, add, update, delete, false);
-            }
+
 
             if (fileWriter != null) { // may be null while reading (opening) a file
                 fileWriter.save(false, true);
@@ -607,6 +616,22 @@ public abstract class DataFile extends DataAccess {
         return newRecord;
     }
 
+    /**
+     * Method where subclasses of DataFile can run additional actions short after adding, updating or deleting a record
+     * Empty by default.
+     */    
+    protected void handleInModifyRecord(DataRecord record, DataRecord newRecord, DataRecord currentRecord, DataKey key, boolean add, boolean update, boolean delete) {
+    	
+    }
+    
+    /**
+     * Method where subclasses of DataFile can run additional actions after all other actions of modifying a record.
+     * Empty by default.
+     */        
+    protected void handlePostModifyRecord(DataRecord record, DataRecord newRecord, DataKey key, boolean add, boolean update, boolean delete) {
+    	
+    }
+    
     private void modifyVersionizedKeys(DataKey key, boolean add, boolean update, boolean delete) {
         DataKey keyUnversionized = getUnversionizedKey(key);
         synchronized(data) { // always synchronize on data to ensure integrity!

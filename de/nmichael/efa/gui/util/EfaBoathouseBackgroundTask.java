@@ -154,6 +154,10 @@ public class EfaBoathouseBackgroundTask extends Thread {
                      if (Logger.isTraceOn(Logger.TT_BACKGROUND, 5)) {
                          Logger.log(Logger.DEBUG, Logger.MSG_DEBUG_EFABACKGROUNDTASK, "EfaBoathouseBackgroundTask: doing nothing as admin mode is active.");
                      }
+                } else if (Daten.isShutdownRequested) {
+                    if (Logger.isTraceOn(Logger.TT_BACKGROUND, 5)) {
+                        Logger.log(Logger.DEBUG, Logger.MSG_DEBUG_EFABACKGROUNDTASK, "EfaBoathouseBackgroundTask: doing nothing as shutdown is requested.");
+                    }
                 } else {
                 	
                 // find out whether a project is open, and whether it's local or remote
@@ -421,6 +425,19 @@ public class EfaBoathouseBackgroundTask extends Thread {
         try {
             DataKeyIterator it = boatStatus.data().getStaticIterator();
             for (DataKey k = it.getFirst(); k != null; k = it.getNext()) {
+            	//check for admin mode or shutdown request - and stop the iteration
+                if (Daten.isAdminMode()) {
+                    if (Logger.isTraceOn(Logger.TT_BACKGROUND, 5)) {
+                        Logger.log(Logger.DEBUG, Logger.MSG_DEBUG_EFABACKGROUNDTASK, "EfaBoathouseBackgroundTask: stopping update of boatstatus as admin mode is active.");
+                    }
+                    break;
+               } else if (Daten.isShutdownRequested) {
+                   if (Logger.isTraceOn(Logger.TT_BACKGROUND, 5)) {
+                       Logger.log(Logger.DEBUG, Logger.MSG_DEBUG_EFABACKGROUNDTASK, "EfaBoathouseBackgroundTask: stopping update of boatstatus as shutdown is requested.");
+                   }
+                   break;
+               }
+            	
                 BoatStatusRecord boatStatusRecord = (BoatStatusRecord) boatStatus.data().get(k);
                 if (boatStatusRecord == null) {
                     continue;
@@ -602,6 +619,7 @@ public class EfaBoathouseBackgroundTask extends Thread {
             Logger.logdebug(e);
         }
     }
+    
     private void checkForUnreadMessages() {
         if (Logger.isTraceOn(Logger.TT_BACKGROUND, 8)) {
             Logger.log(Logger.DEBUG, Logger.MSG_DEBUG_EFABACKGROUNDTASK,

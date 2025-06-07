@@ -4101,8 +4101,34 @@ public class EfaBaseFrame extends BaseDialog implements IItemListener {
         } else {
             crew[0].setDescription(International.getString("Name"));
         }
+        
+        // if the boat changed, or the boatvariant changed, we need to take care that
+        // the persons list is accurate. So if we have a 3seat boat with cox, and change to a 2seat without cox,
+        // the person who was cox and person3 should be made available in the person list.
+        // so we reset the person list and remove all persons from it which are still set.
+
+        //refill autocompletelist for persons with all persons
+		autoCompleteListPersons.reset();
+		
+		// remove currently used persons	
+		for (int i=0; i<LogbookRecord.CREW_MAX; i++) {
+			//crew(0)=cox crew(1)..crew(24)=crew					
+			removeFromAutoCompleteVisible(getCrewItem(i));
+		}
     }
 
+    /**
+     * Removes a value from the visible items of an autocomplete list of a field
+     * @param theField the AutoComplete Field
+     */
+    private void removeFromAutoCompleteVisible(ItemTypeStringAutoComplete theField) {
+    	theField.getValueFromGui();
+    	String value=theField.getValue();
+    	if (value!=null && value.trim().isEmpty()==false) {
+    		theField.removeFromVisible(value);
+    	}
+    }
+    
     // wird von boot_focusLost aufgerufen, sowie vom FocusManager! (irgendwie unsauber, da bei <Tab> doppelt...
     void currentBoatUpdateGui() {
         currentBoatUpdateGui(-1);

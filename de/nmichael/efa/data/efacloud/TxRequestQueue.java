@@ -28,7 +28,6 @@ import de.nmichael.efa.gui.EfaBaseFrame;
 import de.nmichael.efa.gui.EfaBoathouseFrame;
 import de.nmichael.efa.gui.EfaCloudConfigDialog;
 import de.nmichael.efa.gui.ImagesAndIcons;
-import de.nmichael.efa.util.EfaUtil;
 import de.nmichael.efa.util.International;
 import de.nmichael.efa.util.Logger;
 
@@ -83,7 +82,7 @@ public class TxRequestQueue implements TaskManager.RequestDispatcherIF {
     // The update period MUST be at least 5 times the InternetAccessManager timeout.
     // The synchronisation start delay is one SYNCH_PERIOD
     static final int SYNCH_PERIOD_DEFAULT = 3600000; // = 3600 seconds = 1 hour
-    static final long SYNCHRONIZATION_TIMEOUT = 180000; // the synchronisation will be forced to end after this time
+    static final long SYNCHRONIZATION_TIMEOUT = 15*60*1000; // the synchronisation will be forced to end after this time - 15 minutes
     static int synch_period = SYNCH_PERIOD_DEFAULT; // = 3600 seconds = 1 hour
     static final int STATS_UPLOAD_PERIOD_MIN = 86400000;  // = 86400 seconds = 24 hours
 
@@ -826,6 +825,8 @@ public class TxRequestQueue implements TaskManager.RequestDispatcherIF {
                 // ============== time out for synchronization ======
                 if ((txq.getState() == TxRequestQueue.QUEUE_IS_SYNCHRONIZING)
                         && ((System.currentTimeMillis() - synchControl.lastSynchStartedMillis) > SYNCHRONIZATION_TIMEOUT)) {
+                	//TODO: Code is buggy. See https://github.com/nicmichael/efa/issues/257 for more info.
+                	//(Upload) Sync currently will not be stopped after the sync timeout.
                     txq.registerStateChangeRequest(TxRequestQueue.RQ_QUEUE_RESUME);
                     txq.logApiMessage("Synchronization Timeout. "
                              + International.getString("Die Synchronisation wird beendet."), 1);

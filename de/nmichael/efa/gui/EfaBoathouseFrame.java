@@ -1149,7 +1149,7 @@ public class EfaBoathouseFrame extends BaseFrame implements IItemListener {
         Dialog.IGNORE_WINDOW_STACK_CHECKS = true;
         int exitCode = 0;
         String who = "unknown";
-
+        Daten.isShutdownRequested=true;
         switch (reason) {
             case EFA_EXIT_REASON_USER: // manuelles Beenden von efa
                 boolean byUser;
@@ -1159,6 +1159,7 @@ public class EfaBoathouseFrame extends BaseFrame implements IItemListener {
                             admin = AdminLoginDialog.login(this, International.getString("Beenden von efa"));
                             if (admin == null) {
                                 Dialog.IGNORE_WINDOW_STACK_CHECKS = false;
+                                Daten.isShutdownRequested=false;
                                 return false;
                             }
                         }

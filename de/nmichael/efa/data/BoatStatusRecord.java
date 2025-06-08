@@ -241,13 +241,19 @@ public class BoatStatusRecord extends DataRecord {
      * @return Destination and DestinationVariant name
      */
     public String getDestination() {
-    	
-        LogbookRecord r = getLogbookRecord(); 	
-        if (r==null) {
-        	return International.getString("Fehler: kein Fahrtenbucheintrag zu Boot auf Fahrt");
-        } else {
-        	return r.getDestinationAndVariantName();
-        }
+   	
+    	if (getLogbook().equalsIgnoreCase(Daten.project.getCurrentLogbook().getName())) {
+    		LogbookRecord r = getLogbookRecord(); 	
+	    	if (r==null) {
+	        	return International.getString("Fehler: kein Fahrtenbucheintrag zu Boot auf Fahrt");
+	        } else {
+	        	return r.getDestinationAndVariantName();
+	        }
+    	} else {
+    		// boatstatus not in the current logbook, so only display sessionno and logbookname.
+    		// this is safe, as this data is in the boatstatus, and we do not load a "foreign" logbook on the fly
+    		return "#"+getEntryNoAndLogbook();
+    	}
     }    
     
     public void setOnlyInBoathouseId(int boathouseId) {

@@ -266,6 +266,7 @@ public class EfaConfig extends StorageObject implements IItemFactory {
 	private ItemTypeBoolean efaDirekt_mitgliederDuerfenNamenHinzufuegen;
 	private ItemTypeBoolean efaDirekt_resBooteNichtVerfuegbar;
 	private ItemTypeBoolean efaDirekt_wafaRegattaBooteAufFahrtNichtVerfuegbar;
+	private ItemTypeBoolean efaDirekt_boatListShowForeignLogbookSessionsAsNotAvailable;
 	private ItemTypeInteger efaDirekt_resLookAheadTime;
 	private ItemTypeString efaDirekt_execOnEfaExit;
 	private ItemTypeTime efaDirekt_exitTime;
@@ -1380,6 +1381,12 @@ public class EfaConfig extends StorageObject implements IItemFactory {
 					BaseTabbedDialog.makeCategory(CATEGORY_BOATHOUSE, CATEGORY_GUI),
 					International.getString(
 							"Boote auf Regatta, Trainingslager oder Mehrtagesfahrt als 'nicht verfügbar' anzeigen")));
+			addParameter(efaDirekt_boatListShowForeignLogbookSessionsAsNotAvailable = new ItemTypeBoolean(
+					"BoatListShowForeignLogbookSessionsAsNotAvailable", true, IItemType.TYPE_PUBLIC,
+					BaseTabbedDialog.makeCategory(CATEGORY_BOATHOUSE, CATEGORY_GUI),
+					International.getString(
+							"Boote, die in anderen Fahrtenbüchern unterwegs sind, als 'nicht verfügbar' anzeigen")));
+			
 			addParameter(efaDirekt_boatsNotAvailableListSize = new ItemTypeInteger("BoatsNotAvailableListSize", 200,
 					100, 600, IItemType.TYPE_EXPERT,
 					BaseTabbedDialog.makeCategory(CATEGORY_BOATHOUSE, CATEGORY_GUI),
@@ -2400,6 +2407,10 @@ public class EfaConfig extends StorageObject implements IItemFactory {
 		return efaDirekt_wafaRegattaBooteAufFahrtNichtVerfuegbar.getValue();
 	}
 
+	public boolean getValueEfaDirekt_boatListShowForeignLogbookSessionsAsNotAvailable() {
+		return efaDirekt_boatListShowForeignLogbookSessionsAsNotAvailable.getValue();
+	}
+	
 	public int getValueEfaDirekt_resLookAheadTime() {
 		return efaDirekt_resLookAheadTime.getValue();
 	}

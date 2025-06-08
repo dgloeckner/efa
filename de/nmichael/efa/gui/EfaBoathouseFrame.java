@@ -1257,6 +1257,15 @@ public class EfaBoathouseFrame extends BaseFrame implements IItemListener {
      * @return
      */
     private String[] getListActions(int listnr, DataRecord r) {
+
+    	String currentLogbookName = null;
+    	String recordLogbookName = null;
+    	BoatStatusRecord rb = null;
+    	currentLogbookName = (Daten.project != null ? Daten.project.getCurrentLogbook().getName() : null);
+    	
+    	// if a BoatStatusRecord is provided, check it's status and choose the appropriate "list"
+    	// as Boats on the water may  also be present in 'not available' list.
+    	
         if (r != null && r instanceof BoatStatusRecord) {
             // this boat may have been sorted into a "wrong" list... fix its status first
             String s = ((BoatStatusRecord)r).getCurrentStatus();
@@ -1269,8 +1278,10 @@ public class EfaBoathouseFrame extends BaseFrame implements IItemListener {
             if (s != null && s.equals(BoatStatusRecord.STATUS_NOTAVAILABLE)) {
                 listnr = 3;
             }
+    		rb = (BoatStatusRecord) r;
+            recordLogbookName = rb.getLogbook();
         }
-
+      
         String startSession = EfaUtil.replace(Daten.efaConfig.getValueEfaDirekt_butFahrtBeginnen().getValueText(), ">>>", "").trim();
         String finishSession = EfaUtil.replace(Daten.efaConfig.getValueEfaDirekt_butFahrtBeenden().getValueText(), "<<<", "").trim();
         String boatReserve = (Daten.efaConfig.getValueEfaDirekt_mitgliederDuerfenReservieren() ?
@@ -1299,9 +1310,13 @@ public class EfaBoathouseFrame extends BaseFrame implements IItemListener {
         }
         if (listnr == 2) { // Boote auf Fahrt
             ArrayList<String> listItems = new ArrayList<String>();
-            listItems.add(ACTIONID_FINISHSESSION + finishSession);
-            listItems.add(ACTIONID_STARTSESSIONCORRECT + International.getString("Eintrag ändern"));
-            listItems.add(ACTIONID_ABORTSESSION + International.getString("Fahrt abbrechen"));
+            listItems.add(ACTIONID_LATEENTRY + International.getString("Nachtrag"));
+            if (r==null || (rb!=null && currentLogbookName!=null && recordLogbookName!=null && currentLogbookName.equalsIgnoreCase(recordLogbookName))) {
+            	// the boat on the water must be in our own logbook to do something with the session
+            	listItems.add(ACTIONID_FINISHSESSION + finishSession);
+	            listItems.add(ACTIONID_STARTSESSIONCORRECT + International.getString("Eintrag ändern"));
+	            listItems.add(ACTIONID_ABORTSESSION + International.getString("Fahrt abbrechen"));
+            }
             if (Daten.efaConfig.getValueEfaDirekt_butBootsreservierungen().getValueShow()) {
                 listItems.add(ACTIONID_BOATRESERVATIONS + boatReserve);
             }
@@ -1311,12 +1326,18 @@ public class EfaBoathouseFrame extends BaseFrame implements IItemListener {
             return listItems.toArray(new String[0]);
         }
         if (listnr == 3) { // nicht verfügbare Boote
-            ArrayList<String> listItems = new ArrayList<String>();
-            listItems.add(ACTIONID_STARTSESSION + startSession);
-            if (Daten.efaConfig.getValueEfaDirekt_wafaRegattaBooteAufFahrtNichtVerfuegbar()) {
-                listItems.add(ACTIONID_FINISHSESSION + finishSession);
-                listItems.add(ACTIONID_ABORTSESSION + International.getString("Fahrt abbrechen"));
-            }
+        	ArrayList<String> listItems = new ArrayList<String>();
+        	
+        	if (r==null || (rb != null && rb.getCurrentStatus() != BoatStatusRecord.STATUS_ONTHEWATER)) {
+        		listItems.add(ACTIONID_STARTSESSION + startSession);
+        	}
+        	
+        	if (r==null || (currentLogbookName!=null && recordLogbookName!=null && currentLogbookName.equalsIgnoreCase(recordLogbookName))) {
+        		if (Daten.efaConfig.getValueEfaDirekt_wafaRegattaBooteAufFahrtNichtVerfuegbar()) {
+	                listItems.add(ACTIONID_FINISHSESSION + finishSession);
+	                listItems.add(ACTIONID_ABORTSESSION + International.getString("Fahrt abbrechen"));
+	            }
+        	}
             listItems.add(ACTIONID_LATEENTRY + International.getString("Nachtrag"));
             if (Daten.efaConfig.getValueEfaDirekt_butBootsreservierungen().getValueShow()) {
                 listItems.add(ACTIONID_BOATRESERVATIONS + boatReserve);
@@ -1926,9 +1947,17 @@ public class EfaBoathouseFrame extends BaseFrame implements IItemListener {
             if (ae.getActionCommand().equals(EfaMouseListener.EVENT_MOUSECLICKED_1x)
                     || ae.getActionCommand().equals(EfaMouseListener.EVENT_MOUSECLICKED_2x)) {
                 showBoatStatus(listID, (ItemTypeBoatstatusList) item, 1);
+
                 if (ae.getActionCommand().equals(EfaMouseListener.EVENT_MOUSECLICKED_2x)) {
                     boatListDoubleClick(listID, list);
                 }
+            }
+            if (ae.getActionCommand().equals(EfaMouseListener.EVENT_BUILD_POPUP_MENU)) {
+                ItemTypeBoatstatusList.BoatListItem bli = getSelectedListItem((ItemTypeBoatstatusList) item);
+                if (bli!=null) {
+                	((ItemTypeBoatstatusList)item).setPopupActions(getListActions(-1, bli.boatStatus));
+                }            	
+
             }
             if (ae.getActionCommand().equals(EfaMouseListener.EVENT_POPUP)) {
                 showBoatStatus(listID, (ItemTypeBoatstatusList) item, 1);

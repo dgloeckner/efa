@@ -73,7 +73,7 @@ public class BoatStatus extends StorageObject {
         return getBoats(status, false);
     }
 
-    /*
+    /**
      * @param getBoatsForLists - if true, this will return boats not necessarily according
      * to their status, but rather which *list* they should appear in. It might be that
      * some boats which have status ONTHEWATER are supposed to be displayed as NOTAVAILABLE
@@ -90,6 +90,10 @@ public class BoatStatus extends StorageObject {
             DataKeyIterator it = data().getStaticIterator();
             DataKey k = it.getFirst();
             String currentLogBookEfaBoatHouse = Daten.project.getCurrentLogbookEfaBoathouse();
+            Boolean showForeignLogbookEntries = Daten.efaConfig.getValueEfaDirekt_boatListShowForeignLogbookSessionsAsNotAvailable();
+            Boolean statusIsOnTheWater = status.equalsIgnoreCase(BoatStatusRecord.STATUS_ONTHEWATER);
+            Boolean statusIsNotAvailableBoats = status.equalsIgnoreCase(BoatStatusRecord.STATUS_NOTAVAILABLE);
+            
             // take care for null values. null should not happen here, but anyway
             if (currentLogBookEfaBoatHouse == null)
                 currentLogBookEfaBoatHouse = "";
@@ -104,10 +108,11 @@ public class BoatStatus extends StorageObject {
                                 r.getOnlyInBoathouseId() + ")");
                     }
                     //  for boats on the water show only those which have sessions in the current logbook
-                    if (status.equalsIgnoreCase(BoatStatusRecord.STATUS_ONTHEWATER)) {
+                    if (statusIsOnTheWater) {
                         String rLogbook = r.getLogbook();
-                        if ((rLogbook != null) && rLogbook.equalsIgnoreCase(currentLogBookEfaBoatHouse))
+                        if ((rLogbook != null) && rLogbook.equalsIgnoreCase(currentLogBookEfaBoatHouse)) {
                             v.add(r);
+                        } 
                     } else {
                         // for all other show only the boats which are in this boathouse, if they are restricted.
                         if (r.getOnlyInBoathouseIdAsInt() < 0
@@ -115,6 +120,16 @@ public class BoatStatus extends StorageObject {
                             String s = (getBoatsForLists ? r.getShowInList() : r.getCurrentStatus());
                             if (s != null && s.equals(status)) {
                                 v.add(r);
+                            } else {
+                            	if (statusIsNotAvailableBoats && showForeignLogbookEntries && r.getCurrentStatus().equalsIgnoreCase(BoatStatusRecord.STATUS_ONTHEWATER)){
+
+                            		String rLogbook = r.getLogbook(); // r.getLogbook needs a lot of time, so determine this value late 
+                                    if ((rLogbook != null) && !rLogbook.equalsIgnoreCase(currentLogBookEfaBoatHouse)) {
+                                    	//boats which are on the water, but not in the current logbook, 
+                                    	//shall be shown as "not available". 
+                                    	v.add(r);
+                                    }
+                            	}
                             }
                         }
                     }

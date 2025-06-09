@@ -12,13 +12,15 @@
         <Changes lang="de">
         	<ChangeItem>Neu: update runEfa.bat/.sh - 192MB RAM statt 160MB für efa JavaVM, wegen Speicher-Mehrbedarf für efaCloud.</ChangeItem>
 			<ChangeItem>Neu: Boote, die in anderen Logbüchern 'auf Fahrt' sind, können als 'nicht verfügbare Boote' angezeigt werden.</ChangeItem>
-        	<ChangeItem>Bugfix: Auswahlliste für Personen wird aktualisiert, wenn bei Neuanlage einer Fahrt das Boot oder die Bootsvariante geändert wird.</ChangeItem>        	
+        	<ChangeItem>Bugfix: Auswahlliste für Personen wird aktualisiert, wenn bei Neuanlage einer Fahrt das Boot oder die Bootsvariante geändert wird.</ChangeItem>
+        	<ChangeItem>Bugfix: Efa-Neustart unter Windows funktioniert zuverlässiger, es gibt keine Meldungen mehr 'efa läuft bereits im Hintergrund'.</ChangeItem>        	
         	<ChangeItem>Bugfix: efaCloud: Ecrid Index Handling verbessert: keine Probleme mehr nach dem Aufsetzen neuer efaCloud Systeme</ChangeItem>
         </Changes>
         <Changes lang="en">
         	<ChangeItem>New: update runEfa.bat/.sh - 192MB RAM instead of 160MB for efa JavaVM, due to higher demands for efaCloud.</ChangeItem>
 			<ChangeItem>New: Boats which are 'on the water' in other logbooks, can be shown as 'not available boats'</ChangeItem>
         	<ChangeItem>Bugfix: When changing the boat or boatvariant while creating a new session, the autocomplete list for persons get a refresh.</ChangeItem>        	
+        	<ChangeItem>Bugfix: A restart of efa works better on Windows(r) systems. There are no longer messages like 'efa is already running in background'.</ChangeItem>        	
         	<ChangeItem>Bugfix: efaCloud: Ecrid index handling optimized: no more issues when setting up new efaCloud systems.</ChangeItem>
         </Changes>	
 	</Version>

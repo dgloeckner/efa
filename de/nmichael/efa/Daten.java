@@ -79,7 +79,7 @@ public class Daten {
 																	// auch Zusätze wie "alpha" o.ä. enthalten)
 	public final static String VERSIONID = "2.4.1_#17"; // VersionsID: Format: "X.Y.Z_MM"; final-Version z.B. 1.4.0_00;
 														// beta-Version z.B. 1.4.0_#1  //# is not good, is used in efa.data.Waters 
-	public final static String VERSIONRELEASEDATE = "08.06.2025"; // Release Date: TT.MM.JJJJ
+	public final static String VERSIONRELEASEDATE = "09.06.2025"; // Release Date: TT.MM.JJJJ
 	public final static String MAJORVERSION = "2";
 	public final static String PROGRAMMID = "EFA.240"; // Versions-ID für Wettbewerbsmeldungen
 	public final static String PROGRAMMID_DRV = "EFADRV.241"; // Versions-ID für Wettbewerbsmeldungen
@@ -379,6 +379,30 @@ public class Daten {
 			}
 		}
 
+		// On Windows systems, efa relies on java restart. So we need to take care of the java-based restart
+		// AFTER running the haltProgram code. Otherwise, the new efa instance may be run faster than the current one has shut down.
+		if (exitCode == Daten.HALT_JAVARESTART ) {
+            String restartargs = (Daten.efa_java_arguments != null ? Daten.efa_java_arguments
+                    : "-cp " + System.getProperty("java.class.path")
+                    + " " + Daten.EFADIREKT_MAINCLASS + de.nmichael.efa.boathouse.Main.STARTARGS);
+            String[] cmdargs = restartargs.split(" ");
+            String[] cmd = new String[cmdargs.length + 1];
+            cmd[0] = System.getProperty("java.home") + Daten.fileSep + "bin" + Daten.fileSep + "java";
+            for (int i=0; i<cmdargs.length; i++) {
+                cmd[i+1] = cmdargs[i];
+            }
+            Logger.log(Logger.INFO, Logger.MSG_EVT_EFARESTART,
+                    International.getMessage("Neustart mit Kommando: {cmd}", EfaUtil.arr2string(cmd)));
+            try {
+                Runtime.getRuntime().exec(cmd);
+            } catch (Exception ee) {
+                Logger.log(Logger.ERROR, Logger.MSG_ERR_EFARESTARTEXEC_FAILED,
+                        LogString.cantExecCommand(EfaUtil.arr2string(cmd), International.getString("Kommando")));
+            }
+        }		
+		
+		// PROGRAMMENDE log entry must be the last to be shown on efa shutdown/restart,
+		// as efa looks for this line on startup and will state efa has not been shut down correctly if it is missing.
 		if (exitCode != 0) {
 			if (exitCode == Daten.HALT_SHELLRESTART || exitCode == Daten.HALT_JAVARESTART) {
 				Logger.log(Logger.INFO, Logger.MSG_CORE_HALT,
@@ -393,6 +417,7 @@ public class Daten {
 		} else {
 			Logger.log(Logger.INFO, Logger.MSG_CORE_HALT, International.getString("PROGRAMMENDE"));
 		}
+		
 		if (program != null) {
 			program.exit(exitCode);
 		} else {

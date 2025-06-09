@@ -393,6 +393,29 @@ public class Daten {
 		} else {
 			Logger.log(Logger.INFO, Logger.MSG_CORE_HALT, International.getString("PROGRAMMENDE"));
 		}
+		
+		// On Windows systems, efa relies on java restart. So we need to take care of the java-based restart
+		// AFTER running the haltProgram code. Otherwise, the new efa instance may be run faster than the current one has shut down.
+		if (exitCode == Daten.HALT_JAVARESTART ) {
+            String restartargs = (Daten.efa_java_arguments != null ? Daten.efa_java_arguments
+                    : "-cp " + System.getProperty("java.class.path")
+                    + " " + Daten.EFADIREKT_MAINCLASS + de.nmichael.efa.boathouse.Main.STARTARGS);
+            String[] cmdargs = restartargs.split(" ");
+            String[] cmd = new String[cmdargs.length + 1];
+            cmd[0] = System.getProperty("java.home") + Daten.fileSep + "bin" + Daten.fileSep + "java";
+            for (int i=0; i<cmdargs.length; i++) {
+                cmd[i+1] = cmdargs[i];
+            }
+            Logger.log(Logger.INFO, Logger.MSG_EVT_EFARESTART,
+                    International.getMessage("Neustart mit Kommando: {cmd}", EfaUtil.arr2string(cmd)));
+            try {
+                Runtime.getRuntime().exec(cmd);
+            } catch (Exception ee) {
+                Logger.log(Logger.ERROR, Logger.MSG_ERR_EFARESTARTEXEC_FAILED,
+                        LogString.cantExecCommand(EfaUtil.arr2string(cmd), International.getString("Kommando")));
+            }
+        }
+		
 		if (program != null) {
 			program.exit(exitCode);
 		} else {

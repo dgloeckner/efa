@@ -1955,9 +1955,14 @@ public class EfaBoathouseFrame extends BaseFrame implements IItemListener {
             if (ae.getActionCommand().equals(EfaMouseListener.EVENT_BUILD_POPUP_MENU)) {
                 ItemTypeBoatstatusList.BoatListItem bli = getSelectedListItem((ItemTypeBoatstatusList) item);
                 if (bli!=null) {
-                	((ItemTypeBoatstatusList)item).setPopupActions(getListActions(-1, bli.boatStatus));
+                	if (bli.boatStatus != null) {
+                		//we do not need to provide the specific list, as the actions get determined by the boatstatus of the selected item.
+                		((ItemTypeBoatstatusList)item).setPopupActions(getListActions(-1, bli.boatStatus));
+                	} else if (bli.person!= null) {
+                		//in the person list, there is no boat item. And the List type is set to 101
+                		((ItemTypeBoatstatusList)item).setPopupActions(getListActions(101, null));
+                	}
                 }            	
-
             }
             if (ae.getActionCommand().equals(EfaMouseListener.EVENT_POPUP)) {
                 showBoatStatus(listID, (ItemTypeBoatstatusList) item, 1);

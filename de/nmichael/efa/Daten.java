@@ -379,21 +379,6 @@ public class Daten {
 			}
 		}
 
-		if (exitCode != 0) {
-			if (exitCode == Daten.HALT_SHELLRESTART || exitCode == Daten.HALT_JAVARESTART) {
-				Logger.log(Logger.INFO, Logger.MSG_CORE_HALT,
-						International.getString("PROGRAMMENDE") + " (Exit Code " + exitCode + ")");
-			} else {
-				if (Daten.applID != Daten.APPL_CLI) {
-					Logger.log(Logger.INFO, Logger.MSG_CORE_HALT, getCurrentStack());
-				}
-				Logger.log(Logger.ERROR, Logger.MSG_CORE_HALT,
-						International.getString("PROGRAMMENDE") + " (Error Code " + exitCode + ")");
-			}
-		} else {
-			Logger.log(Logger.INFO, Logger.MSG_CORE_HALT, International.getString("PROGRAMMENDE"));
-		}
-		
 		// On Windows systems, efa relies on java restart. So we need to take care of the java-based restart
 		// AFTER running the haltProgram code. Otherwise, the new efa instance may be run faster than the current one has shut down.
 		if (exitCode == Daten.HALT_JAVARESTART ) {
@@ -414,7 +399,24 @@ public class Daten {
                 Logger.log(Logger.ERROR, Logger.MSG_ERR_EFARESTARTEXEC_FAILED,
                         LogString.cantExecCommand(EfaUtil.arr2string(cmd), International.getString("Kommando")));
             }
-        }
+        }		
+		
+		// PROGRAMMENDE log entry must be the last to be shown on efa shutdown/restart,
+		// as efa looks for this line on startup and will state efa has not been shut down correctly if it is missing.
+		if (exitCode != 0) {
+			if (exitCode == Daten.HALT_SHELLRESTART || exitCode == Daten.HALT_JAVARESTART) {
+				Logger.log(Logger.INFO, Logger.MSG_CORE_HALT,
+						International.getString("PROGRAMMENDE") + " (Exit Code " + exitCode + ")");
+			} else {
+				if (Daten.applID != Daten.APPL_CLI) {
+					Logger.log(Logger.INFO, Logger.MSG_CORE_HALT, getCurrentStack());
+				}
+				Logger.log(Logger.ERROR, Logger.MSG_CORE_HALT,
+						International.getString("PROGRAMMENDE") + " (Error Code " + exitCode + ")");
+			}
+		} else {
+			Logger.log(Logger.INFO, Logger.MSG_CORE_HALT, International.getString("PROGRAMMENDE"));
+		}
 		
 		if (program != null) {
 			program.exit(exitCode);

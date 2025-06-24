@@ -10,15 +10,20 @@
 
 package de.nmichael.efa.gui;
 
+import java.awt.AWTEvent;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 import javax.swing.JDialog;
 import javax.swing.SwingConstants;
 
 import de.nmichael.efa.Daten;
+import de.nmichael.efa.core.items.IItemListener;
 import de.nmichael.efa.core.items.IItemType;
 import de.nmichael.efa.core.items.ItemTypeBoolean;
 import de.nmichael.efa.core.items.ItemTypeDate;
@@ -32,15 +37,16 @@ import de.nmichael.efa.util.Dialog;
 import de.nmichael.efa.util.EfaUtil;
 import de.nmichael.efa.util.International;
 import de.nmichael.efa.util.LogString;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 
-public class NewLogbookDialog extends StepwiseDialog {
+public class NewLogbookDialog extends StepwiseDialog implements IItemListener {
 
-    private static final String LOGBOOKNAME        = "LOGBOOKNAME";
+	private static final long serialVersionUID = -6041787195199421231L;
+
+	private static final String LOGBOOKNAME        = "LOGBOOKNAME";
     private static final String LOGBOOKNAMEHINT    = "LOGBOOKNAMEHINT";    
     private static final String LOGBOOKDESCRIPTION = "LOGBOOKDESCRIPTION";
     private static final String LOGBOOKNAMESTEP1   = "LOGBOOKNAMESTEP1";
+    private static final String AUTOCALC_DATETO    = "AUTOCALC_DATETO";
     private static final String DATEFROM           = "DATEFROM";
     private static final String DATETO             = "DATETO";
     private static final String AUTOMATICLOGSWITCH = "AUTOMATICLOGSWITCH";
@@ -49,6 +55,10 @@ public class NewLogbookDialog extends StepwiseDialog {
     private static final String CATEGORY_STEP_0    = "0";
     private static final String CATEGORY_STEP_1    = "1";
     private static final String CATEGORY_STEP_2    = "2";
+    
+    private ItemTypeDate itemDateFrom;
+    private ItemTypeDate itemDateTo;
+    private ItemTypeBoolean itemAutoCalcDateTo;
     
     private String newLogbookName;
 
@@ -130,12 +140,22 @@ public class NewLogbookDialog extends StepwiseDialog {
         newLogbookNameLabel.setBoldFont(true);
         items.add(newLogbookNameLabel);
         
+        item = new ItemTypeBoolean(AUTOCALC_DATETO,true, IItemType.TYPE_PUBLIC, CATEGORY_STEP_1, International.getString("Endedatum automatisch berechnen"));
+        item.registerItemListener(this);
+        this.itemAutoCalcDateTo = (ItemTypeBoolean) item;
+        items.add(item);
+
+        
         item = new ItemTypeDate(DATEFROM, new DataTypeDate(1, 1, EfaUtil.string2int(year, 2010)), IItemType.TYPE_PUBLIC, CATEGORY_STEP_1, International.getString("Beginn des Zeitraums"));
         ((ItemTypeDate)item).setNotNull(true);
+        item.registerItemListener(this);
         items.add(item);
+        this.itemDateFrom=(ItemTypeDate)item;
+        
         item = new ItemTypeDate(DATETO, new DataTypeDate(31, 12, EfaUtil.string2int(year, 2010)), IItemType.TYPE_PUBLIC, CATEGORY_STEP_1, International.getString("Ende des Zeitraums"));
         ((ItemTypeDate)item).setNotNull(true);
         items.add(item);
+        this.itemDateTo=(ItemTypeDate)item;
 
 
         // Items for Step 2name, type, category, description
@@ -273,4 +293,38 @@ public class NewLogbookDialog extends StepwiseDialog {
     	return International.getString("Fahrtenbuch")+": \""+newLogbookName+"\"";
     }
 
+    public void itemListenerAction(IItemType itemType, AWTEvent event) {
+    	Boolean calculateField=false;
+    	if (itemAutoCalcDateTo!=null)  {
+    		itemAutoCalcDateTo.getValueFromGui();//Read checkbox from Gui into the field
+    		calculateField=itemAutoCalcDateTo.getValue();
+    	}
+    	if (calculateField && itemType.getName().equalsIgnoreCase(DATEFROM)) {
+    		if ((itemDateFrom!=null && itemDateTo!=null) && (event instanceof KeyEvent)){
+    			//if (event. is KeyEvent) 
+    			itemDateFrom.getValueFromGui();//get the value into the field
+    			calculateDateTo(itemDateFrom.getDate());
+    		}
+    	} else if (calculateField && itemType.getName().equalsIgnoreCase(AUTOCALC_DATETO)) {
+    		if ((itemDateFrom!=null && itemDateTo!=null)){
+    			//if (event. is KeyEvent) 
+    			itemDateFrom.getValueFromGui();//get the value into the field
+    			calculateDateTo(itemDateFrom.getDate());
+    		}    		
+    	}
+    }
+    
+    private void calculateDateTo(DataTypeDate from) {
+		try {
+			DataTypeDate targetDateTo = from;
+			//add a year and reduce by one day
+			targetDateTo.setDate(targetDateTo.getDay(), targetDateTo.getMonth(),targetDateTo.getYear()+1);
+			targetDateTo.addDays(-1);
+			itemDateTo.setValueDate(targetDateTo);
+			itemDateTo.showValue();
+		} catch (Exception e) {
+			EfaUtil.foo();// do nothing
+		}    	
+    }
+    
 }

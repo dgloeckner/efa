@@ -49,6 +49,7 @@ public class NewLogbookDialog extends StepwiseDialog implements IItemListener {
     private static final String AUTOCALC_DATETO    = "AUTOCALC_DATETO";
     private static final String DATEFROM           = "DATEFROM";
     private static final String DATETO             = "DATETO";
+    private static final String DATETOHINT		   = "DATETOHINT";
     private static final String AUTOMATICLOGSWITCH = "AUTOMATICLOGSWITCH";
     private static final String LOGSWITCHBOATHOUSE = "LOGSWITCHBOATHOUSE";
 
@@ -156,7 +157,12 @@ public class NewLogbookDialog extends StepwiseDialog implements IItemListener {
         ((ItemTypeDate)item).setNotNull(true);
         items.add(item);
         this.itemDateTo=(ItemTypeDate)item;
-
+        
+        if (Daten.project.getIsProjectStorageTypeEfaCloud()) {
+            items.add(EfaGuiUtils.createHintWordWrap(DATETOHINT, IItemType.TYPE_PUBLIC, CATEGORY_STEP_1,
+            		International.getString("Bei Nutzung von efaCloud muss der Startzeitpunkt mit dem in efaCloud hinterlegten Startzeitpunkt übereinstimmen.")
+            		,2,10,10,500));
+        }          
 
         // Items for Step 2name, type, category, description
         item = new ItemTypeBoolean(AUTOMATICLOGSWITCH, false, IItemType.TYPE_PUBLIC, CATEGORY_STEP_2,
@@ -197,11 +203,12 @@ public class NewLogbookDialog extends StepwiseDialog implements IItemListener {
             if (year > 1980 && year < 2100) {
                 ItemTypeDate logFromDate = (ItemTypeDate) getItemByName(DATEFROM);
                 ItemTypeDate logFromTo = (ItemTypeDate) getItemByName(DATETO);
+                
                 if (logFromDate != null) {
-                    logFromDate.setValueDate(new DataTypeDate(1, 1, year));
+                    logFromDate.setValueDate(new DataTypeDate(getStartDayFromCurrentLogbook(), getStartMonthFromCurrentLogbook(), year));
                 }
                 if (logFromTo != null) {
-                    logFromTo.setValueDate(new DataTypeDate(31, 12, year));
+                    logFromTo.setValueDate(calculateDateTo(logFromDate.getDate()));
                 }
             }
             
@@ -222,6 +229,47 @@ public class NewLogbookDialog extends StepwiseDialog implements IItemListener {
         return true;
     }
 
+    /**
+     * Gets the number of the day of the start date of a currently loaded logbook.
+     * @return number of the day, or 1 if no logbook/project is open.
+     */
+    private int getStartDayFromCurrentLogbook() {
+    	if (Daten.project != null &&  Daten.project.getCurrentLogbook() != null) {
+    		return Daten.project.getCurrentLogbook().getStartDate().getDay();
+    	} else {
+    		return 1;
+    	}
+    }
+
+    /**
+     * Gets the number of the month of the start date of a currently loaded logbook.
+     * @return number of the month, or 1 if no logbook/project is open.
+     */
+    private int getStartMonthFromCurrentLogbook() {
+    	if (Daten.project != null &&  Daten.project.getCurrentLogbook() != null) {
+    		return Daten.project.getCurrentLogbook().getStartDate().getMonth();
+    	} else {
+    		return 1;
+    	}
+    }
+    /**
+     * Calculates the end date of the logbook period, being given a start date.
+     * The end date is calculated by adding a year and substracting a day.
+     * @param from start date (not null)
+     * @return end date of the period. null, if there had been an error.
+     */
+    private DataTypeDate calculateDateTo(DataTypeDate from) {
+		try {
+			DataTypeDate targetDateTo = from;
+			//add a year and reduce by one day
+			targetDateTo.setDate(targetDateTo.getDay(), targetDateTo.getMonth(),targetDateTo.getYear()+1);
+			targetDateTo.addDays(-1);
+			return targetDateTo;
+		} catch (Exception e) {
+			return null;
+		}    	
+    }
+    
     boolean finishButton_actionPerformed(ActionEvent e) {
         if (!super.finishButton_actionPerformed(e)) {
             return false;
@@ -303,28 +351,37 @@ public class NewLogbookDialog extends StepwiseDialog implements IItemListener {
     		if ((itemDateFrom!=null && itemDateTo!=null) && (event instanceof KeyEvent)){
     			//if (event. is KeyEvent) 
     			itemDateFrom.getValueFromGui();//get the value into the field
-    			calculateDateTo(itemDateFrom.getDate());
+    			itemDateTo.setValueDate(calculateDateTo(itemDateFrom.getDate()));
+    			itemDateTo.showValue();    			
     		}
     	} else if (calculateField && itemType.getName().equalsIgnoreCase(AUTOCALC_DATETO)) {
     		if ((itemDateFrom!=null && itemDateTo!=null)){
     			//if (event. is KeyEvent) 
     			itemDateFrom.getValueFromGui();//get the value into the field
-    			calculateDateTo(itemDateFrom.getDate());
+    			itemDateTo.setValueDate(calculateDateTo(itemDateFrom.getDate()));
+    			itemDateTo.showValue();
     		}    		
     	}
     }
     
-    private void calculateDateTo(DataTypeDate from) {
-		try {
-			DataTypeDate targetDateTo = from;
-			//add a year and reduce by one day
-			targetDateTo.setDate(targetDateTo.getDay(), targetDateTo.getMonth(),targetDateTo.getYear()+1);
-			targetDateTo.addDays(-1);
-			itemDateTo.setValueDate(targetDateTo);
-			itemDateTo.showValue();
-		} catch (Exception e) {
-			EfaUtil.foo();// do nothing
-		}    	
+    protected boolean nextButton_actionPerformed(ActionEvent e) {
+    	Boolean val = super.nextButton_actionPerformed(e);
+    	if (step == 1) {
+    		// usability: if entering step 1, take care that the itemDateFrom gets the focus.
+    		// otherwise AUTOCALC_DATETO checkbox would be focused, this is not optimal
+    		itemDateFrom.requestFocus();
+    	}
+    	return val;
+    }
+
+    protected boolean backButton_actionPerformed(ActionEvent e) {
+    	Boolean val = super.backButton_actionPerformed(e);
+    	if (step == 1) {
+    		// usability: if entering step 1, take care that the itemDateFrom gets the focus.
+    		// otherwise AUTOCALC_DATETO checkbox would be focused, this is not optimal    		
+    		itemDateFrom.requestFocus();
+    	}
+    	return val;
     }
     
 }

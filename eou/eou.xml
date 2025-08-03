@@ -1,6 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <efaOnlineUpdate>
 	<Version>
+  		<VersionID>2.4.1#18</VersionID>
+  		<ReleaseDate>03.08.2025</ReleaseDate>
+        <DownloadUrl>TODO</DownloadUrl>
+        <DownloadSize>TODO</DownloadSize>
+		<MinimumJavaVersion>1.8</MinimumJavaVersion>
+		<MinimumEfaCloudVersion>2.3.3</MinimumEfaCloudVersion>
+        <ShowNotice lang="de">Wenn efaCloud eingesetzt wird, muss der Server mindestens Version 2.3.3 unterstützen. EfaCloud 2.4.0_10 und höher werden empfohlen.</ShowNotice>
+        <ShowNotice lang="en">If you use efaCloud, make sure your server at least supports efaCloud Version 2.3.3. It is recommended to upgrade to EfaCloud 2.4.0_10 or above.</ShowNotice>
+        <Changes lang="de">
+        	<ChangeItem>Neu: Bei Anlage eines neuen Fahrtenbuchs wird der Startzeitraum des aktuell geöffneten Fahrtenbuchs als Grundlage genommen - statt wie bisher der 01.01. Der Endezeitpunkt der Periode wird automatisch berechnet. Dies vereinfacht die Anlage neuer Fahrtenbücher bei abweichender Startperiode (z.B. Kanufahren in Deutschland).</ChangeItem>
+        </Changes>
+        <Changes lang="en">
+        	<ChangeItem>New: When creating a new logbook, the start date of the currently opened logbook is used as the basis, instead of January 1st as before. The end date is calculated automatically. This simplifies the creation of new logbooks with a different start date (e.g., canoeing in Germany).</ChangeItem>
+        </Changes>	
+	</Version>
+	<Version>
   		<VersionID>2.4.1#17</VersionID>
   		<ReleaseDate>08.06.2025</ReleaseDate>
         <DownloadUrl>TODO</DownloadUrl>

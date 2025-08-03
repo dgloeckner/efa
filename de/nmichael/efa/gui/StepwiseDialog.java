@@ -273,7 +273,7 @@ public abstract class StepwiseDialog extends BaseDialog {
         return true;
     }
 
-    boolean backButton_actionPerformed(ActionEvent e) {
+    protected boolean backButton_actionPerformed(ActionEvent e) {
         if (!checkInput(-1)) {
             return false;
         }
@@ -286,7 +286,7 @@ public abstract class StepwiseDialog extends BaseDialog {
         return true;
     }
 
-    boolean nextButton_actionPerformed(ActionEvent e) {
+    protected boolean nextButton_actionPerformed(ActionEvent e) {
         if (!checkInput(+1)) {
             return false;
         }

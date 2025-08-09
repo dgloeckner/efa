@@ -140,8 +140,8 @@ public abstract class StepwiseDialog extends BaseDialog {
         descriptionPanel.add(descriptionLabel, BorderLayout.NORTH);
 
         JScrollPane descriptionScrollPane = new JScrollPane();
-        descriptionScrollPane.setPreferredSize(new Dimension(200,80));
-        descriptionScrollPane.setMinimumSize(new Dimension(200,80));
+        descriptionScrollPane.setPreferredSize(new Dimension(200,100));
+        descriptionScrollPane.setMinimumSize(new Dimension(200,100));
         descriptionPanel.add(descriptionScrollPane, BorderLayout.CENTER);
         descriptionText = new JTextArea();
         descriptionText.setEditable(false);
@@ -179,6 +179,7 @@ public abstract class StepwiseDialog extends BaseDialog {
         }
 
         descriptionText.setText(getDescription(step));
+        if (getDescription(step).length()>0) { descriptionText.setCaretPosition(0);}
         if (inputPanel != null) {
             // inputPanelWrapper.remove(inputPanel);
             inputScrollPane.getViewport().remove(inputPanel);

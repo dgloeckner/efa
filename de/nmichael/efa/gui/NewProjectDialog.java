@@ -16,7 +16,6 @@ import de.nmichael.efa.core.items.*;
 import de.nmichael.efa.data.*;
 import de.nmichael.efa.data.storage.*;
 import de.nmichael.efa.ex.EfaException;
-import de.nmichael.efa.gui.util.EfaBoathouseBackgroundTask;
 import de.nmichael.efa.*;
 import de.nmichael.efa.core.config.AdminRecord;
 import de.nmichael.efa.core.config.EfaConfig;

@@ -84,12 +84,20 @@ public class NewLogbookDialog extends StepwiseDialog implements IItemListener {
     }
 
     String getDescription(int step) {
+    	String val = "";
         switch(step) {
             case 0:
-                return International.getString("Ein Fahrtenbuch sollte üblicherweise alle Fahrten eines Jahr enthalten. "+
+                val= International.getString("Ein Fahrtenbuch sollte üblicherweise alle Fahrten eines Jahr enthalten. "+
                         "Vereine mit mehreren Bootshäusern sollten pro Bootshaus ein eigenes Fahrtenbuch (in demselben Projekt) anlegen.");
+            	if (Daten.project.getNumberOfBoathouses()>1 || Daten.project.getIsProjectStorageTypeEfaCloud()) {
+            		val=val+"\n"+International.getString("Bei Nutzung von efaCloud oder mehreren Bootshäusern MUSS der Fahrtenbuchname dem Aufbau JJJJ_Freitext entsprechen, z.B. 2025_Bootshausname");
+            	}  
+            	if (Daten.project.getIsProjectStorageTypeEfaCloud()) {
+            		val=val+"\n"+International.getString("Bei Nutzung von efaCloud mit mehreren Bootshäusern muss das Fahrtenbuch auch beim Referenzuser angelegt sein. Sonst ist kein Upload von Fahrten möglich.");
+            	}
+            	return val;
             case 1:
-                return International.getString("Bitte wähle den Zeitraum für Fahrten dieses Fahrtenbuches aus. efa wird später nur Fahrten "+
+            	return International.getString("Bitte wähle den Zeitraum für Fahrten dieses Fahrtenbuches aus. efa wird später nur Fahrten "+
                         "innerhalb dieses Zeitraums für dieses Fahrtenbuch zulassen.");
             case 2:
                 return International.getString("Durch die Konfiguration eines Fahrtenbuchwechsels ist es möglich, ein neues Fahrtenbuch "+
@@ -110,15 +118,15 @@ public class NewLogbookDialog extends StepwiseDialog implements IItemListener {
         String year = Integer.toString( cal.get(Calendar.MONTH)+1 <= 10 ?
             cal.get(Calendar.YEAR) : cal.get(Calendar.YEAR) + 1); // current year until October, year+1 else
 
+        items.add(EfaGuiUtils.createHintWordWrap(LOGBOOKNAMEHINT, IItemType.TYPE_PUBLIC, CATEGORY_STEP_0, 
+        		International.getString("Der Fahrtenbuchname sollte dem Aufbau JJJJ_Freitext entsprechen z.B. 2025_Bootshausname")
+        		,2,10,10,500));
+            
         if (Daten.project.getNumberOfBoathouses()>1 || Daten.project.getIsProjectStorageTypeEfaCloud()) {
-            items.add(EfaGuiUtils.createHintWordWrap(LOGBOOKNAMEHINT, IItemType.TYPE_PUBLIC, CATEGORY_STEP_0,
-            		International.getString("Bei Nutzung von efaCloud oder mehreren Bootshäusern MUSS der Fahrtenbuchname dem Aufbau JJJJ_Freitext entsprechen, z.B. 2025_Bootshausname")
+            items.add(EfaGuiUtils.createHintWordWrap(LOGBOOKNAMEHINT+"1", IItemType.TYPE_PUBLIC, CATEGORY_STEP_0, 
+            		International.getString("Achten Sie auf weitere Hinweise im Beschreibungs-Bereich dieses Dialogs.")
             		,2,10,10,500));
-        } else {
-            items.add(EfaGuiUtils.createHintWordWrap(LOGBOOKNAMEHINT, IItemType.TYPE_PUBLIC, CATEGORY_STEP_0, 
-            		International.getString("Der Fahrtenbuchname sollte dem Aufbau JJJJ_Freitext entsprechen z.B. 2025_Bootshausname")
-            		,2,10,10,500));
-        }        
+        }     
         
         item = new ItemTypeString(LOGBOOKNAME, year, IItemType.TYPE_PUBLIC, CATEGORY_STEP_0, International.getString("Name des Fahrtenbuchs"));
         ((ItemTypeString)item).setAllowedCharacters("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_");
@@ -127,12 +135,6 @@ public class NewLogbookDialog extends StepwiseDialog implements IItemListener {
         items.add(item);
         item = new ItemTypeString(LOGBOOKDESCRIPTION, "", IItemType.TYPE_PUBLIC, CATEGORY_STEP_0, International.getString("Beschreibung"));
         items.add(item);
-
-        if (Daten.project.getIsProjectStorageTypeEfaCloud()) {
-            items.add(EfaGuiUtils.createHintWordWrap(LOGBOOKNAMEHINT+"1", IItemType.TYPE_PUBLIC, CATEGORY_STEP_0,
-            		International.getString("Bei Nutzung von efaCloud mit mehreren Bootshäusern muss das Fahrtenbuch auch beim Referenzuser angelegt sein. Sonst ist kein Upload von Fahrten möglich.")
-            		,2,10,10,500));
-        }        
         
         // Items for Step 1
         ItemTypeLabel newLogbookNameLabel = new ItemTypeLabel(LOGBOOKNAMESTEP1, IItemType.TYPE_PUBLIC, CATEGORY_STEP_1, buildLogbookName());

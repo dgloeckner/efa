@@ -99,7 +99,7 @@ public class EfaAboutDialog extends BaseDialog {
         mainPanel.setLayout(new BorderLayout());
         aboutEfaPanel.setLayout(new GridBagLayout());
         systemInfoPanel.setLayout(borderLayout3);
-        systemInfoScrollPane.setPreferredSize(new Dimension(400, 300));
+        systemInfoScrollPane.setPreferredSize(new Dimension(400, 290));
         dankePanel.setLayout(borderLayout4);
         languagePanel.setLayout(borderLayout5);
         librariesPanel.setLayout(borderLayout6);
@@ -132,7 +132,12 @@ public class EfaAboutDialog extends BaseDialog {
         librariesScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         changelogScrollPane.getViewport().add(changelogText, null);
         changelogScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        changelogScrollPane.setPreferredSize(new Dimension(400, 300));
+        // this is relevant for sizing the efaAboutDialog with no vertical scrollbar - each scrollpane needs a preferred size
+        changelogScrollPane.setPreferredSize(new Dimension(400, 600));
+        dankeScrollPane.setPreferredSize(new Dimension(850, 750)); 
+        languageScrollPane.setPreferredSize(new Dimension(400, 600));
+        librariesScrollPane.setPreferredSize(new Dimension(400, 600));
+                
         mainPanel.add(tabbedPane, BorderLayout.CENTER);
 
     }

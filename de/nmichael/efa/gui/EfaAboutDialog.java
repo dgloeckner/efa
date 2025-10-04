@@ -134,6 +134,7 @@ public class EfaAboutDialog extends BaseDialog {
         changelogScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         // this is relevant for sizing the efaAboutDialog with no vertical scrollbar - each scrollpane needs a preferred size
         changelogScrollPane.setPreferredSize(new Dimension(400, 600));
+        changelogScrollPane.getVerticalScrollBar().setUnitIncrement(6);
         dankeScrollPane.setPreferredSize(new Dimension(850, 750)); 
         languageScrollPane.setPreferredSize(new Dimension(400, 600));
         librariesScrollPane.setPreferredSize(new Dimension(400, 600));

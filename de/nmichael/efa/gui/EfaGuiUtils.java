@@ -115,7 +115,7 @@ public class EfaGuiUtils {
 		// adding a special prefix
 		ItemTypeLabel item = new ItemTypeLabel(EfaConfig.NOT_STORED_ITEM_PREFIX + uniqueName, type, category, caption);
 		item.setPadding(0, 0, padBefore, padAfter);
-		item.setFieldGrid(3, GridBagConstraints.EAST, GridBagConstraints.BOTH);
+		item.setFieldGrid(gridWidth, GridBagConstraints.EAST, GridBagConstraints.BOTH);
 		return item;
 	}	
 

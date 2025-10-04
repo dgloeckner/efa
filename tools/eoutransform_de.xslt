@@ -25,10 +25,10 @@
 	</ul>
 	</xsl:if>
 	<xsl:for-each select="Changes[@lang='de']">
-	    <xsl:if test="ChangeItem[(starts-with(translate(.,'ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ','abcdefghijklmnopqrstuvwxyzäöü'),'neu'))]">
+	    <xsl:if test="ChangeItem[(starts-with(translate(.,'ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ','abcdefghijklmnopqrstuvwxyzäöü'),'neu:'))]">
         	<b>Neuerungen</b>
 	        <ul>
-	        <xsl:for-each select="ChangeItem[starts-with(translate(.,'ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ','abcdefghijklmnopqrstuvwxyzäöü'),'neu')]">
+	        <xsl:for-each select="ChangeItem[starts-with(translate(.,'ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ','abcdefghijklmnopqrstuvwxyzäöü'),'neu:')]">
 		    <li>
 		        <xsl:value-of select="substring-after(.,':')"/>
 		    </li>
@@ -37,10 +37,10 @@
         </xsl:if>
 	</xsl:for-each>
 	<xsl:for-each select="Changes[@lang='de']">
-	    <xsl:if test="ChangeItem[(starts-with(translate(.,'ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ','abcdefghijklmnopqrstuvwxyzäöü'),'bugfix'))]">
+	    <xsl:if test="ChangeItem[(starts-with(translate(.,'ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ','abcdefghijklmnopqrstuvwxyzäöü'),'bugfix:'))]">
         	<b>Korrekturen</b>
 	        <ul>
-	        <xsl:for-each select="ChangeItem[starts-with(translate(.,'ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ','abcdefghijklmnopqrstuvwxyzäöü'),'bugfix')]">
+	        <xsl:for-each select="ChangeItem[starts-with(translate(.,'ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ','abcdefghijklmnopqrstuvwxyzäöü'),'bugfix:')]">
 		    <li>
 		        <xsl:value-of select="substring-after(.,':')"/>
 		    </li>
@@ -50,14 +50,14 @@
 	</xsl:for-each>
 	<xsl:for-each select="Changes[@lang='de']">
 	    <xsl:if test="ChangeItem[
-		not(starts-with(translate(.,'ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ','abcdefghijklmnopqrstuvwxyzäöü'),'neu')) and
-		not(starts-with(translate(.,'ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ','abcdefghijklmnopqrstuvwxyzäöü'),'bugfix'))
+		not(starts-with(translate(.,'ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ','abcdefghijklmnopqrstuvwxyzäöü'),'neu:')) and
+		not(starts-with(translate(.,'ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ','abcdefghijklmnopqrstuvwxyzäöü'),'bugfix:'))
 		]">
     		<b>Sonstige Änderungen</b>
 		<ul>
 		    <xsl:for-each select="ChangeItem[
-			not(starts-with(translate(.,'ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ','abcdefghijklmnopqrstuvwxyzäöü'),'neu')) and
-		    not(starts-with(translate(.,'ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ','abcdefghijklmnopqrstuvwxyzäöü'),'bugfix'))
+			not(starts-with(translate(.,'ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ','abcdefghijklmnopqrstuvwxyzäöü'),'neu:')) and
+		    not(starts-with(translate(.,'ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ','abcdefghijklmnopqrstuvwxyzäöü'),'bugfix:'))
 		    ]">
 		    <li>
 			<xsl:value-of select="."/>

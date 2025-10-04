@@ -145,6 +145,10 @@ public class EfaCloudConfigDialog extends BaseTabbedDialog implements IItemListe
                     item.setPadding(0, 0, 20, 20);
                     item.registerItemListener(this);
                     item.setFieldGrid(2, GridBagConstraints.CENTER, GridBagConstraints.NONE);
+                    
+                    guiItems.add(EfaGuiUtils.createHintWordWrap(BUTTON_EFACLOUD_SYNCH_UPLOAD+"HINT",IItemType.TYPE_PUBLIC, category, 
+                    		International.getString("Werden mehrere Fahrtenbücher hintereinander in efaCloud hochgeladen, dann muss nach jedem Wechsel des Fahrtenbuchs ein Neustart von efa durchgeführt werden."),
+                    				1,10,10,600));
                 }
                 // If the queue is paused the options are resume or deactivate
                 else if (state == TxRequestQueue.QUEUE_IS_PAUSED) {

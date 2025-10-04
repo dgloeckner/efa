@@ -36,6 +36,7 @@ import de.nmichael.efa.data.Clubwork;
 import de.nmichael.efa.data.Logbook;
 import de.nmichael.efa.data.Project;
 import de.nmichael.efa.data.ProjectRecord;
+import de.nmichael.efa.data.efacloud.EfaCloudUtil;
 import de.nmichael.efa.data.storage.IDataAccess;
 import de.nmichael.efa.gui.dataedit.ProjectEditDialog;
 import de.nmichael.efa.gui.util.EfaMouseListener;
@@ -511,7 +512,9 @@ public class OpenProjectOrLogbookDialog extends BaseDialog implements IItemListe
     }
 
     public String openDialog() {
-        showDialog();
+    	if (EfaCloudUtil.isEfaCloudTXQueueActive() == false) {
+    		showDialog();
+    	}
         return name;
     }
 

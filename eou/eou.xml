@@ -1,18 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <efaOnlineUpdate>
 	<Version>
-  		<VersionID>2.4.1#19</VersionID>
-  		<ReleaseDate>04.10.2025</ReleaseDate>
+  		<VersionID>2.5.0#1</VersionID>
+  		<ReleaseDate>05.10.2025</ReleaseDate>
         <DownloadUrl>TODO</DownloadUrl>
         <DownloadSize>TODO</DownloadSize>
 		<MinimumJavaVersion>1.8</MinimumJavaVersion>
 		<MinimumEfaCloudVersion>2.3.3</MinimumEfaCloudVersion>
-        <ShowNotice lang="de">Wenn efaCloud eingesetzt wird, muss der Server mindestens Version 2.3.3 unterstützen. EfaCloud 2.4.0_10 und höher werden empfohlen.</ShowNotice>
+        <ShowNotice lang="de">Wenn efaCloud eingesetzt wird, muss der Server mindestens Version 2.3.3 unterstützen. EfaCloud 2.4.0_12 und höher werden empfohlen.</ShowNotice>
         <ShowNotice lang="en">If you use efaCloud, make sure your server at least supports efaCloud Version 2.3.3. It is recommended to upgrade to EfaCloud 2.4.0_12 or above.</ShowNotice>
         <Changes lang="de">
+        	<ChangeItem>Neu: Adminmodus/Fahrtenbuch: Bei Anlage eines neuen Fahrtenbuchs wird der Fahrtenbuchname auf allen Folgeseiten des Dialogs wiederholt.</ChangeItem>
         	<ChangeItem>Neu: [efaCloud] Wenn eine efaCloud-Synchronisation im Hintergrund läuft, wird das benutzerseitige Wechseln von Projekten, Fahrtenbüchern und Vereinsarbeit unterbunden, und der Anwender mit einer Meldung informiert.</ChangeItem>
         </Changes>
         <Changes lang="en">
+        	<ChangeItem>New: Admin mode/Logbook: When creating a new logbook, the logbook name gets shown on all pages of the 'new logbook' dialog.</ChangeItem>
         	<ChangeItem>New: [efaCloud] If an efaCloud synchronisation is currently running in background, the user cannot open the dialogs for choosing projects, logbooks and clubwork. The user is informed with a message.</ChangeItem>
         </Changes>	
 	</Version>
@@ -23,14 +25,14 @@
         <DownloadSize>TODO</DownloadSize>
 		<MinimumJavaVersion>1.8</MinimumJavaVersion>
 		<MinimumEfaCloudVersion>2.3.3</MinimumEfaCloudVersion>
-        <ShowNotice lang="de">Wenn efaCloud eingesetzt wird, muss der Server mindestens Version 2.3.3 unterstützen. EfaCloud 2.4.0_10 und höher werden empfohlen.</ShowNotice>
+        <ShowNotice lang="de">Wenn efaCloud eingesetzt wird, muss der Server mindestens Version 2.3.3 unterstützen. EfaCloud 2.4.0_12 und höher werden empfohlen.</ShowNotice>
         <ShowNotice lang="en">If you use efaCloud, make sure your server at least supports efaCloud Version 2.3.3. It is recommended to upgrade to EfaCloud 2.4.0_10 or above.</ShowNotice>
         <Changes lang="de">
-        	<ChangeItem>Neu: Bei Anlage eines neuen Fahrtenbuchs wird der Startzeitraum des aktuell geöffneten Fahrtenbuchs als Grundlage genommen - statt wie bisher der 01.01. Der Endezeitpunkt der Periode wird automatisch berechnet. Dies vereinfacht die Anlage neuer Fahrtenbücher bei abweichender Startperiode (z.B. Kanufahren in Deutschland).</ChangeItem>
+        	<ChangeItem>Neu: Adminmodus/Fahrtenbuch: Bei Anlage eines neuen Fahrtenbuchs wird der Startzeitraum des aktuell geöffneten Fahrtenbuchs als Grundlage genommen - statt wie bisher der 01.01. Der Endezeitpunkt der Periode wird automatisch berechnet. Dies vereinfacht die Anlage neuer Fahrtenbücher bei abweichender Startperiode (z.B. Kanufahren in Deutschland).</ChangeItem>
         	<ChangeItem>Neu: Changelog im "Über Efa" Dialog ist besser strukturiert.</ChangeItem>
         </Changes>
         <Changes lang="en">
-        	<ChangeItem>New: When creating a new logbook, the start date of the currently opened logbook is used as the basis, instead of January 1st as before. The end date is calculated automatically. This simplifies the creation of new logbooks with a different start date (e.g., canoeing in Germany).</ChangeItem>
+        	<ChangeItem>New: Admin mode/Logbook: When creating a new logbook, the start date of the currently opened logbook is used as the basis, instead of January 1st as before. The end date is calculated automatically. This simplifies the creation of new logbooks with a different start date (e.g., canoeing in Germany).</ChangeItem>
         	<ChangeItem>New: Changelog in "About Efa" dialog has been optimized for readability.</ChangeItem>
         </Changes>	
 	</Version>
@@ -76,8 +78,8 @@
         </Changes>
         <Changes lang="en">
         	<ChangeItem>New: Dialog for editing BoatStatus in landscape mode; shows a new column for Trip number and Logbook-Date.</ChangeItem>
-        	<ChangeItem>New: EfaBase/Admin-Mode: When editing logbook entries, some fields are highlighted with a red warning icon when they are (unexpectedly) empty.</ChangeItem>
-        	<ChangeItem>New: EfaBase/Admin-Mode: A Session does not gets set to "closed" by default if a session gets edited in efaBase/Admin mode. This means that the button "Session open - finish now" is visible more often if the session is actually open.</ChangeItem>
+        	<ChangeItem>New: EfaBase/Admin mode: When editing logbook entries, some fields are highlighted with a red warning icon when they are (unexpectedly) empty.</ChangeItem>
+        	<ChangeItem>New: EfaBase/Admin mode: A Session does not gets set to "closed" by default if a session gets edited in efaBase/Admin mode. This means that the button "Session open - finish now" is visible more often if the session is actually open.</ChangeItem>
         	<ChangeItem>Bugfix: Boatstatus: If the BoatStatus gets set to a value != OnTheWater, the attributes for TripNo and Logbookname get cleared as well.</ChangeItem>
         	<ChangeItem>Bugfix: Session start: if a trip is &gt;30km, and only a single trip type is available, no dialog for confirming the trip type is shown.</ChangeItem>
         </Changes>	

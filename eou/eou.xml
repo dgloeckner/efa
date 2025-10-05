@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <efaOnlineUpdate>
 	<Version>
-  		<VersionID>2.5.0#1</VersionID>
+  		<VersionID>2.5.0#19</VersionID>
   		<ReleaseDate>05.10.2025</ReleaseDate>
         <DownloadUrl>TODO</DownloadUrl>
         <DownloadSize>TODO</DownloadSize>
@@ -19,7 +19,7 @@
         </Changes>	
 	</Version>
 	<Version>
-  		<VersionID>2.4.1#18</VersionID>
+  		<VersionID>2.5.0#18</VersionID>
   		<ReleaseDate>03.08.2025</ReleaseDate>
         <DownloadUrl>TODO</DownloadUrl>
         <DownloadSize>TODO</DownloadSize>
@@ -37,7 +37,7 @@
         </Changes>	
 	</Version>
 	<Version>
-  		<VersionID>2.4.1#17</VersionID>
+  		<VersionID>2.5.0#17</VersionID>
   		<ReleaseDate>08.06.2025</ReleaseDate>
         <DownloadUrl>TODO</DownloadUrl>
         <DownloadSize>TODO</DownloadSize>
@@ -61,7 +61,7 @@
         </Changes>	
 	</Version>
 	<Version>
-  		<VersionID>2.4.1#16</VersionID>
+  		<VersionID>2.5.0#16</VersionID>
   		<ReleaseDate>21.04.2025</ReleaseDate>
         <DownloadUrl>TODO</DownloadUrl>
         <DownloadSize>TODO</DownloadSize>
@@ -85,7 +85,7 @@
         </Changes>	
 	</Version>
 	<Version>
-  		<VersionID>2.4.1#15</VersionID>
+  		<VersionID>2.5.0#15</VersionID>
   		<ReleaseDate>13.04.2025</ReleaseDate>
         <DownloadUrl>TODO</DownloadUrl>
         <DownloadSize>TODO</DownloadSize>
@@ -105,7 +105,7 @@
         </Changes>	
 	</Version>
 	<Version>
-        <VersionID>2.4.1#14</VersionID>
+        <VersionID>2.5.0#14</VersionID>
         <ReleaseDate>16.03.2025</ReleaseDate>
         <DownloadUrl>TODO</DownloadUrl>
         <DownloadSize>TODO</DownloadSize>
@@ -133,7 +133,7 @@
         </Changes>
 	</Version>
 	<Version>
-        <VersionID>2.4.1#12</VersionID>
+        <VersionID>2.5.0#12</VersionID>
         <ReleaseDate>09.03.2025</ReleaseDate>
         <DownloadUrl>TODO</DownloadUrl>
         <DownloadSize>TODO</DownloadSize>
@@ -192,7 +192,7 @@
 		</Changes>
 	</Version>
 	<Version>
-        <VersionID>2.4.1#11</VersionID>
+        <VersionID>2.5.0#11</VersionID>
         <ReleaseDate>27.10.2024</ReleaseDate>
         <DownloadUrl>TODO</DownloadUrl>
         <DownloadSize>TODO</DownloadSize>
@@ -239,11 +239,11 @@
             <ChangeItem>BugFix: Nullpointer im Audit Task behoben, wenn Reservierungen zu nicht sichtbaren Booten gelöscht werden sollen.</ChangeItem>
 			<ChangeItem>BugFix: Wenn ein Restore auch Konfigurationsdaten wiederherstellt, wird das Projekt nicht neu geladen und der Anwender zum Neustart von efa aufgefordert. Dies sorgt dafür, dass die wiederhergestellten Konfigurationsdaten, Bootstypen etc. direkt zum Einsatz kommen.</ChangeItem>
 			<ChangeItem>BugFix: Admin Dialog: Besseres Layout, wenn ein anstehender Fahrtenbuch- oder Vereinsarbeitswechsel dargestellt wird.</ChangeItem>			
-            <ChangeItem>BugFix: EFA#102: EFA2.4.1#8 Beta: efaCLI Export: bisherige Standards für Feld- und Text-Trennzeichen sollen bestehen bleiben (für Abwärtskompatiblität)</ChangeItem>
-            <ChangeItem>BugFix: EFA#106: EFA2.4.1#8 Beta: efaCLI Export: Betreff der versandten Mail beinhaltet unnötige Zeitzonen-Angabe</ChangeItem>
-            <ChangeItem>BugFix: EFA#107: EFA2.4.1#8 Beta: efaCLI Export: CSV-Exporte ohne absolute Pfadangabe landen im Efa-Hauptverzeichnis</ChangeItem>
-            <ChangeItem>BugFix: EFA#103: EFA2.4.1#8 Beta: efaCLI Statistiken: lassen sich über efaCLI nicht mehr erstellen.</ChangeItem>
-            <ChangeItem>BugFix: EFA#104: EFA2.4.1#8 Beta: Rechtschreibfehler in DE, efaConfig: Bootshaus -&gt; Benachrichtigungen</ChangeItem>
+            <ChangeItem>BugFix: EFA#102: EFA2.5.0#8 Beta: efaCLI Export: bisherige Standards für Feld- und Text-Trennzeichen sollen bestehen bleiben (für Abwärtskompatiblität)</ChangeItem>
+            <ChangeItem>BugFix: EFA#106: EFA2.5.0#8 Beta: efaCLI Export: Betreff der versandten Mail beinhaltet unnötige Zeitzonen-Angabe</ChangeItem>
+            <ChangeItem>BugFix: EFA#107: EFA2.5.0#8 Beta: efaCLI Export: CSV-Exporte ohne absolute Pfadangabe landen im Efa-Hauptverzeichnis</ChangeItem>
+            <ChangeItem>BugFix: EFA#103: EFA2.5.0#8 Beta: efaCLI Statistiken: lassen sich über efaCLI nicht mehr erstellen.</ChangeItem>
+            <ChangeItem>BugFix: EFA#104: EFA2.5.0#8 Beta: Rechtschreibfehler in DE, efaConfig: Bootshaus -&gt; Benachrichtigungen</ChangeItem>
             <ChangeItem>BugFix: [efaCloud] Kein Nullpointer-Fehler mehr beim Betreten des Admin-Modus, wenn kein Projekt geöffnet ist.</ChangeItem>
             <ChangeItem>BugFix: [efaCloud] Im Debug Modus werden keine unnötigen Nullpointer-Exceptions mehr ins Log geschrieben. https://github.com/nicmichael/efa/issues/138</ChangeItem>
             <ChangeItem>Code: Refactoring: Unnötige Imports entfernt.</ChangeItem>          
@@ -286,11 +286,11 @@
             <ChangeItem>BugFix: Fixed nullpointer in audit task when deleting reservations for invisible boats.</ChangeItem>
 			<ChangeItem>BugFix: If a restore of a backup restores config items, the project will NOT be reloaded, but the user gets a request to restart efa. This ensures that config data is loaded before the audit task starts up and performs unwanted changes.</ChangeItem>
 			<ChangeItem>BugFix: Admin Dialog: Better layout for showing upcoming automatic logbook or clubwork switch.</ChangeItem>
-            <ChangeItem>BugFix: EFA#102: EFA2.4.1#8 Beta: efaCLI Export: current standards for CSV delimiter and CSV quote shall remain for backwards compatibility</ChangeItem>
-            <ChangeItem>BugFix: EFA#106: EFA2.4.1#8 Beta: efaCLI Export: Topic of mails contain unneccesary timezone descriptions</ChangeItem>
-            <ChangeItem>BugFix: EFA#107: EFA2.4.1#8 Beta: efaCLI Export: CSV export without absolute paths create files in efa main directory</ChangeItem>
-            <ChangeItem>BugFix: EFA#103: EFA2.4.1#8 Beta: efaCLI Statistics: Statistics could not be created any more.</ChangeItem>
-            <ChangeItem>BugFix: EFA#104: EFA2.4.1#8 Beta: typo in DE, efaConfig: Boathouse-&gt; Notifications</ChangeItem>
+            <ChangeItem>BugFix: EFA#102: EFA2.5.0#8 Beta: efaCLI Export: current standards for CSV delimiter and CSV quote shall remain for backwards compatibility</ChangeItem>
+            <ChangeItem>BugFix: EFA#106: EFA2.5.0#8 Beta: efaCLI Export: Topic of mails contain unneccesary timezone descriptions</ChangeItem>
+            <ChangeItem>BugFix: EFA#107: EFA2.5.0#8 Beta: efaCLI Export: CSV export without absolute paths create files in efa main directory</ChangeItem>
+            <ChangeItem>BugFix: EFA#103: EFA2.5.0#8 Beta: efaCLI Statistics: Statistics could not be created any more.</ChangeItem>
+            <ChangeItem>BugFix: EFA#104: EFA2.5.0#8 Beta: typo in DE, efaConfig: Boathouse-&gt; Notifications</ChangeItem>
             <ChangeItem>BugFix: [efaCloud] No more nullpointer exception when entering admin mode and no open project.</ChangeItem>
             <ChangeItem>BugFix: [efaCloud] No more exceptions logged in debug mode. https://github.com/nicmichael/efa/issues/138 </ChangeItem>
             <ChangeItem>Code: Refactoring: Removed unused import statemens.</ChangeItem>          

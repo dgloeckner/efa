@@ -120,7 +120,7 @@
         	<ChangeItem>BugFix: Admin-Dialog: Anzahl der Nachrichten wird bei geschlossenen Projekten auf der Schaltfläche korrekt dargestellt.</ChangeItem>
         	<ChangeItem>BugFix: [efaCloud] efaCloud Logdateien sind wieder auf max. 200kb Größe limitiert.</ChangeItem>
         	<ChangeItem>BugFix: [efaCloud] Löschen von efaCloud Projekten verwirrt nicht mehr die efaCloud TX-Synchronisation.</ChangeItem>
-        	<ChangeItem>BugFix: [efaCloud] Bug in efa 2.4.1#12 bei Migration von Projekten nach efaCloud behoben.</ChangeItem>
+        	<ChangeItem>BugFix: [efaCloud] Bug in efa 2.5.0#12 bei Migration von Projekten nach efaCloud behoben.</ChangeItem>
         </Changes>
         <Changes lang="en">
         	<ChangeItem>BugFix: efaBase could not be closed via File-&gt;Quit, some fragments kept running in backround.</ChangeItem>
@@ -129,7 +129,7 @@
         	<ChangeItem>BugFix: Admin-Dialog: Number of unread messages is shown correctly on the button, when project has been closed.</ChangeItem>
         	<ChangeItem>BugFix: [efaCloud]: efaCloud log files are again limited to 200kb size max.</ChangeItem>
         	<ChangeItem>BugFix: [efaCloud] Deleting efaCloud projects no longer disturbs efaCloud TX-Synchronisation.</ChangeItem>
-        	<ChangeItem>BugFix: [efaCloud] Bug in efa 2.4.1#12 fixed which avoided migration of local projects to efaCloud.</ChangeItem>
+        	<ChangeItem>BugFix: [efaCloud] Bug in efa 2.5.0#12 fixed which avoided migration of local projects to efaCloud.</ChangeItem>
         </Changes>
 	</Version>
 	<Version>

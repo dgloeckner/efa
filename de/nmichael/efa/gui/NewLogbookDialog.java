@@ -46,6 +46,7 @@ public class NewLogbookDialog extends StepwiseDialog implements IItemListener {
     private static final String LOGBOOKNAMEHINT    = "LOGBOOKNAMEHINT";    
     private static final String LOGBOOKDESCRIPTION = "LOGBOOKDESCRIPTION";
     private static final String LOGBOOKNAMESTEP1   = "LOGBOOKNAMESTEP1";
+    private static final String LOGBOOKNAMESTEP2   = "LOGBOOKNAMESTEP2";
     private static final String AUTOCALC_DATETO    = "AUTOCALC_DATETO";
     private static final String DATEFROM           = "DATEFROM";
     private static final String DATETO             = "DATETO";
@@ -166,7 +167,14 @@ public class NewLogbookDialog extends StepwiseDialog implements IItemListener {
             		,2,10,10,500));
         }          
 
-        // Items for Step 2name, type, category, description
+        // Items for Step 2 name, type, category, description
+        
+        ItemTypeLabel newLogbookNameLabelStep2 = new ItemTypeLabel(LOGBOOKNAMESTEP2, IItemType.TYPE_PUBLIC, CATEGORY_STEP_2, buildLogbookName());
+        newLogbookNameLabelStep2.setHorizontalAlignment(SwingConstants.CENTER);
+        newLogbookNameLabelStep2.setFieldGrid(3, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL);
+        newLogbookNameLabelStep2.setBoldFont(true);
+        items.add(newLogbookNameLabelStep2);
+        
         item = new ItemTypeBoolean(AUTOMATICLOGSWITCH, false, IItemType.TYPE_PUBLIC, CATEGORY_STEP_2,
                 International.getMessage("Fahrtenbuchwechsel automatisch zum {datum}", "?"));
         items.add(item);
@@ -217,6 +225,10 @@ public class NewLogbookDialog extends StepwiseDialog implements IItemListener {
             //update logbookname for next gui step
             ItemTypeLabel logbookname = (ItemTypeLabel)getItemByName(LOGBOOKNAMESTEP1);
             logbookname.setDescription(buildLogbookName());
+            
+            logbookname = (ItemTypeLabel)getItemByName(LOGBOOKNAMESTEP2);
+            logbookname.setDescription(buildLogbookName());
+            
         }
 
         if (step == 1) {

@@ -53,7 +53,7 @@
 		not(starts-with(translate(.,'ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ','abcdefghijklmnopqrstuvwxyzäöü'),'new:')) and
 		not(starts-with(translate(.,'ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ','abcdefghijklmnopqrstuvwxyzäöü'),'bugfix:'))
 		]">
-    		<b>Miscenalleous</b>
+    		<b>Miscellaneous</b>
 		<ul>
 		    <xsl:for-each select="ChangeItem[
 			not(starts-with(translate(.,'ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ','abcdefghijklmnopqrstuvwxyzäöü'),'new:')) and

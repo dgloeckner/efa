@@ -96,6 +96,11 @@ public abstract class Widget implements IWidget {
         parameters.add(p);
     }
     
+    void addParameterInternal(IItemType p, int padYBefore, int padYAfter) {
+        p.setPadding(0, 0, padYBefore, padYAfter);        
+        addParameterInternal(p);
+    }
+    
     /**
      * Adds a header item in an efa widget config. This header value is not safed within efaConfig.
      * There is no word-wrap for the caption.

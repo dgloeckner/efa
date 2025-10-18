@@ -39,7 +39,10 @@ public class ItemTypeString extends ItemTypeLabelTextfield {
     }
 
     public IItemType copyOf() {
-        return new ItemTypeString(name, value, type, category, description);
+        ItemTypeString copy = new ItemTypeString(name, value, type, category, description);
+        copy.setPadding(padXbefore, padXafter, padYbefore, padYafter);
+        copy.setFieldGrid(fieldGridWidth, fieldGridHeight, fieldGridAnchor, fieldGridFill);
+        return copy;
     }
 
     public void parseValue(String value) {

@@ -158,10 +158,22 @@ public class WeatherIcons {
 	public static final String IMAGE_WEATHER_395_32 = "weather\\weather_395_32.png";
 	public static final String IMAGE_WEATHER_395_48 = "weather\\weather_395_48.png";
 	public static final String IMAGE_WEATHER_395_64 = "weather\\weather_395_64.png";
-
+	
+	public static final String IMAGE_MIN            = "weather\\min.png";
+	public static final String IMAGE_MAX            = "weather\\max.png";
+	public static final String IMAGE_RAIN           = "weather\\rain.png";
+	public static final String IMAGE_SUN            = "weather\\sun.png";
+	public static final String IMAGE_UV_INDEX       = "weather\\uvindex.png";
+	public static final String IMAGE_UV_INDEX_LOW   = "weather\\uvindex_low.png";
+	public static final String IMAGE_UV_INDEX_MEDIUM = "weather\\uvindex_medium.png";
+	public static final String IMAGE_UV_INDEX_ABOVE_MEDIUM = "weather\\uvindex_above_medium.png";
+	public static final String IMAGE_UV_INDEX_HIGH  = "weather\\uvindex_high.png";
+	public static final String IMAGE_UV_INDEX_VERY_HIGH = "weather\\uvindex_very_high.png";
+	public static final String IMAGE_UV_INDEX_SEVERE = "weather\\uvindex_severe.png";
+	
 	
 	public static ImageIcon getWeatherIconForCode(int code, int size, boolean isDay, boolean center) {
-		String iconName="weather\\weather_"+code+(isDay ? "" : "-1")+"_"+size;
+		String iconName="weather\\weather_"/*+code+(isDay ? "" : "-1")*/+"_"+size;
 		if (code == 113) {
 			iconName = (center ? iconName +"_center.png" : iconName + ".png");
 		} else {

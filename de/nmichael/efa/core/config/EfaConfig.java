@@ -343,6 +343,11 @@ public class EfaConfig extends StorageObject implements IItemFactory {
 	private ItemTypeColor efaGuiToolTipHeaderBackground; 
 	private ItemTypeColor efaGuiToolTipHeaderForeground;
 	
+	private ItemTypeColor efaGuiErrorBackground; 
+	private ItemTypeColor efaGuiErrorForeground;
+	private ItemTypeColor efaGuiErrorHeaderBackground; 
+	private ItemTypeColor efaGuiErrorHeaderForeground;
+	
 	private ItemTypeStringList efaDirekt_bnrMsgToAdminDefaultRecipient;
 	private ItemTypeBoolean efaDirekt_bnrError_admin;
 	private ItemTypeBoolean efaDirekt_bnrError_bootswart;
@@ -439,9 +444,15 @@ public class EfaConfig extends StorageObject implements IItemFactory {
 
 	private static Color standardToolTipBackgroundColor = new Color(224,237,249);
 	private static Color standardToolTipForegroundColor = new Color(21,65,106);
-
+	
 	private static Color standardToolTipHeaderBackgroundColor = new Color(250,252,254);
 	private static Color standardToolTipHeaderForegroundColor = standardToolTipForegroundColor;	
+
+	private static Color standardErrorBackgroundColor = new Color(249,224,224);
+	private static Color standardErrorForegroundColor = new Color(148,29,29);
+	
+	private static Color standardErrorHeaderBackgroundColor = new Color(254,250,250);
+	private static Color standardErrorHeaderForegroundColor = standardErrorForegroundColor;	
 	
 	
 	// private internal data
@@ -979,6 +990,33 @@ public class EfaConfig extends StorageObject implements IItemFactory {
 					EfaUtil.getColor(standardToolTipHeaderForegroundColor), IItemType.TYPE_PUBLIC,
 					BaseTabbedDialog.makeCategory(CATEGORY_COMMON, CATEGORY_GUI),
 					International.getString("Tooltipp-Überschriften Textfarbe"), false));					
+			
+
+			addHeader("efaGuiError", IItemType.TYPE_PUBLIC,
+					BaseTabbedDialog.makeCategory(CATEGORY_COMMON, CATEGORY_GUI),
+					International.getString("Farben für Fehlermeldungen"), 3);
+			
+			addParameter(efaGuiErrorBackground = new ItemTypeColor("efaGuiErrorBackground",
+					EfaUtil.getColor(standardErrorBackgroundColor),
+					EfaUtil.getColor(standardErrorBackgroundColor), IItemType.TYPE_PUBLIC,
+					BaseTabbedDialog.makeCategory(CATEGORY_COMMON, CATEGORY_GUI),
+					International.getString("Fehler Hintergrundfarbe"), false));
+			addParameter(efaGuiErrorForeground = new ItemTypeColor("efaGuiToolTipForeground",
+					EfaUtil.getColor(standardErrorForegroundColor),
+					EfaUtil.getColor(standardErrorForegroundColor), IItemType.TYPE_PUBLIC,
+					BaseTabbedDialog.makeCategory(CATEGORY_COMMON, CATEGORY_GUI),
+					International.getString("Fehler Textfarbe"), false));		
+
+			addParameter(efaGuiErrorHeaderBackground = new ItemTypeColor("efaGuiErrorHeaderBackground",
+					EfaUtil.getColor(standardErrorHeaderBackgroundColor),
+					EfaUtil.getColor(standardErrorHeaderBackgroundColor), IItemType.TYPE_PUBLIC,
+					BaseTabbedDialog.makeCategory(CATEGORY_COMMON, CATEGORY_GUI),
+					International.getString("Fehler-Überschriften Hintergrundfarbe"), false));
+			addParameter(efaGuiErrorHeaderForeground = new ItemTypeColor("efaGuiErrorHeaderForeground",
+					EfaUtil.getColor(standardErrorHeaderForegroundColor),
+					EfaUtil.getColor(standardErrorHeaderForegroundColor), IItemType.TYPE_PUBLIC,
+					BaseTabbedDialog.makeCategory(CATEGORY_COMMON, CATEGORY_GUI),
+					International.getString("Fehler-Überschriften Textfarbe"), false));					
 			
 			addHeader("efaGuiOtherFont", IItemType.TYPE_PUBLIC,
 					BaseTabbedDialog.makeCategory(CATEGORY_COMMON, CATEGORY_GUI),
@@ -3129,6 +3167,26 @@ public class EfaConfig extends StorageObject implements IItemFactory {
 		Color myColor = efaGuiToolTipHeaderForeground.getColor();
 		return (myColor != null ? myColor : standardToolTipHeaderForegroundColor);
 	}
+
+	public Color getErrorBackgroundColor() {
+		Color myColor = efaGuiErrorBackground.getColor();
+		return (myColor != null ? myColor : standardErrorBackgroundColor);
+	}
+
+	public Color getErrorForegroundColor() {
+		Color myColor = efaGuiErrorForeground.getColor();
+		return (myColor != null ? myColor : standardErrorForegroundColor);
+	}
+
+	public Color getErrorHeaderBackgroundColor() {
+		Color myColor = efaGuiErrorHeaderBackground.getColor();
+		return (myColor != null ? myColor : standardErrorHeaderBackgroundColor);
+	}
+
+	public Color getErrorHeaderForegroundColor() {
+		Color myColor = efaGuiErrorHeaderForeground.getColor();
+		return (myColor != null ? myColor : standardErrorHeaderForegroundColor);
+	}	
 	
 	public Boolean getHeaderUseHighlightColor() {
 		return efaHeaderUseHighlightColor.getValue();

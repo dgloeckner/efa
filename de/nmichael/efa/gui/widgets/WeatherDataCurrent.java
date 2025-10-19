@@ -3,7 +3,7 @@ package de.nmichael.efa.gui.widgets;
 /**
  * Class for storing current weather data (no forecast)
  */
-public class WeatherCurrent {
+public class WeatherDataCurrent {
     private double temperature;
     private double windSpeed;
     private double windDirection;

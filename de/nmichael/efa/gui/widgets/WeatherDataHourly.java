@@ -2,8 +2,8 @@ package de.nmichael.efa.gui.widgets;
 
 import java.util.List;
 
-class HourlyData {
-    private List<String> time;
+public class WeatherDataHourly {
+	private List<String> time;
     private List<Double> temperature2m;
     private List<Integer> weatherCode;
     private List<Double> windSpeed10m;
@@ -54,4 +54,5 @@ class HourlyData {
 		this.time = time;
 	}
 
+    
 }

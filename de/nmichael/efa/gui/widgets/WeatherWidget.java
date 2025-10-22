@@ -358,6 +358,14 @@ public class WeatherWidget extends Widget {
 				GridBagConstraints.VERTICAL, new Insets(0, 2, 0, 2), 0, 0));
 	}
 
+	private JPanel initializePanel() {
+		JPanel ret = new JPanel();
+		ret.setOpaque(false);
+		ret.setForeground(mainPanel.getForeground());
+		ret.setLayout(new GridBagLayout());		
+		return ret;
+	}
+	
 	private void addCurrentWeather3(WeatherDataForeCast wdf) {
 
 		JLabel curWeather_temp = new JLabel();
@@ -369,17 +377,13 @@ public class WeatherWidget extends Widget {
 		JLabel curWeather_sunshineUnit = new JLabel();
 		JLabel curWeather_rainUnit = new JLabel();
 		JLabel curWeather_uvindex = new JLabel();
-		
 		JLabel curWeather_wind = new JLabel();
-		JPanel pnlMinMaxSunRain=new JPanel();
-		pnlMinMaxSunRain.setOpaque(false);
-		pnlMinMaxSunRain.setForeground(mainPanel.getForeground());
-		pnlMinMaxSunRain.setLayout(new GridBagLayout());
-		
-		JPanel pnlWeatherTemp=new JPanel();
-		pnlWeatherTemp.setOpaque(false);
-		pnlWeatherTemp.setForeground(mainPanel.getForeground());
-		pnlWeatherTemp.setLayout(new GridBagLayout());
+
+		JPanel pnlSunshine = initializePanel();
+		JPanel pnlUV = initializePanel();
+		JPanel pnlRain = initializePanel();
+		JPanel pnlMinMax=initializePanel();
+		JPanel pnlWeatherTemp=initializePanel();
 
 		double minTemp = wdf.getDaily().getTemperature_2m_min();
 		double maxTemp = wdf.getDaily().getTemperature_2m_max();
@@ -392,7 +396,7 @@ public class WeatherWidget extends Widget {
 		curWeather_temp = new JLabel();
 		curWeather_temp.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
 		curWeather_temp.setFont(
-				mainPanel.getFont().deriveFont((float) (Daten.efaConfig.getValueEfaDirekt_BthsFontSize() + 10)));
+				mainPanel.getFont().deriveFont((float) (Daten.efaConfig.getValueEfaDirekt_BthsFontSize() + 6)));
 		curWeather_temp.setFont(curWeather_temp.getFont().deriveFont(Font.BOLD));
 		curWeather_temp.setText(wdf.getCurrentWeather().getTemperature() +" "+ getTempLabel(true));
 
@@ -416,11 +420,12 @@ public class WeatherWidget extends Widget {
 		df = new DecimalFormat("#.#");
 		curWeather_uvindex.setText(df.format(uvindex));
 		curWeather_uvindex.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
+		curWeather_uvindex.setHorizontalAlignment(SwingConstants.RIGHT);
 		
 		df = new DecimalFormat("#");
 		curWeather_rain.setText(df.format(rain)); 
 		curWeather_rain.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
-
+		
 		curWeather_rainUnit.setText("mm");
 		curWeather_rainUnit.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
 		curWeather_rainUnit.setFont(
@@ -428,71 +433,83 @@ public class WeatherWidget extends Widget {
 
 		/*	roundpanel
 		 *  | HEADER                                   |	
-		 * 	|WeatherIcon|  pnlMinMaxSunRain            |
-		 *  |CurrentTemp|                              |
+		 * 	|curtemp |  weatherIcon | pnlMinMax  
+		 *  |sunshine|   uvindex    | rain             |
 		 * 
-		 * pnlMinMaxSunRain
-		 *  |IMG_Max |lblMax|IMG_Sunshine|lblSunshine|lblSunUnit | 
-		 *  |IMG_Min |lblMin|IMG_UV      |lvlUVindx  |imgUVRated |
-		 *  |        |      |IMG_Rain    |lblRain    |lblRainUnit|
 		 * 
 		 */
-		pnlMinMaxSunRain.add(new JLabel (WeatherIcons.getIcon(WeatherIcons.IMAGE_MAX)), 
-				new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new Insets(2, 4, 2, 2), 0, 0));
-		pnlMinMaxSunRain.add(curWeather_maxTemp, 
+		//Min max Temp
+		pnlMinMax.add(new JLabel (WeatherIcons.getIcon(WeatherIcons.IMAGE_MAX)), 
+				new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new Insets(2, 2, 2, 2), 0, 0));
+		pnlMinMax.add(curWeather_maxTemp, 
 				new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.SOUTHEAST,GridBagConstraints.VERTICAL, new Insets(2, 2, 2, 2), 0, 0));
-		
-		pnlMinMaxSunRain.add(new JLabel (WeatherIcons.getIcon(WeatherIcons.IMAGE_SUN)), 
-				new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new Insets(2, 12, 2, 2), 0, 0));
-		pnlMinMaxSunRain.add(curWeather_sunshine, 
-				new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST,GridBagConstraints.VERTICAL, new Insets(2, 2, 2, 2), 0, 0));		
-		pnlMinMaxSunRain.add(curWeather_sunshineUnit, 
-				new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST,GridBagConstraints.VERTICAL, new Insets(2, 2, 2, 2), 0, 0));		
-		
-		
-		pnlMinMaxSunRain.add(new JLabel (WeatherIcons.getIcon(WeatherIcons.IMAGE_MIN)), 
-				new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new Insets(2, 4, 2, 2), 0, 0));
-		pnlMinMaxSunRain.add(curWeather_minTemp, 
+		pnlMinMax.add(new JLabel (WeatherIcons.getIcon(WeatherIcons.IMAGE_MIN)), 
+				new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new Insets(2, 2, 2, 2), 0, 0));
+		pnlMinMax.add(curWeather_minTemp, 
 				new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.EAST,GridBagConstraints.VERTICAL, new Insets(2, 2, 2, 2), 0, 0));		
 		
-		pnlMinMaxSunRain.add(new JLabel (WeatherIcons.getIcon(WeatherIcons.IMAGE_UV_INDEX)), 
-				new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new Insets(2, 12, 2, 2), 0, 0));
-		pnlMinMaxSunRain.add(curWeather_uvindex, 
-				new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0, GridBagConstraints.EAST,GridBagConstraints.VERTICAL, new Insets(2, 2, 2, 2), 0, 0));	
+		//Sunshine hours
+		JLabel lblSunIcon=new JLabel (WeatherIcons.getIcon(WeatherIcons.IMAGE_SUN));
+		lblSunIcon.setHorizontalTextPosition(SwingConstants.RIGHT);
+		lblSunIcon.setIconTextGap(0);
+		pnlSunshine.add(lblSunIcon, 
+				new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new Insets(0, 0, 2, 2), 0, 0));
+		pnlSunshine.add(curWeather_sunshine, 
+				new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST,GridBagConstraints.VERTICAL, new Insets(0, 2, 2, 2), 0, 0));		
+		pnlSunshine.add(curWeather_sunshineUnit, 
+				new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST,GridBagConstraints.VERTICAL, new Insets(0, 2, 2, 2), 0, 0));		
+		
+		// uv index
+		pnlUV.add(new JLabel (WeatherIcons.getIcon(WeatherIcons.IMAGE_UV_INDEX)), 
+				new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new Insets(0, 0, 2, 2), 0, 0));
+		pnlUV.add(curWeather_uvindex, 
+				new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST,GridBagConstraints.VERTICAL, new Insets(0, 2, 2, 2), 0, 0));	
 		JLabel uvi = new JLabel(wdf.getDaily().getUv_index_icon());
 		uvi.setIconTextGap(0);
 		uvi.setHorizontalTextPosition(SwingConstants.RIGHT);
-		pnlMinMaxSunRain.add(uvi, 
-				new GridBagConstraints(4, 1, 1, 1, 0.0, 0.0, GridBagConstraints.EAST,GridBagConstraints.VERTICAL, new Insets(2, 2, 2, 2), 0, 0));		
+		pnlUV.add(uvi, 
+				new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST,GridBagConstraints.VERTICAL, new Insets(0, 0, 2, 2), 0, 0));		
 		
-		pnlMinMaxSunRain.add(new JLabel (WeatherIcons.getIcon(WeatherIcons.IMAGE_RAIN)), 
-				new GridBagConstraints(2, 2, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new Insets(2, 12, 2, 2), 0, 0));
-		pnlMinMaxSunRain.add(curWeather_rain, 
-				new GridBagConstraints(3, 2, 1, 1, 0.0, 0.0, GridBagConstraints.EAST,GridBagConstraints.VERTICAL, new Insets(2, 2, 2, 2), 0, 0));		
-		pnlMinMaxSunRain.add(curWeather_rainUnit, 
-				new GridBagConstraints(4, 2, 1, 1, 0.0, 0.0, GridBagConstraints.EAST,GridBagConstraints.VERTICAL, new Insets(2, 2, 2, 2), 0, 0));		
+		// rain
+		pnlRain.add(new JLabel (WeatherIcons.getIcon(WeatherIcons.IMAGE_RAIN)), 
+				new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new Insets(0, 2, 2, 4), 0, 0));
+		pnlRain.add(curWeather_rain, 
+				new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST,GridBagConstraints.VERTICAL, new Insets(0, 2, 2, 2), 0, 0));		
+		pnlRain.add(curWeather_rainUnit, 
+				new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST,GridBagConstraints.VERTICAL, new Insets(0, 2, 2, 2), 0, 0));		
 				
-		/*
+		//wind just a label 
 		curWeather_wind.setText(International.getString("Wind") + ": "
 				+ International.getString(wdf.getCurrentWeather().getWindDirectionText()) + " "
 				+ International.getString("mit") + " " + wdf.getCurrentWeather().getWindSpeed()
 				+ getWeatherSpeedScale());
 		curWeather_wind.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
 		curWeather_wind.setHorizontalTextPosition(SwingConstants.CENTER);
-		 */
 		
-		pnlWeatherTemp.add(curWeather_icon, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
-				GridBagConstraints.BOTH, new Insets(0, 12, 0, 6), 0, 0));
+		//first row
+		roundPanel.add(curWeather_temp,  new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST,
+				GridBagConstraints.BOTH, new Insets(0, 2, 0, 2), 0, 0));
 
-		pnlWeatherTemp.add(curWeather_temp, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
-				GridBagConstraints.BOTH, new Insets(0, 12, 4, 6), 0, 0));
+		roundPanel.add(curWeather_icon,  new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+				GridBagConstraints.BOTH, new Insets(2, 5, 0, 5), 0, 0));
 		
+		roundPanel.add(pnlMinMax,        new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0, GridBagConstraints.EAST,
+				GridBagConstraints.BOTH, new Insets(0, 0, 0, 4), 0, 0));
 		
-		roundPanel.add(pnlWeatherTemp, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+		// second row
+		roundPanel.add(pnlSunshine,      new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.WEST,
+				GridBagConstraints.VERTICAL, new Insets(2, 2, 0, 0), 0, 0));
+
+		roundPanel.add(pnlUV,            new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+				GridBagConstraints.BOTH, new Insets(2, 0, 0, 0), 0, 0));
+
+		roundPanel.add(pnlRain,          new GridBagConstraints(2, 2, 1, 1, 0.0, 0.0, GridBagConstraints.SOUTHEAST,
+				GridBagConstraints.VERTICAL, new Insets(2, 0, 0, 2), 0, 0));
+
+		/*roundPanel.add(curWeather_wind, new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
 				GridBagConstraints.BOTH, new Insets(2, 12, 0, 6), 0, 0));
-
-		roundPanel.add(pnlMinMaxSunRain, new GridBagConstraints(1, 1, 1, 2, 0.0, 1.0, GridBagConstraints.EAST,
-				GridBagConstraints.BOTH, new Insets(2, 12, 0, 4), 0, 0));
+		*/
+		
 
 		
 	}

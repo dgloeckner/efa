@@ -173,7 +173,7 @@ public class WeatherIcons {
 	
 	
 	public static ImageIcon getWeatherIconForCode(int code, int size, boolean isDay, boolean center) {
-		String iconName="weather\\weather_"/*+code+(isDay ? "" : "-1")*/+"_"+size;
+		String iconName="weather\\weather_"+code/*+(isDay ? "" : "-1")*/+"_"+size;
 		if (code == 113) {
 			iconName = (center ? iconName +"_center.png" : iconName + ".png");
 		} else {

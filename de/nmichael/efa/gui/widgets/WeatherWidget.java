@@ -30,6 +30,7 @@ import de.nmichael.efa.core.items.ItemTypeLongLat;
 import de.nmichael.efa.core.items.ItemTypeString;
 import de.nmichael.efa.core.items.ItemTypeStringList;
 import de.nmichael.efa.data.LogbookRecord;
+import de.nmichael.efa.data.types.DataTypeTime;
 import de.nmichael.efa.gui.util.RoundedBorder;
 import de.nmichael.efa.gui.util.RoundedPanel;
 import de.nmichael.efa.util.International;
@@ -374,6 +375,13 @@ public class WeatherWidget extends Widget {
 		return ret;
 	}
 	
+	private JLabel initializeLabel() {
+		JLabel ret = new JLabel();
+		ret.setOpaque(false);
+		ret.setForeground(mainPanel.getForeground());
+		return ret;
+	}
+	
 	private void addCurrentWeather3(WeatherDataForeCast wdf) {
 
 		JLabel curWeather_temp = new JLabel();
@@ -406,12 +414,14 @@ public class WeatherWidget extends Widget {
 		curWeather_temp.setFont(
 				mainPanel.getFont().deriveFont((float) (Daten.efaConfig.getValueEfaDirekt_BthsFontSize() + 6)));
 		curWeather_temp.setFont(curWeather_temp.getFont().deriveFont(Font.BOLD));
-		curWeather_temp.setText(wdf.getCurrentWeather().getTemperature() +" "+ getTempLabel(true));
+		curWeather_temp.setText(" "+wdf.getCurrentWeather().getTemperature() +" "+ getTempLabel(true));
 
 		curWeather_icon.setIcon(WeatherIcons.getWeatherIconForCode(wdf.getCurrentWeather().getIconCode(), 64,
 				wdf.getCurrentWeather().getIsDay() == 1, false));
 		curWeather_icon.setToolTipText(wdf.getCurrentWeather().getDescription());
-
+		curWeather_icon.setIconTextGap(0);
+		curWeather_icon.setHorizontalTextPosition(SwingConstants.LEFT);
+		
 		curWeather_minTemp.setText(minTemp + tempLabel);
 		curWeather_minTemp.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
 
@@ -448,13 +458,13 @@ public class WeatherWidget extends Widget {
 		 */
 		//Min max Temp
 		pnlMinMax.add(new JLabel (WeatherIcons.getIcon(WeatherIcons.IMAGE_MAX)), 
-				new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(2, 0, 2, 4), 0, 0));
+				new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(2, 0, 2, 2), 0, 0));
 		pnlMinMax.add(curWeather_maxTemp, 
-				new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0, GridBagConstraints.SOUTHEAST,GridBagConstraints.VERTICAL, new Insets(2, 0, 2, 0), 0, 0));
+				new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST,GridBagConstraints.VERTICAL, new Insets(2, 0, 2, 0), 0, 0));
 		pnlMinMax.add(new JLabel (WeatherIcons.getIcon(WeatherIcons.IMAGE_MIN)), 
-				new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(2, 0, 2, 4), 0, 0));
+				new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(2, 0, 2, 2), 0, 0));
 		pnlMinMax.add(curWeather_minTemp, 
-				new GridBagConstraints(1, 1, 1, 1, 1.0, 0.0, GridBagConstraints.EAST,GridBagConstraints.VERTICAL, new Insets(2, 0, 2, 0), 0, 0));		
+				new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.EAST,GridBagConstraints.VERTICAL, new Insets(2, 0, 2, 0), 0, 0));		
 		
 		//Sunshine hours
 		JLabel lblSunIcon=new JLabel (WeatherIcons.getIcon(WeatherIcons.IMAGE_SUN));
@@ -496,23 +506,23 @@ public class WeatherWidget extends Widget {
 		
 		//first row
 		roundPanel.add(curWeather_temp,  new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.WEST,
-				GridBagConstraints.BOTH, new Insets(0, 2, 0, 2), 0, 0));
+				GridBagConstraints.VERTICAL, new Insets(0, 2, 0, 2), 0, 0));
 
 		roundPanel.add(curWeather_icon,  new GridBagConstraints(1, 1, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
-				GridBagConstraints.BOTH, new Insets(2, 5, 0, 5), 0, 0));
+				GridBagConstraints.VERTICAL, new Insets(2, 6, 0, 6), 0, 0));
 		
 		roundPanel.add(pnlMinMax,        new GridBagConstraints(2, 1, 1, 1, 1.0, 1.0, GridBagConstraints.EAST,
-				GridBagConstraints.BOTH, new Insets(0, 0, 0, 4), 0, 0));
+				GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 4), 0, 0));
 		
 		// second row
-		roundPanel.add(pnlSunshine,      new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0, GridBagConstraints.WEST,
+		roundPanel.add(pnlSunshine,      new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.VERTICAL, new Insets(2, 2, 0, 0), 0, 0));
 
-		roundPanel.add(pnlUV,            new GridBagConstraints(1, 2, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER,
-				GridBagConstraints.BOTH, new Insets(2, 0, 0, 0), 0, 0));
+		roundPanel.add(pnlUV,            new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+				GridBagConstraints.VERTICAL, new Insets(2, 0, 0, 0), 0, 0));
 
-		roundPanel.add(pnlRain,          new GridBagConstraints(2, 2, 1, 1, 1.0, 0.0, GridBagConstraints.SOUTHEAST,
-				GridBagConstraints.VERTICAL, new Insets(2, 0, 0, 2), 0, 0));
+		roundPanel.add(pnlRain,          new GridBagConstraints(2, 2, 1, 1, 0.0, 0.0, GridBagConstraints.SOUTHEAST,
+				GridBagConstraints.VERTICAL, new Insets(2, 0, 0, 4), 0, 0));
 
 		/*roundPanel.add(curWeather_wind, new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
 				GridBagConstraints.BOTH, new Insets(2, 12, 0, 6), 0, 0));
@@ -526,24 +536,151 @@ public class WeatherWidget extends Widget {
 	
 	private void addForeCast(WeatherDataForeCast wdf) {
 		String tempLabel = getTempLabel(true);
+		
+		/*roundPanel.add(
+				addForeCastLegendPanel(),
+				new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.VERTICAL,
+						new Insets(4, 2, 2, 18), 0, 0));*/
 		roundPanel.add(
-				addForeCastPanel("14:00", WeatherIcons.getIcon(WeatherIcons.IMAGE_WEATHER_116_48), "28" + tempLabel),
-				new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				addForeCastPanel("14:00", 
+						WeatherIcons.getIcon(WeatherIcons.IMAGE_WEATHER_116_48), 
+						"28" + tempLabel, 
+						"3.5", 
+						WeatherIcons.getIcon(WeatherIcons.IMAGE_UV_INDEX_SEVERE),
+						"3mm"),
+						new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
+						new Insets(4, 2, 2, 4), 0, 0));
+		roundPanel.add(
+				addForeCastPanel("15:00", 
+						WeatherIcons.getIcon(WeatherIcons.IMAGE_WEATHER_113_48), 
+						"24" + tempLabel, 
+						"3.5", 
+						WeatherIcons.getIcon(WeatherIcons.IMAGE_UV_INDEX_VERY_HIGH),
+						"3mm"),
+						new GridBagConstraints(1, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.VERTICAL,
+						new Insets(4, 2, 2, 4), 0, 0));
+		roundPanel.add(
+				addForeCastPanel("16:00", 
+						WeatherIcons.getIcon(WeatherIcons.IMAGE_WEATHER_320_48), 
+						"20" + tempLabel, 
+						"3.5", 
+						WeatherIcons.getIcon(WeatherIcons.IMAGE_UV_INDEX_HIGH),
+						"3mm"),
+						new GridBagConstraints(2, 1, 1, 1, 1.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+						new Insets(4, 2, 2, 4), 0, 0));
+	/*	roundPanel.add(
+				addForeCastPanel("17:00", 
+						WeatherIcons.getIcon(WeatherIcons.IMAGE_WEATHER_386_1_48), 
+						"18" + tempLabel, 
+						"3.5", 
+						WeatherIcons.getIcon(WeatherIcons.IMAGE_UV_INDEX_MEDIUM),
+						"3mm"),
+						new GridBagConstraints(3, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.VERTICAL,
 						new Insets(4, 2, 2, 18), 0, 0));
-		roundPanel.add(
-				addForeCastPanel("16:00", WeatherIcons.getIcon(WeatherIcons.IMAGE_WEATHER_113_48), "24" + tempLabel),
-				new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(2, 0, 2, 18), 0, 0));
-		roundPanel.add(
-				addForeCastPanel("18:00", WeatherIcons.getIcon(WeatherIcons.IMAGE_WEATHER_320_48), "20" + tempLabel),
-				new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(2, 0, 2, 18), 0, 0));
-		roundPanel.add(
-				addForeCastPanel("20:00", WeatherIcons.getIcon(WeatherIcons.IMAGE_WEATHER_386_48), "18" + tempLabel),
-				new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(2, 0, 2, 4), 0, 0));
+	*/
 	}
 
+	
+
+	private JPanel addForeCastPanel(String time, ImageIcon weatherIcon, String temp, String uvIndex, ImageIcon uvIndexLevel, String rain) {
+		JPanel myPanel = initializePanel();
+		JLabel timeLabel = initializeLabel();
+		JLabel weatherIconLabel = initializeLabel();
+		JLabel tempLabel = initializeLabel();
+		JLabel uvIndexLabel = initializeLabel();
+		JLabel rainLabel = initializeLabel();
+		
+		myPanel.setForeground(Daten.efaConfig.getToolTipForegroundColor());
+		myPanel.setBackground(Daten.efaConfig.getToolTipBackgroundColor());
+
+		timeLabel.setText(time);
+		timeLabel.setHorizontalTextPosition(SwingConstants.CENTER);
+		timeLabel.setFont(timeLabel.getFont().deriveFont(Font.BOLD));
+		timeLabel.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
+
+		weatherIconLabel.setIcon(weatherIcon);
+		weatherIconLabel.setIconTextGap(0);
+		weatherIconLabel.setHorizontalTextPosition(SwingConstants.CENTER);
+		tempLabel.setText(temp);
+		tempLabel.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
+		tempLabel.setHorizontalTextPosition(SwingConstants.CENTER);
+
+		uvIndexLabel.setIcon(uvIndexLevel);
+		uvIndexLabel.setHorizontalTextPosition(SwingConstants.LEFT);
+		uvIndexLabel.setIconTextGap(4);
+		uvIndexLabel.setText(uvIndex);
+		uvIndexLabel.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
+		
+		rainLabel.setText(rain);
+		rainLabel.setIcon(WeatherIcons.getIcon(WeatherIcons.IMAGE_RAIN));
+		rainLabel.setIconTextGap(2);
+		rainLabel.setHorizontalTextPosition(SwingConstants.RIGHT);
+		rainLabel.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
+		
+   	    myPanel.add(timeLabel,   		new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.VERTICAL, 		new Insets(1,3,1,3), 0, 0));
+   	    myPanel.add(weatherIconLabel, 	new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.VERTICAL, 	    new Insets(1,3,1,3), 0, 0)); 
+   	    myPanel.add(tempLabel, 			new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.VERTICAL, 		new Insets(1,3,1,3), 0, 0));
+   	    myPanel.add(uvIndexLabel, 		new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.VERTICAL, 		new Insets(1,3,1,3), 0, 0));
+   	    //myPanel.add(rainLabel, 			new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.VERTICAL, 		new Insets(1,3,1,3), 0, 0));
+   	    
+/*
+		myPanel.setLayout(new BorderLayout(0, 0));
+		myPanel.add(timeLabel, BorderLayout.NORTH);
+		myPanel.add(weatherIconLabel, BorderLayout.CENTER);
+		myPanel.add(tempLabel, BorderLayout.SOUTH);
+*/
+		return myPanel;
+
+	}
+	
+	private JPanel addForeCastLegendPanel() {
+		JPanel myPanel = initializePanel();
+		JLabel timeLabel = initializeLabel();
+		JLabel weatherIconLabel = initializeLabel();
+		JLabel tempLabel = initializeLabel();
+		JLabel uvIndexLabel = initializeLabel();
+		JLabel rainLabel = initializeLabel();
+		
+		myPanel.setForeground(Daten.efaConfig.getToolTipForegroundColor());
+		myPanel.setBackground(Daten.efaConfig.getToolTipBackgroundColor());
+
+		timeLabel.setText(".");
+		timeLabel.setHorizontalTextPosition(SwingConstants.CENTER);
+		timeLabel.setFont(timeLabel.getFont().deriveFont(Font.BOLD));
+
+		weatherIconLabel.setIcon(WeatherIcons.getIcon(WeatherIcons.IMAGE_WEATHER_TRANSPARENT_48));
+		weatherIconLabel.setIconTextGap(0);
+		weatherIconLabel.setHorizontalTextPosition(SwingConstants.CENTER);
+		weatherIconLabel.setPreferredSize(new Dimension(2,48));
+		tempLabel.setText(".");
+		tempLabel.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
+		tempLabel.setHorizontalTextPosition(SwingConstants.CENTER);
+
+		uvIndexLabel.setIcon(WeatherIcons.getIcon(WeatherIcons.IMAGE_UV_INDEX));
+		uvIndexLabel.setHorizontalTextPosition(SwingConstants.LEFT);
+		uvIndexLabel.setIconTextGap(0);
+		uvIndexLabel.setText(null);
+
+		rainLabel.setIcon(WeatherIcons.getIcon(WeatherIcons.IMAGE_RAIN));
+		rainLabel.setHorizontalTextPosition(SwingConstants.LEFT);
+		rainLabel.setIconTextGap(0);
+		rainLabel.setText(null);
+		
+   	    myPanel.add(timeLabel,   		new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, 		new Insets(2,3,2,3), 0, 0));
+   	    myPanel.add(weatherIconLabel, 	new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, 	new Insets(2,3,2,3), 0, 0)); 
+   	    myPanel.add(tempLabel, 			new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, 		new Insets(2,3,2,3), 0, 0));
+   	    myPanel.add(uvIndexLabel, 		new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, 		new Insets(2,3,2,3), 0, 0));
+   	    myPanel.add(rainLabel, 			new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, 		new Insets(2,3,2,3), 0, 0));
+   	    
+/*
+		myPanel.setLayout(new BorderLayout(0, 0));
+		myPanel.add(timeLabel, BorderLayout.NORTH);
+		myPanel.add(weatherIconLabel, BorderLayout.CENTER);
+		myPanel.add(tempLabel, BorderLayout.SOUTH);
+*/
+		return myPanel;
+
+	}
 	
 	private void addError(WeatherDataForeCast wdf) {
 		JTextArea errorLabel1= new JTextArea();
@@ -570,46 +707,6 @@ public class WeatherWidget extends Widget {
 				GridBagConstraints.BOTH, new Insets(2, 4, 2, 4), 0, 0));
 	}
 
-	private JPanel addForeCastPanel(String time, ImageIcon image, String temp) {
-		JPanel myPanel = new JPanel();
-		JLabel topLabel = new JLabel();
-		JLabel centerLabel = new JLabel(image);
-		JLabel bottomLabel = new JLabel();
-
-		myPanel.setForeground(Daten.efaConfig.getToolTipForegroundColor());
-		myPanel.setBackground(Daten.efaConfig.getToolTipBackgroundColor());
-
-		topLabel.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
-		bottomLabel.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
-
-		topLabel.setText(time);
-		topLabel.setHorizontalTextPosition(SwingConstants.CENTER);
-		topLabel.setFont(topLabel.getFont().deriveFont(Font.BOLD));
-		/*
-		 * centerLabel.setIcon(image); centerLabel.setText("");
-		 * centerLabel.setIconTextGap(0);
-		 */
-		bottomLabel.setText(temp);
-		bottomLabel.setHorizontalTextPosition(SwingConstants.CENTER);
-
-		/*
-		 * myPanel.setLayout(new GridBagLayout()); myPanel.add(topLabel, new
-		 * GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
-		 * GridBagConstraints.BOTH, new Insets(2,3,2,3), 0, 0));
-		 * myPanel.add(centerLabel, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
-		 * GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new
-		 * Insets(2,3,2,3), 0, 0)); myPanel.add(bottomLabel, new GridBagConstraints(0,
-		 * 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new
-		 * Insets(2,3,2,), 0, 0));
-		 */
-		myPanel.setLayout(new BorderLayout(0, 0));
-		myPanel.add(topLabel, BorderLayout.NORTH);
-		myPanel.add(centerLabel, BorderLayout.CENTER);
-		myPanel.add(bottomLabel, BorderLayout.SOUTH);
-
-		return myPanel;
-
-	}
 
 	@Override
 	public JComponent getComponent() {

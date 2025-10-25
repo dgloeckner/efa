@@ -1,5 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <efaOnlineUpdate>
+    <Version>
+        <VersionID>2.5.0#20</VersionID>
+        <ReleaseDate>25.10.2025</ReleaseDate>
+        <DownloadUrl>TODO</DownloadUrl>
+        <DownloadSize>TODO</DownloadSize>
+        <Changes lang="de">
+            <ChangeItem>Neu: Aktualisierte Wettbewerbsbedingungen fuer LRV Brandenburg</ChangeItem>
+            <ChangeItem>Bugfix: Kleine Fehlerkorrekturen</ChangeItem>
+        </Changes>
+        <Changes lang="en">
+            <ChangeItem>BugFix: Minor Bugfixes</ChangeItem>
+        </Changes>
+    </Version>
 	<Version>
   		<VersionID>2.5.0#19</VersionID>
   		<ReleaseDate>05.10.2025</ReleaseDate>
@@ -294,6 +307,19 @@
             <ChangeItem>BugFix: [efaCloud] No more nullpointer exception when entering admin mode and no open project.</ChangeItem>
             <ChangeItem>BugFix: [efaCloud] No more exceptions logged in debug mode. https://github.com/nicmichael/efa/issues/138 </ChangeItem>
             <ChangeItem>Code: Refactoring: Removed unused import statemens.</ChangeItem>          
+        </Changes>
+    </Version>
+    <Version>
+        <VersionID>2.4.0_01</VersionID>
+        <ReleaseDate>10.10.2025</ReleaseDate>
+        <DownloadUrl>http://efa.nmichael.de/download/efa240.zip</DownloadUrl>
+        <DownloadSize>6590962</DownloadSize>
+        <Changes lang="de">
+            <ChangeItem>Neu: Aktualisierte Wettbewerbsbedingungen fuer LRV Brandenburg</ChangeItem>
+            <ChangeItem>Bugfix: Kleine Fehlerkorrekturen</ChangeItem>
+        </Changes>
+        <Changes lang="en">
+            <ChangeItem>BugFix: Minor Bugfixes</ChangeItem>
         </Changes>
     </Version>
 	<Version>

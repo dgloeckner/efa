@@ -161,10 +161,10 @@ public class WeatherWidget extends Widget {
 		titlePanel.add(titleLabel, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
 				GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
 
-		roundPanel.add(titlePanel, new GridBagConstraints(0, 0,  3 /*4*/, 1, 1.0, 0.0, GridBagConstraints.CENTER,
+
+		roundPanel.add(titlePanel, new GridBagConstraints(0, 0,  (getWeatherLayout().equals(WEATHER_LAYOUT_FORECAST) ? 4 : 3), 1, 1.0, 0.0, GridBagConstraints.CENTER,
 				GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
 		roundPanel.setMinimumSize(new Dimension(240, 120));
-		;
 		// mainPanel.setPreferredSize(new Dimension(240,140));
 
 		WeatherDataForeCast wdf = getWeather(this.getWeatherSource(), this.getWeatherLongitude(),
@@ -173,11 +173,19 @@ public class WeatherWidget extends Widget {
 		if (wdf.getStatus() == true) {
 			if (getWeatherLayout().equals(WEATHER_LAYOUT_CURRENT_CLASSIC)) {
 				addCurrentWeather(wdf);
+				roundPanel.add(titlePanel, new GridBagConstraints(0, 0,  3 /*4*/, 1, 1.0, 0.0, GridBagConstraints.CENTER,
+						GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
 			} else if (getWeatherLayout().equals(WEATHER_LAYOUT_CURRENT_WIND)) {
 				addCurrentWeather2(wdf);
+				roundPanel.add(titlePanel, new GridBagConstraints(0, 0,  3 /*4*/, 1, 1.0, 0.0, GridBagConstraints.CENTER,
+						GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
 			} else if (getWeatherLayout().equals(WEATHER_LAYOUT_CURRENT_UVINDEX)) {
+				roundPanel.add(titlePanel, new GridBagConstraints(0, 0,  3 /*4*/, 1, 1.0, 0.0, GridBagConstraints.CENTER,
+						GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
 				addCurrentWeather3(wdf);
 			} else {
+				roundPanel.add(titlePanel, new GridBagConstraints(0, 0, 4, 1, 1.0, 0.0, GridBagConstraints.CENTER,
+						GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
 				addForeCast(wdf);
 			}
 		} else {

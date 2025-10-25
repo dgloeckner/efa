@@ -115,15 +115,15 @@ public class WeatherDataDaily {
 	}
 
 	private ImageIcon getUVIndexIcon(double uv_max) {
-		if (uv_max <=2) {
+		if (uv_max <3) {
 			return WeatherIcons.getIcon(WeatherIcons.IMAGE_UV_INDEX_LOW);
-		} else if (uv_max <=4) {
+		} else if (uv_max <5) {
 			return WeatherIcons.getIcon(WeatherIcons.IMAGE_UV_INDEX_MEDIUM);
-		} else if (uv_max <=6) {
+		} else if (uv_max <7) {
 			return WeatherIcons.getIcon(WeatherIcons.IMAGE_UV_INDEX_ABOVE_MEDIUM);
-		} else if (uv_max <=8) {
+		} else if (uv_max <9) {
 			return WeatherIcons.getIcon(WeatherIcons.IMAGE_UV_INDEX_HIGH);
-		} else if (uv_max <=10) {
+		} else if (uv_max <11) {
 			return WeatherIcons.getIcon(WeatherIcons.IMAGE_UV_INDEX_VERY_HIGH);
 		} else {
 			return WeatherIcons.getIcon(WeatherIcons.IMAGE_UV_INDEX_SEVERE);

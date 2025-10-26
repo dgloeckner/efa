@@ -3,7 +3,8 @@
  */
 package de.nmichael.efa.gui.widgets;
 
-import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -13,14 +14,12 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.DecimalFormat;
 
-import javax.swing.ImageIcon;
+import javax.swing.BorderFactory;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
-import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 
 import org.json.JSONObject;
 
@@ -30,9 +29,9 @@ import de.nmichael.efa.core.items.ItemTypeLongLat;
 import de.nmichael.efa.core.items.ItemTypeString;
 import de.nmichael.efa.core.items.ItemTypeStringList;
 import de.nmichael.efa.data.LogbookRecord;
-import de.nmichael.efa.data.types.DataTypeTime;
 import de.nmichael.efa.gui.util.RoundedBorder;
 import de.nmichael.efa.gui.util.RoundedPanel;
+import de.nmichael.efa.util.EfaUtil;
 import de.nmichael.efa.util.International;
 import de.nmichael.efa.util.Logger;
 
@@ -61,12 +60,12 @@ public class WeatherWidget extends Widget {
 	private static final String WEATHER_LAYOUT_CURRENT_WIND = "WeatherLayoutLayoutCurrentWind";
 	private static final String WEATHER_LAYOUT_CURRENT_UVINDEX = "WeatherLayoutLayoutCurrentUVIndex";
 	
-	private static final String WEATHER_LAYOUT_FORECAST = "WeatherLayoutForecast";
+	private static final String WEATHER_LAYOUT_FORECASTSIMPLE = "WeatherLayoutForecastSimple";
+	private static final String WEATHER_LAYOUT_FORECASTCOMPLEX = "WeatherLayoutForecastComplex";
 
-	private JPanel mainPanel = new JPanel();
+	private volatile JPanel mainPanel = new JPanel();
 	private RoundedPanel roundPanel = new RoundedPanel();
-	private RoundedPanel titlePanel = new RoundedPanel();
-	private JLabel titleLabel = new JLabel();
+	private WeatherUpdater weatherUpdater;
 
 
 	/**
@@ -79,45 +78,44 @@ public class WeatherWidget extends Widget {
 
 		super(International.getString("Wetter"), "Wetter", International.getString("Wetter"), true, true);
 
-		IItemType item = null;
-
-		/*
-		 * addParameterInternal(new ItemTypeBoolean(PARAM_SHOWWEATHER, false,
-		 * IItemType.TYPE_PUBLIC, "", International.getString("Wetterdaten anzeigen") +
-		 * " (" + International.getString("Internetverbindung erforderlich") + ")"));
-		 */
-
 		addHeader("WeatherWidgetLocationHeader", IItemType.TYPE_PUBLIC, "", International.getString("Wetter Daten"), 3);
-
+		
 		addParameterInternal(new ItemTypeStringList(PARAM_WEATHER_SOURCE, WEATHER_SOURCE_OPENMETEO,
 				new String[] { WEATHER_SOURCE_OPENMETEO, WEATHER_SOURCE_WEATHERAPI },
 				new String[] { International.getString("OpenMeteo free API (Europe/North America)"),
 						International.getString("WeatherAPI") },
 				IItemType.TYPE_PUBLIC, "", International.getString("Quelle für Wetterdaten")));
 
-		addParameterInternal(item = new ItemTypeString(PARAM_CAPTION, "Dummy", IItemType.TYPE_PUBLIC, "",
-				International.getString("Beschriftung")), 20, 0);
-
-		addParameterInternal(item = new ItemTypeLongLat(PARAM_LATITUDE, ItemTypeLongLat.ORIENTATION_NORTH, 52, 25, 9,
-				IItemType.TYPE_PUBLIC, "", International.getString("geographische Breite")));
-
-		addParameterInternal(new ItemTypeLongLat(PARAM_LONGITUDE, ItemTypeLongLat.ORIENTATION_EAST, 13, 10, 15,
-				IItemType.TYPE_PUBLIC, "", International.getString("geographische Länge")));
-
-		addParameterInternal(item = new ItemTypeStringList(PARAM_WEATHER_LAYOUT, WEATHER_LAYOUT_CURRENT_UVINDEX,
-				new String[] { WEATHER_LAYOUT_CURRENT_CLASSIC, WEATHER_LAYOUT_CURRENT_WIND, WEATHER_LAYOUT_CURRENT_UVINDEX, WEATHER_LAYOUT_FORECAST },
-				new String[] { International.getString("Aktuelles Wetter (Klassisch)"), International.getString("Aktuelles Wetter (Wind)"), International.getString("Aktuelles Wetter (UV-Index)"), International.getString("Vorhersage") },
-				IItemType.TYPE_PUBLIC, "", International.getString("Layout")), 20, 0);
-
 		addParameterInternal(new ItemTypeStringList(PARAM_TEMPERATURESCALE, TEMP_CELSIUS,
 				new String[] { TEMP_CELSIUS, TEMP_FAHRENHEIT },
 				new String[] { International.getString("Celsius"), International.getString("Fahrenheit") },
-				IItemType.TYPE_PUBLIC, "", International.getString("Temperaturskala")));
+				IItemType.TYPE_PUBLIC, "", International.getString("Temperaturskala")),10,0);
 
 		addParameterInternal(new ItemTypeStringList(PARAM_SPEEDSCALE, SPEEDSCALE_KMH,
 				new String[] { SPEEDSCALE_KMH, SPEEDSCALE_MPH },
 				new String[] { International.getString("km/h"), International.getString("mph") }, IItemType.TYPE_PUBLIC,
 				"", International.getString("Windgeschwindigkeit-Skala")));
+
+		addHeader("WeatherWidgetLocationHeader"+"1", IItemType.TYPE_PUBLIC, "", International.getString("Ort"), 3);
+		
+		addParameterInternal(new ItemTypeString(PARAM_CAPTION, "Dummy", IItemType.TYPE_PUBLIC, "",
+				International.getString("Beschriftung")),0,10);
+
+		addParameterInternal(new ItemTypeLongLat(PARAM_LATITUDE, ItemTypeLongLat.ORIENTATION_NORTH, 52, 25, 9,
+				IItemType.TYPE_PUBLIC, "", International.getString("geographische Breite")));
+
+		addParameterInternal(new ItemTypeLongLat(PARAM_LONGITUDE, ItemTypeLongLat.ORIENTATION_EAST, 13, 10, 15,
+				IItemType.TYPE_PUBLIC, "", International.getString("geographische Länge")));
+
+		addParameterInternal(new ItemTypeStringList(PARAM_WEATHER_LAYOUT, WEATHER_LAYOUT_CURRENT_UVINDEX,
+				new String[] { WEATHER_LAYOUT_CURRENT_CLASSIC, WEATHER_LAYOUT_CURRENT_WIND, WEATHER_LAYOUT_CURRENT_UVINDEX, WEATHER_LAYOUT_FORECASTSIMPLE, WEATHER_LAYOUT_FORECASTCOMPLEX },
+				new String[] { International.getString("Aktuelles Wetter (Klassisch)"), 
+						International.getString("Aktuelles Wetter (Wind)"), 
+						International.getString("Aktuelles Wetter (UV-Index)"), 
+						International.getString("Vorhersage (einfach)"),
+						International.getString("Vorhersage (komplex)") },
+				IItemType.TYPE_PUBLIC, "", International.getString("Layout")), 20, 0);
+
 
 		super.setEnabled(true);
 		super.setPosition(IWidget.POSITION_CENTER);
@@ -126,586 +124,75 @@ public class WeatherWidget extends Widget {
 
 	@Override
 	public void runWidgetWarnings(int mode, boolean actionBegin, LogbookRecord r) {
-		// TODO Auto-generated method stub
-
+		// Nothing to do here
 	}
 
 	@Override
 	public void stop() {
-		// TODO Auto-generated method stub
-
+        try {
+        	// stopHTML also lets the thread die, and efaBths is responsible to set up a new thread.
+        	weatherUpdater.stopRunning();
+        } catch(Exception eignore) {
+            // nothing to do, might not be initialized
+        }
 	}
 
 	@Override
 	public void construct() {
+		Logger.log(Logger.DEBUG, "constructing Weatherpanel ");
+
 		mainPanel = new JPanel();
 		mainPanel.setLayout(new GridBagLayout());
+		mainPanel.setName("WeatherWidget-MainPanel");
 		roundPanel = new RoundedPanel();
+		
 		roundPanel.setLayout(new GridBagLayout());
 		roundPanel.setBackground(Daten.efaConfig.getToolTipBackgroundColor());
 		roundPanel.setForeground(Daten.efaConfig.getToolTipForegroundColor());
 		roundPanel.setBorder(new RoundedBorder(Daten.efaConfig.getToolTipForegroundColor()));
-
+		roundPanel.setName("WeatherWidget-RoundPanel");
+		
 		mainPanel.add(roundPanel, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
 				GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 
-		titlePanel = new RoundedPanel();
-		titlePanel.setLayout(new GridBagLayout());
-		titlePanel.setBackground(Daten.efaConfig.getToolTipHeaderBackgroundColor());
-		titlePanel.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
-
-		titleLabel.setText(getWeatherCaption());
-		titleLabel.setHorizontalTextPosition(SwingConstants.CENTER);
-		titleLabel.setForeground(titlePanel.getForeground());
-		titleLabel.setFont(titleLabel.getFont().deriveFont(Font.BOLD));
-
-		titlePanel.add(titleLabel, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
-				GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
-
-
-		roundPanel.add(titlePanel, new GridBagConstraints(0, 0,  (getWeatherLayout().equals(WEATHER_LAYOUT_FORECAST) ? 4 : 3), 1, 1.0, 0.0, GridBagConstraints.CENTER,
-				GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
+		addInfoPanel();
 		roundPanel.setMinimumSize(new Dimension(240, 120));
-		// mainPanel.setPreferredSize(new Dimension(240,140));
+		roundPanel.invalidate();
 
-		WeatherDataForeCast wdf = getWeather(this.getWeatherSource(), this.getWeatherLongitude(),
-				this.getWeatherLatitude());
+	   	try {
+	   		weatherUpdater = new WeatherUpdater(roundPanel, this);
+	   		weatherUpdater.start();
+            
+        } catch(Exception e) {
+            Logger.log(e);
+        }		
 
-		if (wdf.getStatus() == true) {
-			if (getWeatherLayout().equals(WEATHER_LAYOUT_CURRENT_CLASSIC)) {
-				addCurrentWeather(wdf);
-				roundPanel.add(titlePanel, new GridBagConstraints(0, 0,  3 /*4*/, 1, 1.0, 0.0, GridBagConstraints.CENTER,
-						GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
-			} else if (getWeatherLayout().equals(WEATHER_LAYOUT_CURRENT_WIND)) {
-				addCurrentWeather2(wdf);
-				roundPanel.add(titlePanel, new GridBagConstraints(0, 0,  3 /*4*/, 1, 1.0, 0.0, GridBagConstraints.CENTER,
-						GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
-			} else if (getWeatherLayout().equals(WEATHER_LAYOUT_CURRENT_UVINDEX)) {
-				roundPanel.add(titlePanel, new GridBagConstraints(0, 0,  3 /*4*/, 1, 1.0, 0.0, GridBagConstraints.CENTER,
-						GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
-				addCurrentWeather3(wdf);
-			} else {
-				roundPanel.add(titlePanel, new GridBagConstraints(0, 0, 4, 1, 1.0, 0.0, GridBagConstraints.CENTER,
-						GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
-				addForeCast(wdf);
-			}
-		} else {
-			addError(wdf);
-		}
 
 	}
 
-	private void addCurrentWeather(WeatherDataForeCast wdf) {
-
-		JLabel curWeather_temp = new JLabel();
-		JLabel curWeather_icon = new JLabel();
-		JLabel curWeather_minTemp = new JLabel();
-		JLabel curWeather_maxTemp = new JLabel();
-		JLabel curWeather_wind = new JLabel();
-		
-		String tempLabel = getTempLabel(false);
-		
-		curWeather_temp = new JLabel();
-		curWeather_temp.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
-		curWeather_temp.setFont(
-				mainPanel.getFont().deriveFont((float) (Daten.efaConfig.getValueEfaDirekt_BthsFontSize() + 10)));
-		curWeather_temp.setFont(curWeather_temp.getFont().deriveFont(Font.BOLD));
-		curWeather_temp.setText(wdf.getCurrentWeather().getTemperature() + getTempLabel(true));
-		curWeather_temp.setHorizontalTextPosition(SwingConstants.LEFT);
-
-		curWeather_icon.setIcon(WeatherIcons.getWeatherIconForCode(wdf.getCurrentWeather().getIconCode(), 64,
-				wdf.getCurrentWeather().getIsDay() == 1, false));
-		curWeather_icon.setToolTipText(wdf.getCurrentWeather().getDescription());
-		double minTemp = wdf.getDaily().getTemperature_2m_min();
-		double maxTemp = wdf.getDaily().getTemperature_2m_max();
-
-		curWeather_minTemp.setText("Min: "+ minTemp + tempLabel);
-		curWeather_minTemp.setIconTextGap(4);
-		curWeather_minTemp.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
-		curWeather_minTemp.setHorizontalTextPosition(SwingConstants.RIGHT);
-
-		curWeather_maxTemp.setText("Max: "+ maxTemp + tempLabel);
-		curWeather_maxTemp.setIconTextGap(4);
-		curWeather_maxTemp.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
-		curWeather_maxTemp.setHorizontalTextPosition(SwingConstants.RIGHT);
-
-		curWeather_wind.setText(International.getString("Wind") + ": "
-				+ International.getString(wdf.getCurrentWeather().getWindDirectionText()) + " "
-				+ International.getString("mit") + " " + wdf.getCurrentWeather().getWindSpeed()
-				+ getWeatherSpeedScale());
-		curWeather_wind.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
-		curWeather_wind.setHorizontalTextPosition(SwingConstants.CENTER);
-
-		roundPanel.add(curWeather_temp, new GridBagConstraints(0, 1, 1, 2, 0.0, 0.0, GridBagConstraints.CENTER,
-				GridBagConstraints.BOTH, new Insets(2, 4, 2, 4), 0, 0));
-
-		roundPanel.add(curWeather_icon, new GridBagConstraints(1, 1, 1, 2, 0.0, 0.0, GridBagConstraints.CENTER,
-				GridBagConstraints.BOTH, new Insets(0, 4, 0, 4), 0, 0));
-
-		roundPanel.add(curWeather_maxTemp, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0, GridBagConstraints.SOUTHEAST,
-				GridBagConstraints.NONE, new Insets(4, 4, 0, 4), 0, 0));
-		roundPanel.add(curWeather_minTemp, new GridBagConstraints(2, 2, 1, 1, 0.0, 0.0, GridBagConstraints.EAST,
-				GridBagConstraints.NONE, new Insets(0, 4, 0, 4), 0, 0));
-		roundPanel.add(curWeather_wind, new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
-				GridBagConstraints.VERTICAL, new Insets(0, 2, 0, 2), 0, 0));
-	}
-	
-	private void addCurrentWeather2(WeatherDataForeCast wdf) {
-
-		JLabel curWeather_temp = new JLabel();
-		JLabel curWeather_icon = new JLabel();
-		JLabel curWeather_minTemp = new JLabel();
-		JLabel curWeather_maxTemp = new JLabel();
-		JLabel curWeather_sunshine = new JLabel();
-		JLabel curWeather_rain = new JLabel();
-		JLabel curWeather_sunshineUnit = new JLabel();
-		JLabel curWeather_rainUnit = new JLabel();
-		
-		JLabel curWeather_wind = new JLabel();
-		JPanel pnlMinMaxSunRain=new JPanel();
-		pnlMinMaxSunRain.setOpaque(false);
-		pnlMinMaxSunRain.setForeground(mainPanel.getForeground());
-		pnlMinMaxSunRain.setLayout(new GridBagLayout());
-
-		double minTemp = wdf.getDaily().getTemperature_2m_min();
-		double maxTemp = wdf.getDaily().getTemperature_2m_max();
-		double sunshine = wdf.getDaily().getSunshine_duration()/60/60;
-		double rain = wdf.getDaily().getPrecipitation_sum();
-		
-		String tempLabel = getTempLabel(false);
-		
-		curWeather_temp = new JLabel();
-		curWeather_temp.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
-		curWeather_temp.setFont(
-				mainPanel.getFont().deriveFont((float) (Daten.efaConfig.getValueEfaDirekt_BthsFontSize() + 10)));
-		curWeather_temp.setFont(curWeather_temp.getFont().deriveFont(Font.BOLD));
-		curWeather_temp.setText(wdf.getCurrentWeather().getTemperature() + getTempLabel(false));
-
-		curWeather_icon.setIcon(WeatherIcons.getWeatherIconForCode(wdf.getCurrentWeather().getIconCode(), 64,
-				wdf.getCurrentWeather().getIsDay() == 1, false));
-		curWeather_icon.setToolTipText(wdf.getCurrentWeather().getDescription());
-
-		curWeather_minTemp.setText(minTemp + tempLabel);
-		curWeather_minTemp.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
-
-		curWeather_maxTemp.setText(maxTemp + tempLabel);
-		curWeather_maxTemp.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
-
-		DecimalFormat df = new DecimalFormat("#.#");
-		curWeather_sunshine.setText(df.format(sunshine));
-		curWeather_sunshine.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
-
-		curWeather_sunshineUnit.setText("h");
-		curWeather_sunshineUnit.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
-
-		df = new DecimalFormat("#");
-		curWeather_rain.setText(df.format(rain)); 
-		curWeather_rain.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
-
-		curWeather_rainUnit.setText("mm");
-		curWeather_rainUnit.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
-		curWeather_rainUnit.setFont(
-				mainPanel.getFont().deriveFont((float) (Daten.efaConfig.getValueEfaDirekt_BthsFontSize() -4)));
-
-		/*	roundpanel
-		 *  | HEADER                                             |	
-		 * 	|WeatherIcon|CurrentTemp|pnlMinMaxSunRain            |
-		 *  | WIND                                               |
-		 * 
-		 * pnlMinMaxSunRain
-		 *  |IMG_Max |lblMax|IMG_Sunshine|lblSunshine|lblSunUnit | 
-		 *  |IMG_Min |lblMin|IMG_Rain    |lblRain    |lblRainUnit|
-		 * 
-		 */
-		pnlMinMaxSunRain.add(new JLabel (WeatherIcons.getIcon(WeatherIcons.IMAGE_MAX)), 
-				new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new Insets(2, 4, 2, 2), 0, 0));
-		pnlMinMaxSunRain.add(curWeather_maxTemp, 
-				new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.SOUTHEAST,GridBagConstraints.VERTICAL, new Insets(2, 2, 2, 2), 0, 0));
-		
-		pnlMinMaxSunRain.add(new JLabel (WeatherIcons.getIcon(WeatherIcons.IMAGE_SUN)), 
-				new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new Insets(2, 12, 2, 2), 0, 0));
-		pnlMinMaxSunRain.add(curWeather_sunshine, 
-				new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST,GridBagConstraints.VERTICAL, new Insets(2, 2, 2, 2), 0, 0));		
-		pnlMinMaxSunRain.add(curWeather_sunshineUnit, 
-				new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST,GridBagConstraints.VERTICAL, new Insets(2, 2, 2, 2), 0, 0));		
-		
-		
-		pnlMinMaxSunRain.add(new JLabel (WeatherIcons.getIcon(WeatherIcons.IMAGE_MIN)), 
-				new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new Insets(2, 4, 2, 2), 0, 0));
-		pnlMinMaxSunRain.add(curWeather_minTemp, 
-				new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.EAST,GridBagConstraints.VERTICAL, new Insets(2, 2, 2, 2), 0, 0));		
-		
-		pnlMinMaxSunRain.add(new JLabel (WeatherIcons.getIcon(WeatherIcons.IMAGE_RAIN)), 
-				new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new Insets(2, 12, 2, 2), 0, 0));
-		pnlMinMaxSunRain.add(curWeather_rain, 
-				new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0, GridBagConstraints.EAST,GridBagConstraints.VERTICAL, new Insets(2, 2, 2, 2), 0, 0));		
-		pnlMinMaxSunRain.add(curWeather_rainUnit, 
-				new GridBagConstraints(4, 1, 1, 1, 0.0, 0.0, GridBagConstraints.EAST,GridBagConstraints.VERTICAL, new Insets(2, 2, 2, 2), 0, 0));		
-		
-		
-		curWeather_wind.setText(International.getString("Wind") + ": "
-				+ International.getString(wdf.getCurrentWeather().getWindDirectionText()) + " "
-				+ International.getString("mit") + " " + wdf.getCurrentWeather().getWindSpeed()
-				+ getWeatherSpeedScale());
-		curWeather_wind.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
-		curWeather_wind.setHorizontalTextPosition(SwingConstants.CENTER);
-
-		roundPanel.add(curWeather_icon, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
-				GridBagConstraints.BOTH, new Insets(2, 4, 2, 4), 0, 0));
-
-		roundPanel.add(curWeather_temp, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
-				GridBagConstraints.BOTH, new Insets(0, 0, 0, 4), 0, 0));
-
-		roundPanel.add(pnlMinMaxSunRain, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0, GridBagConstraints.EAST,
-				GridBagConstraints.BOTH, new Insets(0, 4, 0, 4), 0, 0));
-
-		/*roundPanel.add(curWeather_maxTemp, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0, GridBagConstraints.SOUTHEAST,
-				GridBagConstraints.NONE, new Insets(4, 4, 0, 4), 0, 0));
-		roundPanel.add(curWeather_minTemp, new GridBagConstraints(2, 2, 1, 1, 0.0, 0.0, GridBagConstraints.EAST,
-				GridBagConstraints.NONE, new Insets(0, 4, 0, 4), 0, 0));*/
-		roundPanel.add(curWeather_wind, new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
-				GridBagConstraints.VERTICAL, new Insets(0, 2, 0, 2), 0, 0));
-	}
-
-	private JPanel initializePanel() {
-		JPanel ret = new JPanel();
-		ret.setOpaque(false);
-		ret.setForeground(mainPanel.getForeground());
-		ret.setLayout(new GridBagLayout());		
-		return ret;
-	}
-	
-	private JLabel initializeLabel() {
-		JLabel ret = new JLabel();
-		ret.setOpaque(false);
-		ret.setForeground(mainPanel.getForeground());
-		return ret;
-	}
-	
-	private void addCurrentWeather3(WeatherDataForeCast wdf) {
-
-		JLabel curWeather_temp = new JLabel();
-		JLabel curWeather_icon = new JLabel();
-		JLabel curWeather_minTemp = new JLabel();
-		JLabel curWeather_maxTemp = new JLabel();
-		JLabel curWeather_sunshine = new JLabel();
-		JLabel curWeather_rain = new JLabel();
-		JLabel curWeather_sunshineUnit = new JLabel();
-		JLabel curWeather_rainUnit = new JLabel();
-		JLabel curWeather_uvindex = new JLabel();
-		JLabel curWeather_wind = new JLabel();
-
-		JPanel pnlSunshine = initializePanel();
-		JPanel pnlUV = initializePanel();
-		JPanel pnlRain = initializePanel();
-		JPanel pnlMinMax=initializePanel();
-
-
-		double minTemp = wdf.getDaily().getTemperature_2m_min();
-		double maxTemp = wdf.getDaily().getTemperature_2m_max();
-		double sunshine = wdf.getDaily().getSunshine_duration()/60/60;
-		double rain = wdf.getDaily().getPrecipitation_sum();
-		double uvindex = wdf.getDaily().getUv_index_max();
-		
-		String tempLabel = " "+getTempLabel(true);
-		
-		curWeather_temp = new JLabel();
-		curWeather_temp.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
-		curWeather_temp.setFont(
-				mainPanel.getFont().deriveFont((float) (Daten.efaConfig.getValueEfaDirekt_BthsFontSize() + 6)));
-		curWeather_temp.setFont(curWeather_temp.getFont().deriveFont(Font.BOLD));
-		curWeather_temp.setText(" "+wdf.getCurrentWeather().getTemperature() +" "+ getTempLabel(true));
-
-		curWeather_icon.setIcon(WeatherIcons.getWeatherIconForCode(wdf.getCurrentWeather().getIconCode(), 64,
-				wdf.getCurrentWeather().getIsDay() == 1, false));
-		curWeather_icon.setToolTipText(wdf.getCurrentWeather().getDescription());
-		curWeather_icon.setIconTextGap(0);
-		curWeather_icon.setHorizontalTextPosition(SwingConstants.LEFT);
-		
-		curWeather_minTemp.setText(minTemp + tempLabel);
-		curWeather_minTemp.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
-
-		curWeather_maxTemp.setText(maxTemp + tempLabel);
-		curWeather_maxTemp.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
-
-		DecimalFormat df = new DecimalFormat("#.#");
-		curWeather_sunshine.setText(df.format(sunshine));
-		curWeather_sunshine.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
-
-		curWeather_sunshineUnit.setText("h");
-		curWeather_sunshineUnit.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
-
-		df = new DecimalFormat("#.#");
-		curWeather_uvindex.setText(df.format(uvindex));
-		curWeather_uvindex.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
-		curWeather_uvindex.setHorizontalAlignment(SwingConstants.RIGHT);
-		
-		df = new DecimalFormat("#");
-		curWeather_rain.setText(df.format(rain)); 
-		curWeather_rain.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
-		
-		curWeather_rainUnit.setText("mm");
-		curWeather_rainUnit.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
-		curWeather_rainUnit.setFont(
-				mainPanel.getFont().deriveFont((float) (Daten.efaConfig.getValueEfaDirekt_BthsFontSize() -4)));
-
-		/*	roundpanel
-		 *  | HEADER                                   |	
-		 * 	|curtemp |  weatherIcon | pnlMinMax  
-		 *  |sunshine|   uvindex    | rain             |
-		 * 
-		 * 
-		 */
-		//Min max Temp
-		pnlMinMax.add(new JLabel (WeatherIcons.getIcon(WeatherIcons.IMAGE_MAX)), 
-				new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(2, 0, 2, 2), 0, 0));
-		pnlMinMax.add(curWeather_maxTemp, 
-				new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST,GridBagConstraints.VERTICAL, new Insets(2, 0, 2, 0), 0, 0));
-		pnlMinMax.add(new JLabel (WeatherIcons.getIcon(WeatherIcons.IMAGE_MIN)), 
-				new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(2, 0, 2, 2), 0, 0));
-		pnlMinMax.add(curWeather_minTemp, 
-				new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.EAST,GridBagConstraints.VERTICAL, new Insets(2, 0, 2, 0), 0, 0));		
-		
-		//Sunshine hours
-		JLabel lblSunIcon=new JLabel (WeatherIcons.getIcon(WeatherIcons.IMAGE_SUN));
-		lblSunIcon.setHorizontalTextPosition(SwingConstants.RIGHT);
-		lblSunIcon.setIconTextGap(0);
-		pnlSunshine.add(lblSunIcon, 
-				new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new Insets(0, 0, 2, 2), 0, 0));
-		pnlSunshine.add(curWeather_sunshine, 
-				new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST,GridBagConstraints.VERTICAL, new Insets(0, 2, 2, 2), 0, 0));		
-		pnlSunshine.add(curWeather_sunshineUnit, 
-				new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST,GridBagConstraints.VERTICAL, new Insets(0, 2, 2, 2), 0, 0));		
-		
-		// uv index
-		pnlUV.add(new JLabel (WeatherIcons.getIcon(WeatherIcons.IMAGE_UV_INDEX)), 
-				new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new Insets(0, 0, 2, 2), 0, 0));
-		pnlUV.add(curWeather_uvindex, 
-				new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST,GridBagConstraints.VERTICAL, new Insets(0, 2, 2, 2), 0, 0));	
-		JLabel uvi = new JLabel(wdf.getDaily().getUv_index_icon());
-		uvi.setIconTextGap(0);
-		uvi.setHorizontalTextPosition(SwingConstants.RIGHT);
-		pnlUV.add(uvi, 
-				new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST,GridBagConstraints.VERTICAL, new Insets(0, 0, 2, 2), 0, 0));		
-		
-		// rain
-		pnlRain.add(new JLabel (WeatherIcons.getIcon(WeatherIcons.IMAGE_RAIN)), 
-				new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new Insets(0, 2, 2, 4), 0, 0));
-		pnlRain.add(curWeather_rain, 
-				new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST,GridBagConstraints.VERTICAL, new Insets(0, 2, 2, 2), 0, 0));		
-		pnlRain.add(curWeather_rainUnit, 
-				new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST,GridBagConstraints.VERTICAL, new Insets(0, 2, 2, 2), 0, 0));		
-				
-		//wind just a label 
-		curWeather_wind.setText(International.getString("Wind") + ": "
-				+ International.getString(wdf.getCurrentWeather().getWindDirectionText()) + " "
-				+ International.getString("mit") + " " + wdf.getCurrentWeather().getWindSpeed()
-				+ getWeatherSpeedScale());
-		curWeather_wind.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
-		curWeather_wind.setHorizontalTextPosition(SwingConstants.CENTER);
-		
-		//first row
-		roundPanel.add(curWeather_temp,  new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.WEST,
-				GridBagConstraints.VERTICAL, new Insets(0, 2, 0, 2), 0, 0));
-
-		roundPanel.add(curWeather_icon,  new GridBagConstraints(1, 1, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
-				GridBagConstraints.VERTICAL, new Insets(2, 6, 0, 6), 0, 0));
-		
-		roundPanel.add(pnlMinMax,        new GridBagConstraints(2, 1, 1, 1, 1.0, 1.0, GridBagConstraints.EAST,
-				GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 4), 0, 0));
-		
-		// second row
-		roundPanel.add(pnlSunshine,      new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.WEST,
-				GridBagConstraints.VERTICAL, new Insets(2, 2, 0, 0), 0, 0));
-
-		roundPanel.add(pnlUV,            new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
-				GridBagConstraints.VERTICAL, new Insets(2, 0, 0, 0), 0, 0));
-
-		roundPanel.add(pnlRain,          new GridBagConstraints(2, 2, 1, 1, 0.0, 0.0, GridBagConstraints.SOUTHEAST,
-				GridBagConstraints.VERTICAL, new Insets(2, 0, 0, 4), 0, 0));
-
-		/*roundPanel.add(curWeather_wind, new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER,
-				GridBagConstraints.BOTH, new Insets(2, 12, 0, 6), 0, 0));
-		*/
-		
-
-		
-	}
-	
-	
-	
-	private void addForeCast(WeatherDataForeCast wdf) {
-		String tempLabel = getTempLabel(true);
-		
-		/*roundPanel.add(
-				addForeCastLegendPanel(),
-				new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.VERTICAL,
-						new Insets(4, 2, 2, 18), 0, 0));*/
-		roundPanel.add(
-				addForeCastPanel("14:00", 
-						WeatherIcons.getIcon(WeatherIcons.IMAGE_WEATHER_116_48), 
-						"28" + tempLabel, 
-						"3.5", 
-						WeatherIcons.getIcon(WeatherIcons.IMAGE_UV_INDEX_SEVERE),
-						"3mm"),
-						new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
-						new Insets(4, 2, 2, 4), 0, 0));
-		roundPanel.add(
-				addForeCastPanel("15:00", 
-						WeatherIcons.getIcon(WeatherIcons.IMAGE_WEATHER_113_48), 
-						"24" + tempLabel, 
-						"3.5", 
-						WeatherIcons.getIcon(WeatherIcons.IMAGE_UV_INDEX_VERY_HIGH),
-						"3mm"),
-						new GridBagConstraints(1, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.VERTICAL,
-						new Insets(4, 2, 2, 4), 0, 0));
-		roundPanel.add(
-				addForeCastPanel("16:00", 
-						WeatherIcons.getIcon(WeatherIcons.IMAGE_WEATHER_320_48), 
-						"20" + tempLabel, 
-						"3.5", 
-						WeatherIcons.getIcon(WeatherIcons.IMAGE_UV_INDEX_HIGH),
-						"3mm"),
-						new GridBagConstraints(2, 1, 1, 1, 1.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-						new Insets(4, 2, 2, 4), 0, 0));
-	/*	roundPanel.add(
-				addForeCastPanel("17:00", 
-						WeatherIcons.getIcon(WeatherIcons.IMAGE_WEATHER_386_1_48), 
-						"18" + tempLabel, 
-						"3.5", 
-						WeatherIcons.getIcon(WeatherIcons.IMAGE_UV_INDEX_MEDIUM),
-						"3mm"),
-						new GridBagConstraints(3, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.VERTICAL,
-						new Insets(4, 2, 2, 18), 0, 0));
-	*/
-	}
-
-	
-
-	private JPanel addForeCastPanel(String time, ImageIcon weatherIcon, String temp, String uvIndex, ImageIcon uvIndexLevel, String rain) {
-		JPanel myPanel = initializePanel();
-		JLabel timeLabel = initializeLabel();
-		JLabel weatherIconLabel = initializeLabel();
-		JLabel tempLabel = initializeLabel();
-		JLabel uvIndexLabel = initializeLabel();
-		JLabel rainLabel = initializeLabel();
-		
-		myPanel.setForeground(Daten.efaConfig.getToolTipForegroundColor());
-		myPanel.setBackground(Daten.efaConfig.getToolTipBackgroundColor());
-
-		timeLabel.setText(time);
-		timeLabel.setHorizontalTextPosition(SwingConstants.CENTER);
-		timeLabel.setFont(timeLabel.getFont().deriveFont(Font.BOLD));
-		timeLabel.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
-
-		weatherIconLabel.setIcon(weatherIcon);
-		weatherIconLabel.setIconTextGap(0);
-		weatherIconLabel.setHorizontalTextPosition(SwingConstants.CENTER);
-		tempLabel.setText(temp);
-		tempLabel.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
-		tempLabel.setHorizontalTextPosition(SwingConstants.CENTER);
-
-		uvIndexLabel.setIcon(uvIndexLevel);
-		uvIndexLabel.setHorizontalTextPosition(SwingConstants.LEFT);
-		uvIndexLabel.setIconTextGap(4);
-		uvIndexLabel.setText(uvIndex);
-		uvIndexLabel.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
-		
-		rainLabel.setText(rain);
-		rainLabel.setIcon(WeatherIcons.getIcon(WeatherIcons.IMAGE_RAIN));
-		rainLabel.setIconTextGap(2);
-		rainLabel.setHorizontalTextPosition(SwingConstants.RIGHT);
-		rainLabel.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
-		
-   	    myPanel.add(timeLabel,   		new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.VERTICAL, 		new Insets(1,3,1,3), 0, 0));
-   	    myPanel.add(weatherIconLabel, 	new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.VERTICAL, 	    new Insets(1,3,1,3), 0, 0)); 
-   	    myPanel.add(tempLabel, 			new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.VERTICAL, 		new Insets(1,3,1,3), 0, 0));
-   	    myPanel.add(uvIndexLabel, 		new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.VERTICAL, 		new Insets(1,3,1,3), 0, 0));
-   	    //myPanel.add(rainLabel, 			new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.VERTICAL, 		new Insets(1,3,1,3), 0, 0));
-   	    
-/*
-		myPanel.setLayout(new BorderLayout(0, 0));
-		myPanel.add(timeLabel, BorderLayout.NORTH);
-		myPanel.add(weatherIconLabel, BorderLayout.CENTER);
-		myPanel.add(tempLabel, BorderLayout.SOUTH);
-*/
-		return myPanel;
-
-	}
-	
-	private JPanel addForeCastLegendPanel() {
-		JPanel myPanel = initializePanel();
-		JLabel timeLabel = initializeLabel();
-		JLabel weatherIconLabel = initializeLabel();
-		JLabel tempLabel = initializeLabel();
-		JLabel uvIndexLabel = initializeLabel();
-		JLabel rainLabel = initializeLabel();
-		
-		myPanel.setForeground(Daten.efaConfig.getToolTipForegroundColor());
-		myPanel.setBackground(Daten.efaConfig.getToolTipBackgroundColor());
-
-		timeLabel.setText(".");
-		timeLabel.setHorizontalTextPosition(SwingConstants.CENTER);
-		timeLabel.setFont(timeLabel.getFont().deriveFont(Font.BOLD));
-
-		weatherIconLabel.setIcon(WeatherIcons.getIcon(WeatherIcons.IMAGE_WEATHER_TRANSPARENT_48));
-		weatherIconLabel.setIconTextGap(0);
-		weatherIconLabel.setHorizontalTextPosition(SwingConstants.CENTER);
-		weatherIconLabel.setPreferredSize(new Dimension(2,48));
-		tempLabel.setText(".");
-		tempLabel.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
-		tempLabel.setHorizontalTextPosition(SwingConstants.CENTER);
-
-		uvIndexLabel.setIcon(WeatherIcons.getIcon(WeatherIcons.IMAGE_UV_INDEX));
-		uvIndexLabel.setHorizontalTextPosition(SwingConstants.LEFT);
-		uvIndexLabel.setIconTextGap(0);
-		uvIndexLabel.setText(null);
-
-		rainLabel.setIcon(WeatherIcons.getIcon(WeatherIcons.IMAGE_RAIN));
-		rainLabel.setHorizontalTextPosition(SwingConstants.LEFT);
-		rainLabel.setIconTextGap(0);
-		rainLabel.setText(null);
-		
-   	    myPanel.add(timeLabel,   		new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, 		new Insets(2,3,2,3), 0, 0));
-   	    myPanel.add(weatherIconLabel, 	new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, 	new Insets(2,3,2,3), 0, 0)); 
-   	    myPanel.add(tempLabel, 			new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, 		new Insets(2,3,2,3), 0, 0));
-   	    myPanel.add(uvIndexLabel, 		new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, 		new Insets(2,3,2,3), 0, 0));
-   	    myPanel.add(rainLabel, 			new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, 		new Insets(2,3,2,3), 0, 0));
-   	    
-/*
-		myPanel.setLayout(new BorderLayout(0, 0));
-		myPanel.add(timeLabel, BorderLayout.NORTH);
-		myPanel.add(weatherIconLabel, BorderLayout.CENTER);
-		myPanel.add(tempLabel, BorderLayout.SOUTH);
-*/
-		return myPanel;
-
-	}
-	
-	private void addError(WeatherDataForeCast wdf) {
+	private void addInfoPanel() {
 		JTextArea errorLabel1= new JTextArea();
-		errorLabel1.setBackground(Daten.efaConfig.getErrorBackgroundColor());
-		errorLabel1.setForeground(Daten.efaConfig.getErrorForegroundColor());
 		errorLabel1.setFont(
 				mainPanel.getFont().deriveFont((float) (Daten.efaConfig.getValueEfaDirekt_BthsFontSize())));
 		errorLabel1.setFont(errorLabel1.getFont().deriveFont(Font.BOLD));
-		errorLabel1.setText(International.getString("Fehler beim Abruf der Wetterdaten."));
-		errorLabel1.setToolTipText(wdf.getStatusMessage());
+		errorLabel1.setText(International.getString("Ermittle Wetterdaten..."));
 		errorLabel1.setLineWrap(true);
 		errorLabel1.setOpaque(false);
 		errorLabel1.setEditable(false);
 		
-		roundPanel.setBackground(Daten.efaConfig.getErrorBackgroundColor());
-		roundPanel.setForeground(Daten.efaConfig.getErrorForegroundColor());
-		roundPanel.setBorder(new RoundedBorder(Daten.efaConfig.getErrorForegroundColor()));
-		
+		JPanel titlePanel = WeatherRenderer.getLocationHeader(this);
 		titlePanel.setBackground(Daten.efaConfig.getErrorHeaderBackgroundColor());
 		titlePanel.setForeground(Daten.efaConfig.getErrorHeaderForegroundColor());
-		titleLabel.setForeground(titlePanel.getForeground());
 		
-		roundPanel.add(errorLabel1, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER,
+		// Build the main panel view
+
+		roundPanel.add(titlePanel, new GridBagConstraints(0, 0, 4, 1, 1.0, 1.0, GridBagConstraints.CENTER,
+			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));	
+		
+		roundPanel.add(errorLabel1, new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
 				GridBagConstraints.BOTH, new Insets(2, 4, 2, 4), 0, 0));
 	}
+
 
 
 	@Override
@@ -714,7 +201,7 @@ public class WeatherWidget extends Widget {
 		return mainPanel;
 	}
 
-	private String getWeatherCaption() {
+	public String getWeatherCaption() {
 		return ((ItemTypeString) getParameterInternal(PARAM_CAPTION)).getValue();
 	}
 
@@ -743,15 +230,15 @@ public class WeatherWidget extends Widget {
 		return ((ItemTypeStringList) getParameterInternal(PARAM_WEATHER_SOURCE)).toString();
 	}
 
-	private String getWeatherTempScale() {
+	public String getWeatherTempScale() {
 		return ((ItemTypeStringList) getParameterInternal(PARAM_TEMPERATURESCALE)).toString();
 	}
 
-	private String getWeatherSpeedScale() {
+	public String getWeatherSpeedScale() {
 		return ((ItemTypeStringList) getParameterInternal(PARAM_SPEEDSCALE)).toString();
 	}
 
-	private String getTempLabel(boolean withUnit) {
+	public String getTempLabel(boolean withUnit) {
 		if (!withUnit) {
 			return "°";
 		} else {
@@ -759,69 +246,231 @@ public class WeatherWidget extends Widget {
 		}
 	}
 
-	private WeatherDataForeCast getWeather(String source, String longitude, String latitude) {
+		/**
+		 * The WeatherUpdate obtains Weather Data in a separate thread, so that
+		 * the time for getting weather data does not affect the main thread,
+		 * and efaBoathouse is still ready for interaction with the user.
+		 */
+	   class WeatherUpdater extends Thread {
 
-		if (source.equals(WEATHER_SOURCE_OPENMETEO)) {
+	        volatile boolean keepRunning = true;
+	        private JPanel panel;
+	        private	JPanel innerPanel;
+	        private WeatherWidget ww = null;
+	        private WeatherDataForeCast wdf = null;
+	        private long lastWeatherUpdate = 0;
+	        private boolean firstRun=true;
+	        
+	        public WeatherUpdater(JPanel thePanel, WeatherWidget ww) {
+	        	this.panel=thePanel;
+	        	this.ww = ww;
+	        }
 
-			try {
+	        private boolean needsToUpdateWeather() {
+	        	return (this.wdf == null || (System.currentTimeMillis() >= lastWeatherUpdate+(ww.getUpdateInterval()*1000)));
+	        }
+	        
+	        public void run() {
+	        	this.setName("WeatherWidget.WeatherUpdater");
+	            
+	            while (keepRunning) {
+	            	
+	            	try {
+		            	
+	            		if (needsToUpdateWeather()) {
+	            			wdf = getWeather(ww.getWeatherSource(), ww.getWeatherLongitude(), ww.getWeatherLatitude());
+	            			Logger.log(Logger.DEBUG, "Wetterdaten geholt");
+	            		}
+	            		
+	            		
+	        			if (firstRun && wdf != null && wdf.getStatus() == true) {
+		            		
+	        				innerPanel = new JPanel();
+		            		innerPanel.setLayout(new GridBagLayout());
+		            		innerPanel.setBackground(Daten.efaConfig.getToolTipBackgroundColor());
+		            		innerPanel.setForeground(Daten.efaConfig.getToolTipForegroundColor());
+		            		innerPanel.setBorder(BorderFactory.createEmptyBorder());
+		            		innerPanel.setName("WeatherWidget-InnerPanel");
 
-				return fetchMeteoWeather(longitude, latitude);
+		            		if (getWeatherLayout().equals(WEATHER_LAYOUT_CURRENT_CLASSIC)) {
+	        					WeatherRendererCurrentClassic.renderWeather(wdf, innerPanel, ww);
+	        				} else if (getWeatherLayout().equals(WEATHER_LAYOUT_CURRENT_WIND)) {
+	        					WeatherRendererCurrentWind.renderWeather(wdf, innerPanel, ww);
+	        				} else if (getWeatherLayout().equals(WEATHER_LAYOUT_CURRENT_UVINDEX)) {
+	        					WeatherRendererCurrentUVIndex.renderWeather(wdf, innerPanel, ww);
+	        				} else if (getWeatherLayout().equals(WEATHER_LAYOUT_FORECASTSIMPLE)){
+	        					WeatherRendererForeCastSimple.renderWeather(wdf, innerPanel, ww);
+	        				} else {
+	        					WeatherRendererForeCastComplex.renderWeather(wdf, innerPanel, ww);
+	        				}
+	            			Logger.log(Logger.DEBUG, "Wetterdaten gerendert in innerpanel");
+	        			} else {
+		            		innerPanel = new JPanel();
+		            		innerPanel.setLayout(new GridBagLayout());
+		            		innerPanel.setBackground(Daten.efaConfig.getToolTipBackgroundColor());
+		            		innerPanel.setForeground(Daten.efaConfig.getToolTipForegroundColor());
+		            		innerPanel.setBorder(BorderFactory.createEmptyBorder());
+		            		innerPanel.setName("WeatherWidget-InnerPanel");
+	        				
+	        				addError(wdf);
+	        				firstRun=true;
+	            			Logger.log(Logger.DEBUG, "ErrorPanel dargestellt");
+	        			}
+		            	
+	        			innerPanel.invalidate();
+		            	//Use invokelater as swing threadsafe ways
+		            	SwingUtilities.invokeLater(new UpdateWeatherRunner(this.panel, innerPanel));
+		
+            			Logger.log(Logger.DEBUG, "Warte auf update");
+		            	//wait until next full minute plus one sec. this is more accurate than just waiting 60.000 msec
+		            	//from a random offset.
+		           		long waitTime=EfaUtil.getMilliSecondsToFullMinute()+1000;
+		                Thread.sleep(waitTime);
 
-			} catch (Exception e) {
-				Logger.logdebug(e);
-			}
-		}
-		return null;
-	}
+	            	} catch (InterruptedException e) {
+	                	//This is when the thread gets interrupted when it is sleeping.
+	                	EfaUtil.foo();            
+	                } catch (Exception e) {
+	                	Throwable t = e.getCause();
+	                	if (t.getClass().getName().equalsIgnoreCase("java.lang.InterruptedException")) {
+	                		EfaUtil.foo();
+	                	} else {
+	                		Logger.logdebug(e);
+	                	}
+	                }
+		                
+	            }
+	        }
+	        
+	        public synchronized void stopRunning() {
+	            keepRunning = false;
+	            interrupt(); // wake up thread
+	        }
 
-	private WeatherDataForeCast fetchMeteoWeather(String longitude, String latitude) {
 
-		String urlStr = "https://api.open-meteo.com/v1/forecast?latitude=" + latitude + "&longitude=" + longitude
-				+ "&daily=weather_code,sunshine_duration,uv_index_max,uv_index_clear_sky_max,precipitation_sum,temperature_2m_max,temperature_2m_min,wind_speed_10m_max"
-				+ "&hourly=temperature_2m,weather_code,wind_speed_10m,wind_direction_10m,uv_index,is_day"
-				+ "&t=temperature_2m,is_day,weather_code,wind_speed_10m,wind_direction_10m"
-				+ (this.getWeatherTempScale().equals(TEMP_FAHRENHEIT) ? "&temperature_unit=fahrenheit" : "")
-				+ (this.getWeatherSpeedScale().equals(SPEEDSCALE_MPH) ? "&wind_speed_unit=mph" : "")
-				+ "&current_weather=true"
-				+ "&timezone=GMT&forecast_days=1&forecast_hours=24&temporal_resolution=hourly_3"
-				//+ "error"
-				;
+	    	private WeatherDataForeCast getWeather(String source, String longitude, String latitude) {
 
-		try {
+	    		if (source.equals(WEATHER_SOURCE_OPENMETEO)) {
 
-			String response = fetchJSonFromURL(urlStr);
-			JSONObject json = new JSONObject(response.toString());
+	    			try {
 
-			return OpenMeteoApiParser.parseFromOpenMeteo(json);
+	    				return fetchMeteoWeather(longitude, latitude);
 
-		} catch (Exception e) {
-			WeatherDataForeCast tmp=new WeatherDataForeCast();
-			tmp.setStatus(false);
-			tmp.setStatusMessage(International.getString("Fehler beim Abruf der Wetterdaten.")+"\n\n"+ e.getMessage());
-			Logger.logdebug(e);
-			return tmp;
-		}
-	}
+	    			} catch (Exception e) {
+	    				Logger.logdebug(e);
+	    			}
+	    		}
+	    		return null;
+	    	}
 
-	private String fetchJSonFromURL(String urlStr) throws Exception {
-		HttpURLConnection conn = (HttpURLConnection) new URL(urlStr).openConnection();
-		conn.setRequestMethod("GET");
-		conn.setConnectTimeout(5000);//max 5 seconds for connect
-		conn.setReadTimeout(10000); // max 10 seconds for reading data
+	    	private WeatherDataForeCast fetchMeteoWeather(String longitude, String latitude) {
 
-		try (BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"))) {
-			StringBuilder sb = new StringBuilder();
-			String line;
-			while ((line = reader.readLine()) != null)
-				sb.append(line);
-			
-			int status = conn.getResponseCode();
-			if (status != HttpURLConnection.HTTP_OK) {
-				throw new RuntimeException("WebServer Reply Status " + status + sb.toString());
-			}
+	    		String urlStr = "https://api.open-meteo.com/v1/forecast?latitude=" + latitude + "&longitude=" + longitude
+	    				+ "&daily=weather_code,sunshine_duration,uv_index_max,uv_index_clear_sky_max,precipitation_sum,temperature_2m_max,temperature_2m_min,wind_speed_10m_max"
+	    				+ "&hourly=temperature_2m,weather_code,wind_speed_10m,wind_direction_10m,uv_index,is_day,precipitation,precipitation_probability"
+	    				+ "&t=temperature_2m,is_day,weather_code,wind_speed_10m,wind_direction_10m"
+	    				+ (ww.getWeatherTempScale().equals(TEMP_FAHRENHEIT) ? "&temperature_unit=fahrenheit" : "")
+	    				+ (ww.getWeatherSpeedScale().equals(SPEEDSCALE_MPH) ? "&wind_speed_unit=mph" : "")
+	    				+ "&current_weather=true"
+	    				+ "&timezone=GMT&forecast_days=1&forecast_hours=24&temporal_resolution=hourly_3"
+	    				//+ "error"
+	    				;
 
-			return sb.toString();
-		}
-	}
+	    		try {
 
+	    			String response = fetchJSonFromURL(urlStr);
+	    			JSONObject json = new JSONObject(response.toString());
+
+	    			return OpenMeteoApiParser.parseFromOpenMeteo(json);
+
+	    		} catch (Exception e) {
+	    			WeatherDataForeCast tmp=new WeatherDataForeCast();
+	    			tmp.setStatus(false);
+	    			tmp.setStatusMessage(International.getString("Fehler beim Abruf der Wetterdaten.")+"\n\n"+ e.getMessage());
+	    			Logger.logdebug(e);
+	    			return tmp;
+	    		}
+	    	}
+
+	    	private String fetchJSonFromURL(String urlStr) throws Exception {
+	    		HttpURLConnection conn = (HttpURLConnection) new URL(urlStr).openConnection();
+	    		conn.setRequestMethod("GET");
+	    		conn.setConnectTimeout(5000);//max 5 seconds for connect
+	    		conn.setReadTimeout(10000); // max 10 seconds for reading data
+
+	    		try (BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"))) {
+	    			StringBuilder sb = new StringBuilder();
+	    			String line;
+	    			while ((line = reader.readLine()) != null)
+	    				sb.append(line);
+	    			
+	    			int status = conn.getResponseCode();
+	    			if (status != HttpURLConnection.HTTP_OK) {
+	    				throw new RuntimeException("WebServer Reply Status " + status + sb.toString());
+	    			}
+
+	    			return sb.toString();
+	    		}
+	    	}	 
+	    	
+	    	private void addError(WeatherDataForeCast wdf) {
+	    		JTextArea errorLabel1= new JTextArea();
+	    		errorLabel1.setBackground(Daten.efaConfig.getErrorBackgroundColor());
+	    		errorLabel1.setForeground(Daten.efaConfig.getErrorForegroundColor());
+	    		errorLabel1.setFont(
+	    				mainPanel.getFont().deriveFont((float) (Daten.efaConfig.getValueEfaDirekt_BthsFontSize())));
+	    		errorLabel1.setFont(errorLabel1.getFont().deriveFont(Font.BOLD));
+	    		errorLabel1.setText(International.getString("Fehler beim Abruf der Wetterdaten."));
+	    		errorLabel1.setToolTipText(wdf.getStatusMessage());
+	    		errorLabel1.setLineWrap(true);
+	    		errorLabel1.setOpaque(false);
+	    		errorLabel1.setEditable(false);
+	    		
+	    		innerPanel.setBackground(Daten.efaConfig.getErrorBackgroundColor());
+	    		innerPanel.setForeground(Daten.efaConfig.getErrorForegroundColor());
+	    		innerPanel.setBorder(new RoundedBorder(Daten.efaConfig.getErrorForegroundColor()));
+	    		
+	    		JPanel titlePanel = WeatherRenderer.getLocationHeader(ww);
+	    		titlePanel.setBackground(Daten.efaConfig.getErrorHeaderBackgroundColor());
+	    		titlePanel.setForeground(Daten.efaConfig.getErrorHeaderForegroundColor());
+	    		
+	    		// Build the main panel view
+
+	    		innerPanel.add(titlePanel, new GridBagConstraints(0, 0, 4, 1, 1.0, 0.0, GridBagConstraints.CENTER,
+	    			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));	
+	    		
+	    		innerPanel.add(errorLabel1, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER,
+	    				GridBagConstraints.BOTH, new Insets(2, 4, 2, 4), 0, 0));
+	    	}	   
+	        
+	    }
+
+	    private class UpdateWeatherRunner implements Runnable {
+	        
+	    	private JPanel uwrPanel=null;
+	    	private JPanel uwrInnerPanel=null;
+	    	
+	    	public UpdateWeatherRunner(JPanel targetPanel, JPanel innerPanel) {
+	    		this.uwrPanel = targetPanel;
+	    		this.uwrInnerPanel = innerPanel;
+    			Logger.log(Logger.DEBUG, "UpdateRunner Constructor");
+	    	}
+	    	
+	    	public void run() {
+	    		try {
+	    			uwrPanel.removeAll();
+	    			uwrPanel.add(uwrInnerPanel, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
+	    					GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+	    			uwrPanel.revalidate();
+	    			Logger.log(Logger.DEBUG, "UpdateRunner updater");
+
+        			
+	    		} catch (Exception e){
+	    			Logger.log(e);
+	    		}
+	    	}
+	    }
+	
+	
+	
 }

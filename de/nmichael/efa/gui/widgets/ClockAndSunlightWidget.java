@@ -324,21 +324,6 @@ public class ClockAndSunlightWidget extends Widget {
         
         }
 
-        /*
-         * Gets the remaining seconds until the next full minute.
-         * This sets the update interval.
-         */
-        private long getMilliSecondsToFullMinute() {
-            LocalDateTime start = LocalDateTime.now();
-            // Hour + 1, set Minute and Second to 00
-            LocalDateTime end = start.plusMinutes(1).truncatedTo(ChronoUnit.MINUTES);
-
-            // Get Duration
-            Duration duration = Duration.between(start, end);
-            long millis = duration.toMillis();
-            return millis;
-        };
-        
         public void run() {
         	this.setName("MeteoAstroWidget.PanelUpdater");
             String clockValue=null;
@@ -381,7 +366,7 @@ public class ClockAndSunlightWidget extends Widget {
 	            	
 	            	//wait until next full minute plus one sec. this is more accurate than just waiting 60.000 msec
 	            	//from a random offset.
-	           		long waitTime=getMilliSecondsToFullMinute()+1000;
+	           		long waitTime=EfaUtil.getMilliSecondsToFullMinute()+1000;
 	                Thread.sleep(waitTime);
 
             	} catch (InterruptedException e) {
@@ -457,7 +442,9 @@ public class ClockAndSunlightWidget extends Widget {
 
 	    		}
 	
+	    		panel.invalidate();
 	    		panel.repaint();
+	    		
     		} catch (Exception e){
     			Logger.log(e);
     		}

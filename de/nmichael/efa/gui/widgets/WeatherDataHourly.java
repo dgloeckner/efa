@@ -10,6 +10,8 @@ public class WeatherDataHourly {
     private List<Integer> windDirection10m;
     private List<Double> uvIndex;
     private List<Integer> isDay;
+    private List<Double> precipitation;
+    private List<Double> precipitationProb;
     
 	public List<Integer> getIsDay() {
 		return isDay;
@@ -53,6 +55,16 @@ public class WeatherDataHourly {
 	public void setTime(List<String> time) {
 		this.time = time;
 	}
-
-    
+	public List<Double> getPrecipitation() {
+		return precipitation;
+	}
+	public void setPrecipitation(List<Double> precipitation) {
+		this.precipitation = precipitation;
+	}
+	public List<Double> getPrecipitationProb() {
+		return precipitationProb;
+	}
+	public void setPrecipitationProb(List<Double> precipitationProb) {
+		this.precipitationProb = precipitationProb;
+	}  
 }

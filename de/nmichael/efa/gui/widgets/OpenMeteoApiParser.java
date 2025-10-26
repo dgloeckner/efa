@@ -169,6 +169,8 @@ public class OpenMeteoApiParser {
         hourly.setWindDirection10m(toIntList(hd.getJSONArray("wind_direction_10m")));
         hourly.setUvIndex(toDoubleList(hd.getJSONArray("uv_index")));
         hourly.setIsDay(toIntList(hd.getJSONArray("is_day")));
+        hourly.setPrecipitation(toDoubleList(hd.getJSONArray("precipitation")));
+        hourly.setPrecipitationProb(toDoubleList(hd.getJSONArray("precipitation_probability")));
         wdf.setHourly(hourly);
         
         wdf.setStatus(true);

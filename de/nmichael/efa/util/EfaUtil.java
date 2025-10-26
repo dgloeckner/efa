@@ -35,6 +35,9 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -1419,6 +1422,21 @@ public class EfaUtil {
         return makeTimeString(cal.get(Calendar.YEAR), 4);
     }
 
+    /*
+     * Gets the remaining seconds until the next full minute.
+     * This sets the update interval.
+     */
+    public static long getMilliSecondsToFullMinute() {
+        LocalDateTime start = LocalDateTime.now();
+        // Hour + 1, set Minute and Second to 00
+        LocalDateTime end = start.plusMinutes(1).truncatedTo(ChronoUnit.MINUTES);
+
+        // Get Duration
+        Duration duration = Duration.between(start, end);
+        long millis = duration.toMillis();
+        return millis;
+    };    
+    
     public static String date2String(Date date) {
         return date2String(date, true);
     }

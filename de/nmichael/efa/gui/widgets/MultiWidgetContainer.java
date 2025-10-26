@@ -75,10 +75,13 @@ public class MultiWidgetContainer extends Widget {
 
 	@Override
 	public void construct() {
+		Logger.log(Logger.DEBUG, "Multipanel Construct");
+
 		 mainPanel = new JPanel();
+		 mainPanel.setName("MultiWidget-MainPanel");
 		 CardLayout cardLayout = new CardLayout();
 		 cardPanel = new JPanel(cardLayout);
-		 
+		 cardPanel.setName("MultiWidget-Card");
 		 //mainpanel: 
 		 //  left:   button, vertically centered
 		 //  middle: cards
@@ -158,7 +161,6 @@ public class MultiWidgetContainer extends Widget {
         private volatile boolean keepRunning = true;
         private volatile int updateIntervalInSeconds = 15;
 
-        private boolean sunriseError = false;
         private CardLayout cardLayout;
         private JPanel cardPanel;
 

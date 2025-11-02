@@ -157,7 +157,7 @@ public class WeatherWidget extends Widget {
 
 		addInfoPanel();
 		roundPanel.setMinimumSize(new Dimension(240, 120));
-		roundPanel.invalidate();
+		roundPanel.revalidate();
 
 	   	try {
 	   		weatherUpdater = new WeatherUpdater(roundPanel, this);

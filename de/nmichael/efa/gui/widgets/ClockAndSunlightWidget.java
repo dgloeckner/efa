@@ -442,7 +442,7 @@ public class ClockAndSunlightWidget extends Widget {
 
 	    		}
 	
-	    		panel.invalidate();
+	    		panel.revalidate();
 	    		panel.repaint();
 	    		
     		} catch (Exception e){

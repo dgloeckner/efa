@@ -72,7 +72,8 @@ public class ItemTypeBoatstatusList extends ItemTypeList {
         //update the list sometime when the current event is over
         SwingUtilities.invokeLater(new Runnable() {
   	      public void run() {
-                list.repaint();
+              list.revalidate();  
+  	    	  list.repaint();
   	      }
     	});
     }

@@ -7,9 +7,11 @@
         <DownloadSize>TODO</DownloadSize>
         <Changes lang="de">
             <ChangeItem>Bugfix: Fahrten aus einem anderen Fahrtenbuch als dem aktuell geladenen können nicht verändert werden.</ChangeItem>
+            <ChangeItem>Bugfix: Neuzeichnen der Bootsliste nach Veränderung Listeninhalte verbessert.</ChangeItem>            
         </Changes>
         <Changes lang="en">
             <ChangeItem>BugFix: Sessions from a logbook differing from the currently loaded one cannot be modified.</ChangeItem>
+            <ChangeItem>Bugfix: Repainting of boat lists improved when boat lists get updated.</ChangeItem>            
         </Changes>
     </Version>
     <Version>

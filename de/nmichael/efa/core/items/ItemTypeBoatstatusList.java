@@ -73,6 +73,7 @@ public class ItemTypeBoatstatusList extends ItemTypeList {
         SwingUtilities.invokeLater(new Runnable() {
   	      public void run() {
                 list.repaint();
+                list.revalidate();
   	      }
     	});
     }

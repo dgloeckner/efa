@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <efaOnlineUpdate>
     <Version>
+        <VersionID>2.5.0#21</VersionID>
+        <ReleaseDate>03.11.2025</ReleaseDate>
+        <DownloadUrl>TODO</DownloadUrl>
+        <DownloadSize>TODO</DownloadSize>
+        <Changes lang="de">
+            <ChangeItem>Bugfix: Fahrten aus einem anderen Fahrtenbuch als dem aktuell geladenen können nicht verändert werden.</ChangeItem>
+        </Changes>
+        <Changes lang="en">
+            <ChangeItem>BugFix: Sessions from a logbook differing from the currently loaded one cannot be modified.</ChangeItem>
+        </Changes>
+    </Version>
+    <Version>
         <VersionID>2.5.0#20</VersionID>
         <ReleaseDate>25.10.2025</ReleaseDate>
         <DownloadUrl>TODO</DownloadUrl>

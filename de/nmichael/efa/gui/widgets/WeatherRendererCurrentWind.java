@@ -62,6 +62,8 @@ public class WeatherRendererCurrentWind extends WeatherRenderer {
 
 		curWeather_sunshineUnit.setText("h");
 		curWeather_sunshineUnit.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
+		curWeather_sunshineUnit.setFont(
+				roundPanel.getFont().deriveFont((float) (Daten.efaConfig.getValueEfaDirekt_BthsFontSize() -4)));
 
 		df = new DecimalFormat("#");
 		curWeather_rain.setText(df.format(rain)); 
@@ -74,7 +76,7 @@ public class WeatherRendererCurrentWind extends WeatherRenderer {
 
 		/*	roundpanel
 		 *  | HEADER                                             |	
-		 * 	|WeatherIcon|CurrentTemp|pnlMinMaxSunRain            |
+		 * 	|CurrentTemp|WeatherIcon|pnlMinMaxSunRain            |
 		 *  | WIND                                               |
 		 * 
 		 * pnlMinMaxSunRain
@@ -120,19 +122,15 @@ public class WeatherRendererCurrentWind extends WeatherRenderer {
 		roundPanel.add(getLocationHeader(ww), new GridBagConstraints(0, 0, 3, 1, 1.0, 0.0, GridBagConstraints.CENTER,
 			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));		
 				
-		roundPanel.add(curWeather_icon, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+		roundPanel.add(curWeather_temp, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
 				GridBagConstraints.BOTH, new Insets(2, 4, 2, 4), 0, 0));
 
-		roundPanel.add(curWeather_temp, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+		roundPanel.add(curWeather_icon, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
 				GridBagConstraints.BOTH, new Insets(0, 0, 0, 4), 0, 0));
 
 		roundPanel.add(pnlMinMaxSunRain, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0, GridBagConstraints.EAST,
 				GridBagConstraints.BOTH, new Insets(0, 4, 0, 4), 0, 0));
 
-		/*roundPanel.add(curWeather_maxTemp, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0, GridBagConstraints.SOUTHEAST,
-				GridBagConstraints.NONE, new Insets(4, 4, 0, 4), 0, 0));
-		roundPanel.add(curWeather_minTemp, new GridBagConstraints(2, 2, 1, 1, 0.0, 0.0, GridBagConstraints.EAST,
-				GridBagConstraints.NONE, new Insets(0, 4, 0, 4), 0, 0));*/
 		roundPanel.add(curWeather_wind, new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
 				GridBagConstraints.VERTICAL, new Insets(0, 2, 0, 2), 0, 0));
 	}

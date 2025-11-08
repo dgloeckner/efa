@@ -67,6 +67,8 @@ public class WeatherRendererCurrentUVIndex extends WeatherRenderer {
 
 		curWeather_sunshineUnit.setText("h");
 		curWeather_sunshineUnit.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
+		curWeather_sunshineUnit.setFont(
+				roundPanel.getFont().deriveFont((float) (Daten.efaConfig.getValueEfaDirekt_BthsFontSize() -4)));
 
 		df = new DecimalFormat("#.#");
 		curWeather_uvindex.setText(df.format(uvindex));
@@ -147,7 +149,7 @@ public class WeatherRendererCurrentUVIndex extends WeatherRenderer {
 				GridBagConstraints.VERTICAL, new Insets(0, 2, 0, 2), 0, 0));
 
 		roundPanel.add(curWeather_icon,  new GridBagConstraints(1, 1, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
-				GridBagConstraints.VERTICAL, new Insets(2, 6, 0, 6), 0, 0));
+				GridBagConstraints.VERTICAL, new Insets(2, 8, 0, 8), 0, 0));
 		
 		roundPanel.add(pnlMinMax,        new GridBagConstraints(2, 1, 1, 1, 1.0, 1.0, GridBagConstraints.EAST,
 				GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 4), 0, 0));
@@ -157,7 +159,7 @@ public class WeatherRendererCurrentUVIndex extends WeatherRenderer {
 				GridBagConstraints.VERTICAL, new Insets(2, 2, 0, 0), 0, 0));
 
 		roundPanel.add(pnlUV,            new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
-				GridBagConstraints.VERTICAL, new Insets(2, 0, 0, 0), 0, 0));
+				GridBagConstraints.VERTICAL, new Insets(2, 8, 0, 8), 0, 0));
 
 		roundPanel.add(pnlRain,          new GridBagConstraints(2, 2, 1, 1, 0.0, 0.0, GridBagConstraints.SOUTHEAST,
 				GridBagConstraints.VERTICAL, new Insets(2, 0, 0, 4), 0, 0));

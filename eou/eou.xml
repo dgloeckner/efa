@@ -1,10 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <efaOnlineUpdate>
     <Version>
+        <VersionID>2.5.0#21</VersionID>
+        <ReleaseDate>03.11.2025</ReleaseDate>
+        <DownloadUrl>TODO</DownloadUrl>
+        <DownloadSize>TODO</DownloadSize>
+     	<MinimumJavaVersion>1.8</MinimumJavaVersion>
+		<MinimumEfaCloudVersion>2.3.3</MinimumEfaCloudVersion>
+        <ShowNotice lang="de">Wenn efaCloud eingesetzt wird, muss der Server mindestens Version 2.3.3 unterstützen. EfaCloud 2.4.0_12 und höher werden empfohlen.</ShowNotice>
+        <ShowNotice lang="en">If you use efaCloud, make sure your server at least supports efaCloud Version 2.3.3. It is recommended to upgrade to EfaCloud 2.4.0_12 or above.</ShowNotice>
+        <Changes lang="de">
+            <ChangeItem>Bugfix: Fahrten aus einem anderen Fahrtenbuch als dem aktuell geladenen können nicht verändert werden.</ChangeItem>
+            <ChangeItem>Bugfix: Neuzeichnen der Bootsliste nach Veränderung Listeninhalte verbessert.</ChangeItem>            
+        </Changes>
+        <Changes lang="en">
+            <ChangeItem>BugFix: Sessions from a logbook differing from the currently loaded one cannot be modified.</ChangeItem>
+            <ChangeItem>Bugfix: Repainting of boat lists improved when boat lists get updated.</ChangeItem>            
+        </Changes>
+    </Version>
+    <Version>
         <VersionID>2.5.0#20</VersionID>
         <ReleaseDate>25.10.2025</ReleaseDate>
         <DownloadUrl>TODO</DownloadUrl>
         <DownloadSize>TODO</DownloadSize>
+		<MinimumJavaVersion>1.8</MinimumJavaVersion>
+		<MinimumEfaCloudVersion>2.3.3</MinimumEfaCloudVersion>  
+		<ShowNotice lang="de">Wenn efaCloud eingesetzt wird, muss der Server mindestens Version 2.3.3 unterstützen. EfaCloud 2.4.0_12 und höher werden empfohlen.</ShowNotice>
+        <ShowNotice lang="en">If you use efaCloud, make sure your server at least supports efaCloud Version 2.3.3. It is recommended to upgrade to EfaCloud 2.4.0_12 or above.</ShowNotice>
         <Changes lang="de">
             <ChangeItem>Neu: Aktualisierte Wettbewerbsbedingungen fuer LRV Brandenburg</ChangeItem>
             <ChangeItem>Bugfix: Kleine Fehlerkorrekturen</ChangeItem>

@@ -2391,6 +2391,19 @@ public class EfaBoathouseFrame extends BaseFrame implements IItemListener {
             return false;
         }
 
+        //EFA#134: check if session from the current logbook
+        if (item.boatStatus.getLogbook()!=null && 
+        		! item.boatStatus.getLogbook().equalsIgnoreCase(Daten.project.getCurrentLogbookEfaBoathouse())) {
+        	String s = International.getMessage("Die gewählte Fahrt zum Boot '{boot}' stammt aus einem anderen Fahrtenbuch: Fahrt {session}.", 
+        			item.boatStatus.getBoatText(), " #"+item.boatStatus.getEntryNo()+"/"+ item.boatStatus.getLogbook())+
+        			" "+International.getString("Die Fahrt kann nicht verändert werden.");
+            Logger.log(Logger.ERROR, Logger.MSG_ERR_NOLOGENTRYFORBOAT,
+                    s + " " + International.getString("Bitte korrigiere den Status des Bootes im Admin-Modus."));
+            Dialog.error(s);
+            return false;
+        }
+        
+        
         if (logbook.getLogbookRecord(item.boatStatus.getEntryNo()) == null) {
             String s = International.getMessage("Es gibt keine offene Fahrt im Fahrtenbuch mit dem Boot {boat} und LfdNr {lfdnr}.",
                     item.boatStatus.getBoatText(), (item.boatStatus.getEntryNo() != null ? item.boatStatus.getEntryNo().toString() : "null"))

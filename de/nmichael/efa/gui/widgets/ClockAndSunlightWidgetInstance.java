@@ -19,6 +19,7 @@ import de.nmichael.efa.Daten;
 import de.nmichael.efa.core.Plugins;
 import de.nmichael.efa.core.items.ItemTypeLongLat;
 import de.nmichael.efa.data.LogbookRecord;
+import de.nmichael.efa.data.types.DataTypeTime;
 import de.nmichael.efa.gui.BaseDialog;
 import de.nmichael.efa.gui.EfaBaseFrame;
 import de.nmichael.efa.gui.ImagesAndIcons;
@@ -293,7 +294,7 @@ public class ClockAndSunlightWidgetInstance extends WidgetInstance implements IW
         }
 
         public void run() {
-        	this.setName("MeteoAstroWidget.PanelUpdater");
+        	this.setName("ClockAndSunlightWidget.PanelUpdater"+" "+DataTypeTime.now().toString());
             String clockValue=null;
             String dateValue=null;
             String sunriseValue=null;

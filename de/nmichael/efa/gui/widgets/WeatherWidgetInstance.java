@@ -23,6 +23,7 @@ import org.json.JSONObject;
 
 import de.nmichael.efa.Daten;
 import de.nmichael.efa.data.LogbookRecord;
+import de.nmichael.efa.data.types.DataTypeTime;
 import de.nmichael.efa.gui.util.RoundedBorder;
 import de.nmichael.efa.gui.util.RoundedPanel;
 import de.nmichael.efa.util.EfaUtil;
@@ -108,7 +109,7 @@ public class WeatherWidgetInstance extends WidgetInstance implements IWidgetInst
         });
 
 	   	try {
-	   		weatherUpdater = new WeatherUpdater(roundPanel, this);
+	   		weatherUpdater = new WeatherUpdater(roundPanel, this, this.getCaption());
 	   		weatherUpdater.start();
             
         } catch(Exception e) {
@@ -256,10 +257,12 @@ public class WeatherWidgetInstance extends WidgetInstance implements IWidgetInst
         private WeatherWidgetInstance ww = null;
         private WeatherDataForeCast wdf = null;
         private long lastWeatherUpdate = 0;
+        private String theName="";
         
-        public WeatherUpdater(JPanel thePanel, WeatherWidgetInstance ww) {
+        public WeatherUpdater(JPanel thePanel, WeatherWidgetInstance ww, String theName) {
         	this.panel=thePanel;
         	this.ww = ww;
+        	this.theName=theName;
         }
 
         private boolean needsToUpdateWeather() {
@@ -267,7 +270,7 @@ public class WeatherWidgetInstance extends WidgetInstance implements IWidgetInst
         }
         
         public void run() {
-        	this.setName("WeatherWidget.WeatherUpdater");
+        	this.setName("WeatherWidget.WeatherUpdater"+" "+theName+" "+DataTypeTime.now().toString());
             
             while (keepRunning) {
             	

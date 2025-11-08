@@ -17,6 +17,7 @@ import javax.swing.text.html.HTMLEditorKit;
 
 import de.nmichael.efa.Daten;
 import de.nmichael.efa.data.LogbookRecord;
+import de.nmichael.efa.data.types.DataTypeTime;
 import de.nmichael.efa.util.EfaUtil;
 import de.nmichael.efa.util.International;
 import de.nmichael.efa.util.Logger;
@@ -131,7 +132,7 @@ public class HTMLWidgetInstance extends WidgetInstance implements IWidgetInstanc
         private volatile int updateIntervalInSeconds = 24*3600;
 
         public void run() {
-        	this.setName("HTMLWidget.HtmlUpdater");
+        	this.setName("HTMLWidget.HtmlUpdater"+" "+DataTypeTime.now().toString());
             while (keepRunning) {
                 try {
                     try {

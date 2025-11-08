@@ -20,6 +20,7 @@ import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
+import de.nmichael.efa.data.types.DataTypeTime;
 import de.nmichael.efa.util.EfaUtil;
 import de.nmichael.efa.util.Logger;
 
@@ -83,7 +84,7 @@ public class NewsMiniWidget {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
             }
-            this.setName("NewsUpdater");
+            this.setName("NewsUpdater"+" "+DataTypeTime.now().toString());
             while (keepRunning) {
                 
                 try {

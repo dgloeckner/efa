@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import de.nmichael.efa.data.LogbookRecord;
+import de.nmichael.efa.data.types.DataTypeTime;
 import de.nmichael.efa.gui.ImagesAndIcons;
 import de.nmichael.efa.util.EfaUtil;
 import de.nmichael.efa.util.Logger;
@@ -33,13 +34,16 @@ public class MultiWidgetContainerInstance extends WidgetInstance implements IWid
 
 	@Override
 	public void stop() {
-		// TODO Auto-generated method stub
-
+        try {
+        	// stopHTML also lets the thread die, and efaBths is responsible to set up a new thread.
+        	panelUpdater.stopRunning();
+        } catch(Exception eignore) {
+            // nothing to do, might not be initialized
+        }
 	}
 
 	@Override
 	public void construct() {
-		Logger.log(Logger.DEBUG, "Multipanel Construct");
 
 		 mainPanel = new JPanel();
 		 mainPanel.setName("MultiWidget-MainPanel");
@@ -138,7 +142,7 @@ public class MultiWidgetContainerInstance extends WidgetInstance implements IWid
         }
 
         public void run() {
-        	this.setName("MultiWidgetContainer.MultiWidgetPanelUpdater");
+        	this.setName("MultiWidgetContainer.MultiWidgetPanelUpdater"+" "+DataTypeTime.now().toString());
 
             while (keepRunning) {
             	

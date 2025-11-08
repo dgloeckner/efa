@@ -87,8 +87,8 @@ import de.nmichael.efa.gui.dataedit.StatisticsListDialog;
 import de.nmichael.efa.gui.util.EfaBoathouseBackgroundTask;
 import de.nmichael.efa.gui.util.EfaMenuButton;
 import de.nmichael.efa.gui.util.EfaMouseListener;
-import de.nmichael.efa.gui.widgets.ClockMiniWidget;
 import de.nmichael.efa.gui.widgets.IWidget;
+import de.nmichael.efa.gui.widgets.MultiWidgetContainer;
 import de.nmichael.efa.gui.widgets.NewsMiniWidget;
 import de.nmichael.efa.gui.widgets.Widget;
 import de.nmichael.efa.util.Dialog;
@@ -98,7 +98,49 @@ import de.nmichael.efa.util.International;
 import de.nmichael.efa.util.LogString;
 import de.nmichael.efa.util.Logger;
 import de.nmichael.efa.util.Mnemonics;
-
+/**
+ * EfaBoathouseFrame layout
+ * 
+ * -------------------------------------------------|
+ *      widgetTopPanel (within northpanel)          |
+ * -------------------------------------------------|
+ *       |          |           |          |        |               
+ * widget| westpanel| center    | eastpanel| widget |               
+ * left  |          | panel     |          | right  |               
+ * Panel | center:  |           | center:  | panel  |               
+ *       | boats    |           | boatson  |        |               
+ * within| available|           | waterlist| within |               
+ * west  | list     |           | +        | east   |               
+ * panel |          |           | boats    | panel  |               
+ *       |          |           | unavail- |        |               
+ *       |          |           | ablelist |        |               
+ * --------------------------------------------------
+ *     widgetBottomPanel (within southpanel)        |
+ * --------------------------------------------------
+ * 
+ * centerpanel:
+ * contains a gridbaglayout.
+ *    - row 1: logolabel
+ *    - Row 2..n: buttons    (where n=99, enough space for additional buttons, empty rows are not shown in gridbaglayout)
+ *    - Row 100..200: widgetcenterpanel (usually only one row used)
+ *    		widgetcenter uses borderlayout --> contains a north, center, south order
+ *    			first widget with position=center --> widgetCenter.North
+ *    			second widget with position=center --> widgetCenter.center
+ *    		    second+x widget with position= center --> widgetCenter.south
+ *              (so there are at most three widgets positionable in the center)
+ *    - Row 200: multiwidgetCenterPanel --> contains north, center,south
+ *    		this panel only contains the multiWidget widget. 
+ *          it is only shown if any other widget's location is set to "MultiWidget"
+ *          and it is positioned on row 200, as multiwidget should always be bottommost widget,
+ *          e.g. below the clock.
+ *          
+ * southpanel:
+ *     - Center: WidgetBottomPanel
+ *     - South: 
+ *     	  - statusLabel (for Boat info)
+ *        - news label (for red ticker info) 
+ *          
+ */
 public class EfaBoathouseFrame extends BaseFrame implements IItemListener {
 
 	private static final long serialVersionUID = -382107679365085355L;
@@ -168,14 +210,15 @@ public class EfaBoathouseFrame extends BaseFrame implements IItemListener {
     JButton clubworkButton = new JButton();
 
     // Widgets
-    ClockMiniWidget clock;
     NewsMiniWidget news;
     Vector<IWidget> widgets;
+    MultiWidgetContainer multiWidget;
     JPanel widgetTopPanel = new JPanel();
     JPanel widgetBottomPanel = new JPanel();
     JPanel widgetLeftPanel = new JPanel();
     JPanel widgetRightPanel = new JPanel();
     JPanel widgetCenterPanel = new JPanel();
+    JPanel widgetMultiWidgetCenterPanel= new JPanel();
 
     // South Panel GUI Items
     JLabel statusLabel = new JLabel();
@@ -362,7 +405,6 @@ public class EfaBoathouseFrame extends BaseFrame implements IItemListener {
 
     public void updateGuiElements() {
         updateGuiWidgets();
-        updateGuiClock();
         updateGuiNews();
         updateGuiButtonText();
         updateGuiLogo();
@@ -374,12 +416,14 @@ public class EfaBoathouseFrame extends BaseFrame implements IItemListener {
         widgetLeftPanel.setLayout(new BorderLayout());
         widgetRightPanel.setLayout(new BorderLayout());
         widgetCenterPanel.setLayout(new BorderLayout());
+        widgetMultiWidgetCenterPanel.setLayout(new BorderLayout());
 
         northPanel.add(widgetTopPanel, BorderLayout.CENTER);
         southPanel.add(widgetBottomPanel, BorderLayout.CENTER);
         westPanel.add(widgetLeftPanel, BorderLayout.WEST);
         eastPanel.add(widgetRightPanel, BorderLayout.EAST);
         centerPanel.add(widgetCenterPanel, new GridBagConstraints(1, 100, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 10, 10, 10), 0, 0));
+        centerPanel.add(widgetMultiWidgetCenterPanel, new GridBagConstraints(1, 200, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0,0,0,0), 0, 0));
 
         mainPanel.add(westPanel, BorderLayout.WEST);
         mainPanel.add(eastPanel, BorderLayout.EAST);
@@ -614,6 +658,7 @@ public class EfaBoathouseFrame extends BaseFrame implements IItemListener {
         boatsNotAvailableList.displayOnGui(this, boatsNotAvailablePanel, BorderLayout.SOUTH);
         eastPanel.setLayout(new BorderLayout());
         eastPanel.add(boatsNotAvailablePanel, BorderLayout.CENTER);
+       
     }
 
 	private void iniGuiHeaderColors() {
@@ -669,9 +714,9 @@ public class EfaBoathouseFrame extends BaseFrame implements IItemListener {
     private void iniGuiCenterPanel() {
         updateGuiLogo();
         iniGuiButtons();
-        updateGuiClock();
 
         centerPanel.setLayout(new GridBagLayout());
+        int centerPanelYPos=0;
         int logoTop = (int) (10.0f * (Dialog.getFontSize() < 10 ? 12 : Dialog.getFontSize()) / Dialog.getDefaultFontSize());
         int logoBottom = 5;
         if (Daten.efaConfig.getValueEfaDirekt_startMaximized() && Daten.efaConfig.getValueEfaDirekt_vereinsLogo().length() > 0) {
@@ -680,13 +725,24 @@ public class EfaBoathouseFrame extends BaseFrame implements IItemListener {
                 logoBottom = 0;
             }
         }
-        centerPanel.add(logoLabel, new GridBagConstraints(1, 0, 1, 2, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(logoTop, 0, logoBottom, 0), 0, 0));
+        centerPanel.add(logoLabel, new GridBagConstraints(1, centerPanelYPos++, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(logoTop, 0, logoBottom, 0), 0, 0));
         int fahrtbeginnTop = (int) (10.0f * (Dialog.getFontSize() < 10 ? 12 : Dialog.getFontSize()) / Dialog.getDefaultFontSize());
         
+        // we introduce a new buttonpanel. this is neccessary as we have some requirements for the buttons
+        // A)buttons shall all have the same width
+        //    - so that the button with the longest text = longest width defines the width of the buttons in the center
+        // B) but the buttons' width shall not be defined by the multiWidgetWidth.
+        //
+        // so we use a buttonPanel which ensures A), but the buttonPanel is added to centerPanel 
+        // as a not-growing component by using gridbagConstraints.
+        
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new GridBagLayout());
+        
+
         // startSessionButton and startSessionButtonMultiple shall be on the same line, 
         // and take the same width as the other buttons. So we create a panel containing
-        // startSessionButton and startSessionButtonMultiple. The latter gets hidden if it shall not be used.
-        
+        // startSessionButton and startSessionButtonMultiple. The latter gets hidden if it shall not be used.        
         JPanel myPanel=new JPanel();
     	myPanel.setBorder(BorderFactory.createEmptyBorder(0,0,0,0));
     	myPanel.setLayout(new GridBagLayout());
@@ -695,9 +751,9 @@ public class EfaBoathouseFrame extends BaseFrame implements IItemListener {
     	myPanel.add(startSessionButtonMultiple, new GridBagConstraints(9, 1, 1, 1, 0.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new Insets(0, 2, 0, 0), 0, 0));
     	startSessionButtonMultiple.setVisible(Daten.efaConfig.getValueEfaDirekt_MultisessionSupportLateEntry());    
 
-    	centerPanel.add(myPanel, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(fahrtbeginnTop, 0, 0, 0), 0, 0));        
-        centerPanel.add(finishSessionButton, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
-        centerPanel.add(abortSessionButton, new GridBagConstraints(1, 4, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(10, 0, 0, 0), 0, 0));
+    	buttonPanel.add(myPanel, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(fahrtbeginnTop, 0, 0, 0), 0, 0));        
+    	buttonPanel.add(finishSessionButton, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
+    	buttonPanel.add(abortSessionButton, new GridBagConstraints(1, 4, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(10, 0, 0, 0), 0, 0));
 
         // same for lateEntryButton and lateEntryButtonMultiple
     	myPanel=new JPanel();
@@ -708,19 +764,21 @@ public class EfaBoathouseFrame extends BaseFrame implements IItemListener {
     	myPanel.add(lateEntryButtonMultiple, new GridBagConstraints(9, 1, 1, 1, 0.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new Insets(0, 2, 0, 0), 0, 0));
     	lateEntryButtonMultiple.setVisible(Daten.efaConfig.getValueEfaDirekt_MultisessionSupportLateEntry());    
 
-    	centerPanel.add(myPanel, new GridBagConstraints(1, 5, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(10, 0, 0, 0), 0, 0));        
+    	buttonPanel.add(myPanel, new GridBagConstraints(1, 5, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(10, 0, 0, 0), 0, 0));        
         
-        centerPanel.add(clubworkButton, new GridBagConstraints(1, 6, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(10, 0, 0, 0), 0, 0));
-        centerPanel.add(boatReservationButton, new GridBagConstraints(1, 7, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(10, 0, 0, 0), 0, 0));
-        centerPanel.add(showLogbookButton, new GridBagConstraints(1, 8, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(10, 0, 0, 0), 0, 0));
-        centerPanel.add(statisticsButton, new GridBagConstraints(1, 9, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
-        centerPanel.add(messageToAdminButton, new GridBagConstraints(1, 10, 1, 1, 0.0, 0.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL, new Insets(10, 0, 0, 0), 0, 0));
-        centerPanel.add(adminButton, new GridBagConstraints(1, 11, 1, 1, 0.0, 0.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL, new Insets(10, 0, 0, 0), 0, 0));
-        centerPanel.add(specialButton, new GridBagConstraints(1, 12, 1, 1, 0.0, 0.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL, new Insets(10, 0, 0, 0), 0, 0));
-        centerPanel.add(helpButton, new GridBagConstraints(1, 13, 1, 1, 0.0, 0.0, GridBagConstraints.SOUTH, GridBagConstraints.NONE, new Insets(10, 0, 0, 0), 0, 0));
-        centerPanel.add(efaButton, new GridBagConstraints(1, 14, 1, 1, 0.0, 0.0, GridBagConstraints.SOUTH, GridBagConstraints.NONE, new Insets(10, 0, 0, 0), 0, 0));
-        centerPanel.add(clock.getGuiComponent(), new GridBagConstraints(1, 15, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(10, 10, 10, 10), 0, 0));
-        
+    	buttonPanel.add(clubworkButton, new GridBagConstraints(1, 6, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(10, 0, 0, 0), 0, 0));
+    	buttonPanel.add(boatReservationButton, new GridBagConstraints(1, 7, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(10, 0, 0, 0), 0, 0));
+    	buttonPanel.add(showLogbookButton, new GridBagConstraints(1, 8, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(10, 0, 0, 0), 0, 0));
+    	buttonPanel.add(statisticsButton, new GridBagConstraints(1, 9, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
+    	buttonPanel.add(messageToAdminButton, new GridBagConstraints(1, 10, 1, 1, 0.0, 0.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL, new Insets(10, 0, 0, 0), 0, 0));
+    	buttonPanel.add(adminButton, new GridBagConstraints(1, 11, 1, 1, 0.0, 0.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL, new Insets(10, 0, 0, 0), 0, 0));
+    	buttonPanel.add(specialButton, new GridBagConstraints(1, 12, 1, 1, 0.0, 0.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL, new Insets(10, 0, 0, 0), 0, 0));
+    	buttonPanel.add(helpButton, new GridBagConstraints(1, 13, 1, 1, 0.0, 0.0, GridBagConstraints.SOUTH, GridBagConstraints.NONE, new Insets(10, 0, 0, 0), 0, 0));
+    	buttonPanel.add(efaButton, new GridBagConstraints(1, 14, 1, 1, 0.0, 0.0, GridBagConstraints.SOUTH, GridBagConstraints.NONE, new Insets(10, 0, 0, 0), 0, 0));
+
+    	//add the buttonpanel, but do not let it grow with other elements in the center panel.
+    	centerPanel.add(buttonPanel, new GridBagConstraints(1,centerPanelYPos++,1,1,0.0,0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE,new Insets(0,0,0,0),0,0));
+    	
         EfaUtil.handleButtonOpaqueForLookAndFeels(startSessionButton);
         EfaUtil.handleButtonOpaqueForLookAndFeels(startSessionButtonMultiple);
         EfaUtil.handleButtonOpaqueForLookAndFeels(finishSessionButton);
@@ -754,11 +812,13 @@ public class EfaBoathouseFrame extends BaseFrame implements IItemListener {
                 logoLabel.setMaximumSize(new Dimension(logoLabel.getWidth(),logoLabel.getHeight()));
                 logoLabel.setHorizontalAlignment(SwingConstants.CENTER);
                 logoLabel.setHorizontalTextPosition(SwingConstants.CENTER);
+                logoLabel.setVisible(true);
             } catch (Exception e) {
                 Logger.logdebug(e);
             }
         } else {
             logoLabel.setIcon(null);
+            logoLabel.setVisible(false);
         }
     }
 
@@ -934,13 +994,6 @@ public class EfaBoathouseFrame extends BaseFrame implements IItemListener {
         }
     }
 
-    private void updateGuiClock() {
-        if (clock == null) {
-            clock = new ClockMiniWidget();
-        }
-        clock.setVisible(Daten.efaConfig.getValueEfaDirekt_showUhr());
-    }
-
     private void updateGuiNews() {
         if (news == null) {
             news = new NewsMiniWidget();
@@ -960,6 +1013,7 @@ public class EfaBoathouseFrame extends BaseFrame implements IItemListener {
             widgetLeftPanel.removeAll();
             widgetRightPanel.removeAll();
             widgetCenterPanel.removeAll();
+            widgetMultiWidgetCenterPanel.removeAll();
             
             if (Daten.efaConfig.getWidgets() == null) {
                 return;
@@ -974,16 +1028,27 @@ public class EfaBoathouseFrame extends BaseFrame implements IItemListener {
             } catch (Exception e) {
                 Logger.logdebug(e);
             }
-            widgets = new Vector<IWidget>();
 
+            // Initialize MultiWidget
+            multiWidget = new MultiWidgetContainer();
+            IItemType multiEnabled = Daten.efaConfig.getExternalGuiItem(multiWidget.getParameterName(Widget.PARAM_ENABLED));
+            if (multiEnabled != null && multiEnabled instanceof ItemTypeBoolean && ((ItemTypeBoolean) multiEnabled).getValue()) {
+                IItemType[] params = multiWidget.getParameters();
+                for (int j = 0; j < params.length; j++) {
+                    params[j].parseValue(Daten.efaConfig.getExternalGuiItem(params[j].getName()).toString());
+                }
+            }
+
+            
             // find all enabled widgets
-            Vector<IWidget> allWidgets = Widget.getAllWidgets();
+            widgets = new Vector<IWidget>();
+            Vector<IWidget> allWidgets = Widget.getAllWidgets(false);
             for (int i = 0; allWidgets != null && i < allWidgets.size(); i++) {
                 IWidget w = allWidgets.get(i);
                 IItemType enabled = Daten.efaConfig.getExternalGuiItem(w.getParameterName(Widget.PARAM_ENABLED));
                 if (enabled != null && enabled instanceof ItemTypeBoolean && ((ItemTypeBoolean) enabled).getValue()) {
                     // set parameters for this enabled widget according to configuration
-                    IItemType[] params = w.getParameters();
+                	IItemType[] params = w.getParameters();
                     for (int j = 0; j < params.length; j++) {
                         params[j].parseValue(Daten.efaConfig.getExternalGuiItem(params[j].getName()).toString());
                     }
@@ -991,29 +1056,43 @@ public class EfaBoathouseFrame extends BaseFrame implements IItemListener {
                 }
             }
 
+        	multiWidget.show(widgetMultiWidgetCenterPanel, BorderLayout.SOUTH, false);   
+            boolean multiWidgetUse=false;
             // show all enabled widgets
             for (int i = 0; i < widgets.size(); i++) {
                 IWidget w = widgets.get(i);
                 String position = w.getPosition();
                 if (IWidget.POSITION_TOP.equals(position)) {
-                    w.show(widgetTopPanel, BorderLayout.CENTER);
+                    w.show(widgetTopPanel, BorderLayout.CENTER, false);
                 }
                 if (IWidget.POSITION_BOTTOM.equals(position)) {
-                    w.show(widgetBottomPanel, BorderLayout.CENTER);
+                    w.show(widgetBottomPanel, BorderLayout.CENTER, false);
                 }
                 if (IWidget.POSITION_LEFT.equals(position)) {
-                    w.show(widgetLeftPanel, BorderLayout.CENTER);
+                    w.show(widgetLeftPanel, BorderLayout.CENTER, false);
                 }
                 if (IWidget.POSITION_RIGHT.equals(position)) {
-                    w.show(widgetRightPanel, BorderLayout.CENTER);
+                    w.show(widgetRightPanel, BorderLayout.CENTER, false);
                 }
                 if (IWidget.POSITION_CENTER.equals(position)) {
-                    w.show(widgetCenterPanel, BorderLayout.CENTER);
+                    w.show(widgetCenterPanel, BorderLayout.CENTER, false);
+                }
+                if (IWidget.POSITION_MULTIWIDGET.equals(position)) {
+                	JPanel innerPanel = new JPanel(new BorderLayout());
+                	w.show(innerPanel, BorderLayout.CENTER,true);
+                	multiWidget.addWidget(innerPanel);
+                	multiWidgetUse=true;
                 }
             }
+            widgets.add(multiWidget);            
+            if (multiWidgetUse==false) {
+            	multiWidget.getComponent().setVisible(false);
+            }
+            
         } catch (Exception e) {
             Logger.logdebug(e);
         }
+
     }
 
     private void iniGuiNorthPanel() {
@@ -1811,6 +1890,7 @@ public class EfaBoathouseFrame extends BaseFrame implements IItemListener {
             if (Logger.isTraceOn(Logger.TT_GUI, 8)) {
                 Logger.log(Logger.DEBUG, Logger.MSG_GUI_DEBUGGUI, "updateBoatLists(" + listChanged + ") - done");
             }
+            this.revalidate(); // refresh the whole screen
         } catch (Exception e) {
             Logger.logdebug(e);
         } finally {
@@ -2218,7 +2298,7 @@ public class EfaBoathouseFrame extends BaseFrame implements IItemListener {
               personsAvailableList.displayOnGui(this, boatsAvailablePanel, BorderLayout.CENTER);
             }
             boatsAvailablePanel.setPreferredSize(size);
-            this.validate();
+            this.revalidate();
             this.repaint(); // ist erforderlich, damit auch mnemonics richtig geschrieben werden.
             
             updateBoatLists(true,true);

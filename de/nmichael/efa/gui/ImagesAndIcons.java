@@ -131,7 +131,12 @@ public class ImagesAndIcons {
 	public static final String IMAGE_MENU_TRANSLATE = "menu_translate.png";
 	public static final String IMAGE_MENU_UPDATE = "menu_update.png";
 	public static final String IMAGE_MENU_WATERS = "menu_waters.png";
+	public static final String IMAGE_SUNRISE = "sunrise.png";
+	public static final String IMAGE_SUNSET = "sunset.png";
+	public static final String IMAGE_WIDGET_ARROW_LEFT = "widget_arrow_left.png";
+	public static final String IMAGE_WIDGET_ARROW_RIGHT = "widget_arrow_right.png";
 
+	
     public static ImageIcon getIcon(String name) {
         try {
             if (name.indexOf("/") < 0) {

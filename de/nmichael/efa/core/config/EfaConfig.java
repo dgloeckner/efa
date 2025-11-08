@@ -100,8 +100,7 @@ public class EfaConfig extends StorageObject implements IItemFactory {
 	public final String CATEGORY_KANUEFB = "%16%" + International.onlyFor("Kanu-eFB", "de");
 	public final String CATEGORY_LOCALE = "%17%" + International.getStringWithoutAnyEscaping("Sprache & Region");
 	public final String CATEGORY_WIDGETS = "%18%" + International.getString("Widgets");
-	public final String CATEGORY_WIDGET_CLOCK = "%181%" + International.getString("Uhr");
-	public final String CATEGORY_WIDGET_NEWS = "%182%" + International.getString("Ticker");
+	public final String CATEGORY_WIDGET_NEWS = "%9%" + International.getString("Ticker");
 	public final String CATEGORY_DATAACCESS = "%19%" + International.getString("Daten");
 	public final String CATEGORY_DATAXML = "%191%" + International.getString("lokale Dateien");
 	public final String CATEGORY_DATAREMOTE = "%192%" + Daten.EFA_REMOTE;
@@ -340,6 +339,11 @@ public class EfaConfig extends StorageObject implements IItemFactory {
 	private ItemTypeColor efaGuiToolTipHeaderBackground; 
 	private ItemTypeColor efaGuiToolTipHeaderForeground;
 	
+	private ItemTypeColor efaGuiErrorBackground; 
+	private ItemTypeColor efaGuiErrorForeground;
+	private ItemTypeColor efaGuiErrorHeaderBackground; 
+	private ItemTypeColor efaGuiErrorHeaderForeground;
+	
 	private ItemTypeStringList efaDirekt_bnrMsgToAdminDefaultRecipient;
 	private ItemTypeBoolean efaDirekt_bnrError_admin;
 	private ItemTypeBoolean efaDirekt_bnrError_bootswart;
@@ -436,9 +440,15 @@ public class EfaConfig extends StorageObject implements IItemFactory {
 
 	private static Color standardToolTipBackgroundColor = new Color(224,237,249);
 	private static Color standardToolTipForegroundColor = new Color(21,65,106);
-
+	
 	private static Color standardToolTipHeaderBackgroundColor = new Color(250,252,254);
 	private static Color standardToolTipHeaderForegroundColor = standardToolTipForegroundColor;	
+
+	private static Color standardErrorBackgroundColor = new Color(249,224,224);
+	private static Color standardErrorForegroundColor = new Color(148,29,29);
+	
+	private static Color standardErrorHeaderBackgroundColor = new Color(254,250,250);
+	private static Color standardErrorHeaderForegroundColor = standardErrorForegroundColor;	
 	
 	
 	// private internal data
@@ -976,6 +986,33 @@ public class EfaConfig extends StorageObject implements IItemFactory {
 					EfaUtil.getColor(standardToolTipHeaderForegroundColor), IItemType.TYPE_PUBLIC,
 					BaseTabbedDialog.makeCategory(CATEGORY_COMMON, CATEGORY_GUI),
 					International.getString("Tooltipp-Überschriften Textfarbe"), false));					
+			
+
+			addHeader("efaGuiError", IItemType.TYPE_PUBLIC,
+					BaseTabbedDialog.makeCategory(CATEGORY_COMMON, CATEGORY_GUI),
+					International.getString("Farben für Fehlermeldungen"), 3);
+			
+			addParameter(efaGuiErrorBackground = new ItemTypeColor("efaGuiErrorBackground",
+					EfaUtil.getColor(standardErrorBackgroundColor),
+					EfaUtil.getColor(standardErrorBackgroundColor), IItemType.TYPE_PUBLIC,
+					BaseTabbedDialog.makeCategory(CATEGORY_COMMON, CATEGORY_GUI),
+					International.getString("Fehler Hintergrundfarbe"), false));
+			addParameter(efaGuiErrorForeground = new ItemTypeColor("efaGuiToolTipForeground",
+					EfaUtil.getColor(standardErrorForegroundColor),
+					EfaUtil.getColor(standardErrorForegroundColor), IItemType.TYPE_PUBLIC,
+					BaseTabbedDialog.makeCategory(CATEGORY_COMMON, CATEGORY_GUI),
+					International.getString("Fehler Textfarbe"), false));		
+
+			addParameter(efaGuiErrorHeaderBackground = new ItemTypeColor("efaGuiErrorHeaderBackground",
+					EfaUtil.getColor(standardErrorHeaderBackgroundColor),
+					EfaUtil.getColor(standardErrorHeaderBackgroundColor), IItemType.TYPE_PUBLIC,
+					BaseTabbedDialog.makeCategory(CATEGORY_COMMON, CATEGORY_GUI),
+					International.getString("Fehler-Überschriften Hintergrundfarbe"), false));
+			addParameter(efaGuiErrorHeaderForeground = new ItemTypeColor("efaGuiErrorHeaderForeground",
+					EfaUtil.getColor(standardErrorHeaderForegroundColor),
+					EfaUtil.getColor(standardErrorHeaderForegroundColor), IItemType.TYPE_PUBLIC,
+					BaseTabbedDialog.makeCategory(CATEGORY_COMMON, CATEGORY_GUI),
+					International.getString("Fehler-Überschriften Textfarbe"), false));					
 			
 			addHeader("efaGuiOtherFont", IItemType.TYPE_PUBLIC,
 					BaseTabbedDialog.makeCategory(CATEGORY_COMMON, CATEGORY_GUI),
@@ -1776,9 +1813,7 @@ public class EfaConfig extends StorageObject implements IItemFactory {
 					"Fahrtbeschreibung für EFB um Fahrtart erweitern"));
 			
 			// ============================= WIDGETS =============================
-			addParameter(efaDirekt_showUhr = new ItemTypeBoolean("WidgetClockEnabled", true, IItemType.TYPE_PUBLIC,
-					BaseTabbedDialog.makeCategory(CATEGORY_BOATHOUSE, CATEGORY_WIDGETS, CATEGORY_WIDGET_CLOCK),
-					International.getMessage("{item} anzeigen", International.getString("Uhr"))));
+
 			addParameter(efaDirekt_showNews = new ItemTypeBoolean("WidgetNewsEnabled", true, IItemType.TYPE_PUBLIC,
 					BaseTabbedDialog.makeCategory(CATEGORY_BOATHOUSE, CATEGORY_WIDGETS, CATEGORY_WIDGET_NEWS),
 					International.getMessage("{item} anzeigen", International.getString("News"))));
@@ -1788,9 +1823,9 @@ public class EfaConfig extends StorageObject implements IItemFactory {
 			addParameter(efaDirekt_newsScrollSpeed = new ItemTypeInteger("WidgetNewsScrollSpeed", 250, 100,
 					Integer.MAX_VALUE, IItemType.TYPE_EXPERT,
 					BaseTabbedDialog.makeCategory(CATEGORY_BOATHOUSE, CATEGORY_WIDGETS, CATEGORY_WIDGET_NEWS),
-					"Scroll Speed"));
+					"Scroll Speed"));			
 
-			widgets = Widget.getAllWidgets();
+			widgets = Widget.getAllWidgets(true);
 			for (int i = 0; widgets != null && i < widgets.size(); i++) {
 				IWidget w = widgets.get(i);
 				IItemType[] params = w.getParameters();
@@ -3129,6 +3164,26 @@ public class EfaConfig extends StorageObject implements IItemFactory {
 		Color myColor = efaGuiToolTipHeaderForeground.getColor();
 		return (myColor != null ? myColor : standardToolTipHeaderForegroundColor);
 	}
+
+	public Color getErrorBackgroundColor() {
+		Color myColor = efaGuiErrorBackground.getColor();
+		return (myColor != null ? myColor : standardErrorBackgroundColor);
+	}
+
+	public Color getErrorForegroundColor() {
+		Color myColor = efaGuiErrorForeground.getColor();
+		return (myColor != null ? myColor : standardErrorForegroundColor);
+	}
+
+	public Color getErrorHeaderBackgroundColor() {
+		Color myColor = efaGuiErrorHeaderBackground.getColor();
+		return (myColor != null ? myColor : standardErrorHeaderBackgroundColor);
+	}
+
+	public Color getErrorHeaderForegroundColor() {
+		Color myColor = efaGuiErrorHeaderForeground.getColor();
+		return (myColor != null ? myColor : standardErrorHeaderForegroundColor);
+	}	
 	
 	public Boolean getHeaderUseHighlightColor() {
 		return efaHeaderUseHighlightColor.getValue();

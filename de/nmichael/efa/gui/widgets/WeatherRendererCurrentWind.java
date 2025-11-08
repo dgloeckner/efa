@@ -15,7 +15,7 @@ import de.nmichael.efa.util.International;
 
 public class WeatherRendererCurrentWind extends WeatherRenderer {
 
-	public static void renderWeather(WeatherDataForeCast wdf, JPanel roundPanel, WeatherWidget ww) {
+	public static void renderWeather(WeatherDataForeCast wdf, JPanel roundPanel, WeatherWidgetInstance ww) {
 	
 		JLabel curWeather_temp = new JLabel();
 		JLabel curWeather_icon = new JLabel();
@@ -113,13 +113,13 @@ public class WeatherRendererCurrentWind extends WeatherRenderer {
 		curWeather_wind.setText(International.getString("Wind") + ": "
 				+ International.getString(wdf.getCurrentWeather().getWindDirectionText()) + " "
 				+ International.getString("mit") + " " + wdf.getCurrentWeather().getWindSpeed()
-				+ ww.getWeatherSpeedScale());
+				+ ww.getSpeedScale());
 		curWeather_wind.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
 		curWeather_wind.setHorizontalTextPosition(SwingConstants.CENTER);
 
 		// Build the main panel view
 
-		roundPanel.add(getLocationHeader(ww), new GridBagConstraints(0, 0, 3, 1, 1.0, 0.0, GridBagConstraints.CENTER,
+		roundPanel.add(getLocationHeader(ww.getCaption()), new GridBagConstraints(0, 0, 3, 1, 1.0, 0.0, GridBagConstraints.CENTER,
 			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));		
 				
 		roundPanel.add(curWeather_temp, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
@@ -129,7 +129,7 @@ public class WeatherRendererCurrentWind extends WeatherRenderer {
 				GridBagConstraints.BOTH, new Insets(0, 0, 0, 4), 0, 0));
 
 		roundPanel.add(pnlMinMaxSunRain, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0, GridBagConstraints.EAST,
-				GridBagConstraints.BOTH, new Insets(0, 4, 0, 4), 0, 0));
+				GridBagConstraints.BOTH, new Insets(0, 4, 0, 2), 0, 0));
 
 		roundPanel.add(curWeather_wind, new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
 				GridBagConstraints.VERTICAL, new Insets(0, 2, 0, 2), 0, 0));

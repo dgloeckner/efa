@@ -33,22 +33,26 @@ public abstract class WeatherRenderer {
 		return ret;
 	}	
 	
-	protected static JPanel getLocationHeader(WeatherWidget ww) {
+	protected static JPanel getLocationHeader(String caption, Boolean isError) {
 		RoundedPanel titlePanel = new RoundedPanel();
 		titlePanel.setLayout(new GridBagLayout());
-		titlePanel.setBackground(Daten.efaConfig.getToolTipHeaderBackgroundColor());
-		titlePanel.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
+		titlePanel.setBackground(isError ? Daten.efaConfig.getErrorBackgroundColor() : Daten.efaConfig.getToolTipHeaderBackgroundColor());
+		titlePanel.setForeground(isError ? Daten.efaConfig.getErrorForegroundColor() : Daten.efaConfig.getToolTipHeaderForegroundColor());
 	
 		JLabel titleLabel = new JLabel();
-		titleLabel.setText(ww.getWeatherCaption());
+		titleLabel.setText(caption);
 		titleLabel.setHorizontalTextPosition(SwingConstants.CENTER);
 		titleLabel.setForeground(titlePanel.getForeground());
 		titleLabel.setFont(titleLabel.getFont().deriveFont(Font.BOLD));
-	
+		
 		titlePanel.add(titleLabel, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
 				GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
 		
 		return titlePanel;
 	}	
+	
+	protected static JPanel getLocationHeader(String caption) {
+		return getLocationHeader(caption, false);
+	}
 	
 }

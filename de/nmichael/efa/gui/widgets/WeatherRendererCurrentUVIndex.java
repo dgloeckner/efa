@@ -3,18 +3,23 @@ package de.nmichael.efa.gui.widgets;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.text.DecimalFormat;
 
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 import de.nmichael.efa.Daten;
 import de.nmichael.efa.util.International;
+import de.nmichael.efa.util.Logger;
 
 public class WeatherRendererCurrentUVIndex extends WeatherRenderer {
 
-	public static void renderWeather(WeatherDataForeCast wdf, JPanel roundPanel, WeatherWidget ww) {
+	public static void renderWeather(WeatherDataForeCast wdf, JPanel roundPanel, WeatherWidgetInstance ww) {
 		
 
 		JLabel curWeather_temp = new JLabel();
@@ -135,13 +140,40 @@ public class WeatherRendererCurrentUVIndex extends WeatherRenderer {
 		curWeather_wind.setText(International.getString("Wind") + ": "
 				+ International.getString(wdf.getCurrentWeather().getWindDirectionText()) + " "
 				+ International.getString("mit") + " " + wdf.getCurrentWeather().getWindSpeed()
-				+ ww.getWeatherSpeedScale());
+				+ ww.getSpeedScale());
 		curWeather_wind.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
 		curWeather_wind.setHorizontalTextPosition(SwingConstants.CENTER);
 		
+		// Klick auf das Icon wird an Parent weitergeleitet
+        curWeather_icon.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Simuliere Klick auf Parent
+            	try {
+                MouseEvent parentClick = new MouseEvent(
+                    roundPanel.getParent(),
+                    MouseEvent.MOUSE_CLICKED,
+                    System.currentTimeMillis(),
+                    e.getModifiersEx(),
+                    e.getX() + curWeather_icon.getX(),
+                    e.getY() + curWeather_icon.getY(),
+                    e.getClickCount(),
+                    e.isPopupTrigger(),
+                    e.getButton()
+                );
+                for (MouseListener ml : roundPanel.getParent().getMouseListeners()) {
+                    ml.mouseClicked(parentClick);
+                }
+            	} catch (Exception e1) {
+            		//should not occurr..
+            		Logger.logdebug(e1);
+            	}
+            }
+        });
+		
 		// Build the main panel view
 
-		roundPanel.add(getLocationHeader(ww), new GridBagConstraints(0, 0, 3, 1, 1.0, 0.0, GridBagConstraints.CENTER,
+		roundPanel.add(getLocationHeader(ww.getCaption()), new GridBagConstraints(0, 0, 3, 1, 1.0, 0.0, GridBagConstraints.CENTER,
 			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));		
 				
 		//first row

@@ -36,6 +36,7 @@ import de.nmichael.efa.gui.BaseDialog;
 import de.nmichael.efa.gui.BaseFrame;
 import de.nmichael.efa.gui.ImagesAndIcons;
 import de.nmichael.efa.gui.util.RoundedBorder;
+import de.nmichael.efa.gui.util.RoundedLabel;
 import de.nmichael.efa.gui.util.RoundedPanel;
 import de.nmichael.efa.util.Dialog;
 import de.nmichael.efa.util.EfaUtil;
@@ -282,8 +283,11 @@ public class ItemTypeItemList extends ItemType {
         for (int i=0; i<items.size(); i++) {
             JLabel label = null;
             if (repeatTitle) {
-                label = new JLabel();
-                Mnemonics.setLabel(dlg, label, getShortDescription() + " [" + (i + 1) + "]: ");
+                label = new RoundedLabel();
+                label.setBackground(Daten.efaConfig.getTableHeaderBackgroundColor());
+                label.setBorder(new RoundedBorder(Daten.efaConfig.getTableHeaderHeaderColor()));
+                label.setOpaque(true);
+                Mnemonics.setLabel(dlg, label, " "+getShortDescription() + " [" + (i + 1) + "]: ");
                 if (type == IItemType.TYPE_EXPERT) {
                     label.setForeground(Color.red);
                 }
@@ -304,7 +308,7 @@ public class ItemTypeItemList extends ItemType {
                         GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(padYbetween, padXbefore, 0, 0), 0, 0));
             }
             panel.add(delButton, new GridBagConstraints(x+xForAddDelButtons, y+myY, 1, 1, 0.0, 0.0,
-                    GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 2, 0, 0), 0, 0));
+                    GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets((label==null ? 0 : padYbetween), 2, 0, 0), 0, 0));
             delButtons.put(delButton, i);
             lastItemStart = (label != null ? label : delButton);
             if (repeatTitle) {

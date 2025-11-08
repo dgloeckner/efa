@@ -16,7 +16,7 @@ import de.nmichael.efa.util.International;
 public class WeatherRendererError extends WeatherRenderer {
 	
 	
-	public static void renderWeather(WeatherDataForeCast wdf, JPanel roundPanel, WeatherWidget ww) {
+	public static void renderWeather(WeatherDataForeCast wdf, JPanel roundPanel, WeatherWidgetInstance ww) {
 		JTextArea errorLabel1= new JTextArea();
 		errorLabel1.setBackground(Daten.efaConfig.getErrorBackgroundColor());
 		errorLabel1.setForeground(Daten.efaConfig.getErrorForegroundColor());
@@ -34,7 +34,7 @@ public class WeatherRendererError extends WeatherRenderer {
 		roundPanel.setForeground(Daten.efaConfig.getErrorForegroundColor());
 		roundPanel.setBorder(new RoundedBorder(Daten.efaConfig.getErrorForegroundColor()));
 		
-		JPanel titlePanel = WeatherRenderer.getLocationHeader(ww);
+		JPanel titlePanel = WeatherRenderer.getLocationHeader(ww.getCaption(), true);
 		titlePanel.setBackground(Daten.efaConfig.getErrorHeaderBackgroundColor());
 		titlePanel.setForeground(Daten.efaConfig.getErrorHeaderForegroundColor());
 		

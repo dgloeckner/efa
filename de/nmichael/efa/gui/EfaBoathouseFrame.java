@@ -88,9 +88,12 @@ import de.nmichael.efa.gui.util.EfaBoathouseBackgroundTask;
 import de.nmichael.efa.gui.util.EfaMenuButton;
 import de.nmichael.efa.gui.util.EfaMouseListener;
 import de.nmichael.efa.gui.widgets.IWidget;
+import de.nmichael.efa.gui.widgets.IWidgetInstance;
 import de.nmichael.efa.gui.widgets.MultiWidgetContainer;
+import de.nmichael.efa.gui.widgets.MultiWidgetContainerInstance;
 import de.nmichael.efa.gui.widgets.NewsMiniWidget;
 import de.nmichael.efa.gui.widgets.Widget;
+import de.nmichael.efa.gui.widgets.WidgetInstance;
 import de.nmichael.efa.util.Dialog;
 import de.nmichael.efa.util.EfaUtil;
 import de.nmichael.efa.util.Help;
@@ -211,8 +214,10 @@ public class EfaBoathouseFrame extends BaseFrame implements IItemListener {
 
     // Widgets
     NewsMiniWidget news;
-    Vector<IWidget> widgets;
+    Vector<IWidget> widgetTypes = new Vector<IWidget>();
+    Vector<IWidgetInstance> widgetInstances = new Vector<IWidgetInstance>();
     MultiWidgetContainer multiWidget;
+    MultiWidgetContainerInstance multiWidgetInstance;
     JPanel widgetTopPanel = new JPanel();
     JPanel widgetBottomPanel = new JPanel();
     JPanel widgetLeftPanel = new JPanel();
@@ -718,13 +723,13 @@ public class EfaBoathouseFrame extends BaseFrame implements IItemListener {
         centerPanel.setLayout(new GridBagLayout());
         int centerPanelYPos=0;
         int logoTop = (int) (10.0f * (Dialog.getFontSize() < 10 ? 12 : Dialog.getFontSize()) / Dialog.getDefaultFontSize());
-        int logoBottom = 5;
-        if (Daten.efaConfig.getValueEfaDirekt_startMaximized() && Daten.efaConfig.getValueEfaDirekt_vereinsLogo().length() > 0) {
-            logoBottom += (int) ((Dialog.screenSize.getHeight() - 825) / 5);
+        int logoBottom = logoTop;
+        /*if (Daten.efaConfig.getValueEfaDirekt_startMaximized() && Daten.efaConfig.getValueEfaDirekt_vereinsLogo().length() > 0) {
+            logoBottom += (int) ((Dialog.screenSize.getHeight() - 825) / 6);
             if (logoBottom < 0) {
                 logoBottom = 0;
             }
-        }
+        }*/
         centerPanel.add(logoLabel, new GridBagConstraints(1, centerPanelYPos++, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(logoTop, 0, logoBottom, 0), 0, 0));
         int fahrtbeginnTop = (int) (10.0f * (Dialog.getFontSize() < 10 ? 12 : Dialog.getFontSize()) / Dialog.getDefaultFontSize());
         
@@ -1021,10 +1026,14 @@ public class EfaBoathouseFrame extends BaseFrame implements IItemListener {
 
             // stop all previously started widgets
             try {
-                for (int i = 0; widgets != null && i < widgets.size(); i++) {
-                    IWidget w = widgets.get(i);
+                for (int i = 0; widgetInstances != null && i < widgetInstances.size(); i++) {
+                    IWidgetInstance w = widgetInstances.get(i);
                     w.stop();
                 }
+                if (multiWidgetInstance!=null) {
+                	multiWidgetInstance.stop();
+                }
+                widgetInstances.clear();
             } catch (Exception e) {
                 Logger.logdebug(e);
             }
@@ -1040,8 +1049,8 @@ public class EfaBoathouseFrame extends BaseFrame implements IItemListener {
             }
 
             
-            // find all enabled widgets
-            widgets = new Vector<IWidget>();
+            // find all other enabled widget types
+            widgetTypes = new Vector<IWidget>();
             Vector<IWidget> allWidgets = Widget.getAllWidgets(false);
             for (int i = 0; allWidgets != null && i < allWidgets.size(); i++) {
                 IWidget w = allWidgets.get(i);
@@ -1052,41 +1061,41 @@ public class EfaBoathouseFrame extends BaseFrame implements IItemListener {
                     for (int j = 0; j < params.length; j++) {
                         params[j].parseValue(Daten.efaConfig.getExternalGuiItem(params[j].getName()).toString());
                     }
-                    widgets.add(w);
+                    widgetTypes.add(w);
                 }
             }
 
-        	multiWidget.show(widgetMultiWidgetCenterPanel, BorderLayout.SOUTH, false);   
+            multiWidgetInstance = (MultiWidgetContainerInstance) multiWidget.createInstances().get(0); // we are sure there is exactly a single instance
+        	multiWidgetInstance.show(widgetMultiWidgetCenterPanel, BorderLayout.SOUTH, false);   
             boolean multiWidgetUse=false;
+            
             // show all enabled widgets
-            for (int i = 0; i < widgets.size(); i++) {
-                IWidget w = widgets.get(i);
-                String position = w.getPosition();
+            for (int i = 0; i < widgetTypes.size(); i++) {
+                IWidget wt = widgetTypes.get(i);
+                String position = wt.getPosition();
                 if (IWidget.POSITION_TOP.equals(position)) {
-                    w.show(widgetTopPanel, BorderLayout.CENTER, false);
+                	showWidgetInstances(wt, widgetTopPanel, BorderLayout.CENTER, false);
                 }
                 if (IWidget.POSITION_BOTTOM.equals(position)) {
-                    w.show(widgetBottomPanel, BorderLayout.CENTER, false);
+                	showWidgetInstances(wt, widgetBottomPanel, BorderLayout.CENTER, false);
                 }
                 if (IWidget.POSITION_LEFT.equals(position)) {
-                    w.show(widgetLeftPanel, BorderLayout.CENTER, false);
+                	showWidgetInstances(wt, widgetLeftPanel, BorderLayout.CENTER, false);
                 }
                 if (IWidget.POSITION_RIGHT.equals(position)) {
-                    w.show(widgetRightPanel, BorderLayout.CENTER, false);
+                	showWidgetInstances(wt, widgetRightPanel, BorderLayout.CENTER, false);
                 }
                 if (IWidget.POSITION_CENTER.equals(position)) {
-                    w.show(widgetCenterPanel, BorderLayout.CENTER, false);
+                	showWidgetInstances(wt, widgetCenterPanel, BorderLayout.CENTER, false);
                 }
                 if (IWidget.POSITION_MULTIWIDGET.equals(position)) {
                 	JPanel innerPanel = new JPanel(new BorderLayout());
-                	w.show(innerPanel, BorderLayout.CENTER,true);
-                	multiWidget.addWidget(innerPanel);
+                	showWidgetInstances(wt, multiWidgetInstance, true);
                 	multiWidgetUse=true;
                 }
             }
-            widgets.add(multiWidget);            
             if (multiWidgetUse==false) {
-            	multiWidget.getComponent().setVisible(false);
+            	multiWidgetInstance.getComponent().setVisible(false);
             }
             
         } catch (Exception e) {
@@ -1095,6 +1104,35 @@ public class EfaBoathouseFrame extends BaseFrame implements IItemListener {
 
     }
 
+    private void showWidgetInstances(IWidget wt, JPanel targetPanel, String orientation, boolean onMultiWidget) {
+    	//get Instances and put them in our cache.
+    	Vector<WidgetInstance> instances = wt.createInstances();
+    	widgetInstances.addAll(instances);
+    	
+    	for (int i = 0; i<instances.size(); i++) {
+    		IWidgetInstance wi = instances.get(i);
+    		wi.show(targetPanel, orientation, onMultiWidget);
+    	}
+    	
+    }
+    
+    private void showWidgetInstances(IWidget wt, MultiWidgetContainerInstance multiInstance, boolean onMultiWidget) {
+    	//get Instances and put them in our cache.
+    	Vector<WidgetInstance> instances = wt.createInstances();
+    	widgetInstances.addAll(instances);
+    	
+    	for (int i = 0; i<instances.size(); i++) {
+    		IWidgetInstance wi = instances.get(i);
+    		
+        	JPanel innerPanel = new JPanel(new BorderLayout());
+    		wi.show(innerPanel, BorderLayout.CENTER, onMultiWidget);
+    		// and add this innerpanel to the card Layout of the multiWidgetInstance
+        	multiWidgetInstance.addWidget(innerPanel);
+    		
+    	}
+    }
+
+    
     private void iniGuiNorthPanel() {
         updateGuiNews();
         northPanel.setLayout(new BorderLayout());
@@ -2504,8 +2542,8 @@ public class EfaBoathouseFrame extends BaseFrame implements IItemListener {
     }
 
     void showEfaBaseFrame(int mode, ItemTypeBoatstatusList.BoatListItem action) {
-        for (IWidget w : widgets) {
-            w.runWidgetWarnings(mode, true, null);
+        for (IWidgetInstance wi : widgetInstances) {
+            wi.runWidgetWarnings(mode, true, null);
         }
         if (efaBaseFrame == null) {
             prepareEfaBaseFrame();
@@ -2561,8 +2599,8 @@ public class EfaBoathouseFrame extends BaseFrame implements IItemListener {
             }
         }
         if (efaBoathouseAction != null) {
-            for (IWidget w : widgets) {
-                w.runWidgetWarnings(efaBoathouseAction.mode, false, r);
+            for (IWidgetInstance wi : widgetInstances) {
+                wi.runWidgetWarnings(efaBoathouseAction.mode, false, r);
             }
         }
     }

@@ -13,12 +13,12 @@ import de.nmichael.efa.Daten;
 
 public class WeatherRendererForeCastSimple extends WeatherRenderer {
 
-	public static void renderWeather(WeatherDataForeCast wdf, JPanel roundPanel, WeatherWidget ww) {
+	public static void renderWeather(WeatherDataForeCast wdf, JPanel roundPanel, WeatherWidgetInstance ww) {
 		String tempLabel = ww.getTempLabel(true);
 		
 		// Build the main panel view
 
-		roundPanel.add(getLocationHeader(ww), new GridBagConstraints(0, 0, 4, 1, 1.0, 0.0, GridBagConstraints.CENTER,
+		roundPanel.add(getLocationHeader(ww.getCaption()), new GridBagConstraints(0, 0, 4, 1, 1.0, 0.0, GridBagConstraints.CENTER,
 			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));		
 		
 		roundPanel.add(

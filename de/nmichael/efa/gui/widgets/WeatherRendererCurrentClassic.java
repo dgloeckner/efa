@@ -13,7 +13,7 @@ import de.nmichael.efa.util.International;
 
 public class WeatherRendererCurrentClassic extends WeatherRenderer {
 
-	public static void renderWeather(WeatherDataForeCast wdf, JPanel roundPanel, WeatherWidget ww) {
+	public static void renderWeather(WeatherDataForeCast wdf, JPanel roundPanel, WeatherWidgetInstance ww) {
 
 		JLabel curWeather_temp = new JLabel();
 		JLabel curWeather_icon = new JLabel();
@@ -50,13 +50,13 @@ public class WeatherRendererCurrentClassic extends WeatherRenderer {
 		curWeather_wind.setText(International.getString("Wind") + ": "
 				+ International.getString(wdf.getCurrentWeather().getWindDirectionText()) + " "
 				+ International.getString("mit") + " " + wdf.getCurrentWeather().getWindSpeed()
-				+ ww.getWeatherSpeedScale());
+				+ ww.getSpeedScale());
 		curWeather_wind.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
 		curWeather_wind.setHorizontalTextPosition(SwingConstants.CENTER);
 		
 		// Build the main panel view
 
-		roundPanel.add(getLocationHeader(ww), new GridBagConstraints(0, 0, 3, 1, 1.0, 0.0, GridBagConstraints.CENTER,
+		roundPanel.add(getLocationHeader(ww.getCaption()), new GridBagConstraints(0, 0, 3, 1, 1.0, 0.0, GridBagConstraints.CENTER,
 			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));		
 		
 		roundPanel.add(curWeather_temp, new GridBagConstraints(0, 1, 1, 2, 0.0, 0.0, GridBagConstraints.CENTER,

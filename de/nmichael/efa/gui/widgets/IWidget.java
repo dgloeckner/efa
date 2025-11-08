@@ -10,9 +10,9 @@
 
 package de.nmichael.efa.gui.widgets;
 
-import de.nmichael.efa.core.items.*;
-import de.nmichael.efa.data.LogbookRecord;
-import javax.swing.*;
+import java.util.Vector;
+
+import de.nmichael.efa.core.items.IItemType;
 
 public interface IWidget {
 
@@ -34,11 +34,7 @@ public interface IWidget {
     public String getPosition();
     public void setUpdateInterval(int seconds);
     public int getUpdateInterval();
-    public JComponent getComponent();
-    public void runWidgetWarnings(int mode, boolean actionBegin, LogbookRecord r);
 
-    public void show(JPanel panel, int x, int y);
-    public void show(JPanel panel, String orientation, boolean onMultiWidget);
-    public void stop();
-
+    public Vector <WidgetInstance> createInstances();
+    
 }

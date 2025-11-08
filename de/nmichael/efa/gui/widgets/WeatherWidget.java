@@ -139,8 +139,7 @@ public class WeatherWidget extends Widget {
 
 	@Override
 	public void construct() {
-		Logger.log(Logger.DEBUG, "constructing Weatherpanel ");
-
+		// we are in Swing Main Thread here, so we don't need to use swingutils.invokelater...
 		mainPanel = new JPanel();
 		mainPanel.setLayout(new GridBagLayout());
 		mainPanel.setName("WeatherWidget-MainPanel");
@@ -151,8 +150,8 @@ public class WeatherWidget extends Widget {
 		roundPanel.setForeground(Daten.efaConfig.getToolTipForegroundColor());
 		roundPanel.setBorder(new RoundedBorder(Daten.efaConfig.getToolTipForegroundColor()));
 		roundPanel.setName("WeatherWidget-RoundPanel");
-		
-		mainPanel.add(roundPanel, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
+		//grow in horizontal width
+		mainPanel.add(roundPanel, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER,
 				GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 
 		addInfoPanel();
@@ -166,34 +165,31 @@ public class WeatherWidget extends Widget {
         } catch(Exception e) {
             Logger.log(e);
         }		
-
-
 	}
 
 	private void addInfoPanel() {
-		JTextArea errorLabel1= new JTextArea();
-		errorLabel1.setFont(
+		JTextArea infoLabel= new JTextArea();
+		infoLabel.setFont(
 				mainPanel.getFont().deriveFont((float) (Daten.efaConfig.getValueEfaDirekt_BthsFontSize())));
-		errorLabel1.setFont(errorLabel1.getFont().deriveFont(Font.BOLD));
-		errorLabel1.setText(International.getString("Ermittle Wetterdaten..."));
-		errorLabel1.setLineWrap(true);
-		errorLabel1.setOpaque(false);
-		errorLabel1.setEditable(false);
+		infoLabel.setFont(infoLabel.getFont().deriveFont(Font.BOLD));
+		infoLabel.setText(International.getString("Ermittle Wetterdaten..."));
+		infoLabel.setLineWrap(true);
+		infoLabel.setWrapStyleWord(true);
+		infoLabel.setOpaque(false);
+		infoLabel.setEditable(false);
 		
 		JPanel titlePanel = WeatherRenderer.getLocationHeader(this);
-		titlePanel.setBackground(Daten.efaConfig.getErrorHeaderBackgroundColor());
-		titlePanel.setForeground(Daten.efaConfig.getErrorHeaderForegroundColor());
+		titlePanel.setBackground(Daten.efaConfig.getToolTipHeaderBackgroundColor());
+		titlePanel.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
 		
 		// Build the main panel view
 
 		roundPanel.add(titlePanel, new GridBagConstraints(0, 0, 4, 1, 1.0, 1.0, GridBagConstraints.CENTER,
 			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));	
 		
-		roundPanel.add(errorLabel1, new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
+		roundPanel.add(infoLabel, new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
 				GridBagConstraints.BOTH, new Insets(2, 4, 2, 4), 0, 0));
 	}
-
-
 
 	@Override
 	public JComponent getComponent() {
@@ -255,11 +251,9 @@ public class WeatherWidget extends Widget {
 
 	        volatile boolean keepRunning = true;
 	        private JPanel panel;
-	        private	JPanel innerPanel;
 	        private WeatherWidget ww = null;
 	        private WeatherDataForeCast wdf = null;
 	        private long lastWeatherUpdate = 0;
-	        private boolean firstRun=true;
 	        
 	        public WeatherUpdater(JPanel thePanel, WeatherWidget ww) {
 	        	this.panel=thePanel;
@@ -276,56 +270,21 @@ public class WeatherWidget extends Widget {
 	            while (keepRunning) {
 	            	
 	            	try {
-		            	
+
+	            		// only download new weather data after an Interval...
 	            		if (needsToUpdateWeather()) {
 	            			wdf = getWeather(ww.getWeatherSource(), ww.getWeatherLongitude(), ww.getWeatherLatitude());
+	            			lastWeatherUpdate=System.currentTimeMillis();
 	            			Logger.log(Logger.DEBUG, "Wetterdaten geholt");
 	            		}
-	            		
-	            		
-	        			if (firstRun && wdf != null && wdf.getStatus() == true) {
-		            		
-	        				innerPanel = new JPanel();
-		            		innerPanel.setLayout(new GridBagLayout());
-		            		innerPanel.setBackground(Daten.efaConfig.getToolTipBackgroundColor());
-		            		innerPanel.setForeground(Daten.efaConfig.getToolTipForegroundColor());
-		            		innerPanel.setBorder(BorderFactory.createEmptyBorder());
-		            		innerPanel.setName("WeatherWidget-InnerPanel");
-
-		            		if (getWeatherLayout().equals(WEATHER_LAYOUT_CURRENT_CLASSIC)) {
-	        					WeatherRendererCurrentClassic.renderWeather(wdf, innerPanel, ww);
-	        				} else if (getWeatherLayout().equals(WEATHER_LAYOUT_CURRENT_WIND)) {
-	        					WeatherRendererCurrentWind.renderWeather(wdf, innerPanel, ww);
-	        				} else if (getWeatherLayout().equals(WEATHER_LAYOUT_CURRENT_UVINDEX)) {
-	        					WeatherRendererCurrentUVIndex.renderWeather(wdf, innerPanel, ww);
-	        				} else if (getWeatherLayout().equals(WEATHER_LAYOUT_FORECASTSIMPLE)){
-	        					WeatherRendererForeCastSimple.renderWeather(wdf, innerPanel, ww);
-	        				} else {
-	        					WeatherRendererForeCastComplex.renderWeather(wdf, innerPanel, ww);
-	        				}
-	            			Logger.log(Logger.DEBUG, "Wetterdaten gerendert in innerpanel");
-	        			} else {
-		            		innerPanel = new JPanel();
-		            		innerPanel.setLayout(new GridBagLayout());
-		            		innerPanel.setBackground(Daten.efaConfig.getToolTipBackgroundColor());
-		            		innerPanel.setForeground(Daten.efaConfig.getToolTipForegroundColor());
-		            		innerPanel.setBorder(BorderFactory.createEmptyBorder());
-		            		innerPanel.setName("WeatherWidget-InnerPanel");
-	        				
-	        				addError(wdf);
-	        				firstRun=true;
-	            			Logger.log(Logger.DEBUG, "ErrorPanel dargestellt");
-	        			}
 		            	
-	        			innerPanel.invalidate();
 		            	//Use invokelater as swing threadsafe ways
-		            	SwingUtilities.invokeLater(new UpdateWeatherRunner(this.panel, innerPanel));
+		            	SwingUtilities.invokeLater(new UpdateWeatherRunner(this.panel, wdf, ww));
 		
-            			Logger.log(Logger.DEBUG, "Warte auf update");
-		            	//wait until next full minute plus one sec. this is more accurate than just waiting 60.000 msec
-		            	//from a random offset.
-		           		long waitTime=EfaUtil.getMilliSecondsToFullMinute()+1000;
-		                Thread.sleep(waitTime);
+		            	// check every minute if we need to update Weather data.
+		            	// this also implements that the panel gets a refresh with the already downloaded WeatherData 
+		            	// every minute. This is possibly neccessary when using weather forecast which has data for multiple timecodes a day.
+		                Thread.sleep(EfaUtil.getMilliSecondsToFullMinute()+1000);
 
 	            	} catch (InterruptedException e) {
 	                	//This is when the thread gets interrupted when it is sleeping.
@@ -413,35 +372,7 @@ public class WeatherWidget extends Widget {
 	    		}
 	    	}	 
 	    	
-	    	private void addError(WeatherDataForeCast wdf) {
-	    		JTextArea errorLabel1= new JTextArea();
-	    		errorLabel1.setBackground(Daten.efaConfig.getErrorBackgroundColor());
-	    		errorLabel1.setForeground(Daten.efaConfig.getErrorForegroundColor());
-	    		errorLabel1.setFont(
-	    				mainPanel.getFont().deriveFont((float) (Daten.efaConfig.getValueEfaDirekt_BthsFontSize())));
-	    		errorLabel1.setFont(errorLabel1.getFont().deriveFont(Font.BOLD));
-	    		errorLabel1.setText(International.getString("Fehler beim Abruf der Wetterdaten."));
-	    		errorLabel1.setToolTipText(wdf.getStatusMessage());
-	    		errorLabel1.setLineWrap(true);
-	    		errorLabel1.setOpaque(false);
-	    		errorLabel1.setEditable(false);
-	    		
-	    		innerPanel.setBackground(Daten.efaConfig.getErrorBackgroundColor());
-	    		innerPanel.setForeground(Daten.efaConfig.getErrorForegroundColor());
-	    		innerPanel.setBorder(new RoundedBorder(Daten.efaConfig.getErrorForegroundColor()));
-	    		
-	    		JPanel titlePanel = WeatherRenderer.getLocationHeader(ww);
-	    		titlePanel.setBackground(Daten.efaConfig.getErrorHeaderBackgroundColor());
-	    		titlePanel.setForeground(Daten.efaConfig.getErrorHeaderForegroundColor());
-	    		
-	    		// Build the main panel view
-
-	    		innerPanel.add(titlePanel, new GridBagConstraints(0, 0, 4, 1, 1.0, 0.0, GridBagConstraints.CENTER,
-	    			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));	
-	    		
-	    		innerPanel.add(errorLabel1, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER,
-	    				GridBagConstraints.BOTH, new Insets(2, 4, 2, 4), 0, 0));
-	    	}	   
+ 
 	        
 	    }
 
@@ -449,25 +380,54 @@ public class WeatherWidget extends Widget {
 	        
 	    	private JPanel uwrPanel=null;
 	    	private JPanel uwrInnerPanel=null;
+	    	private WeatherDataForeCast uwrWdf=null;
+	    	private WeatherWidget uwrWW=null;
 	    	
-	    	public UpdateWeatherRunner(JPanel targetPanel, JPanel innerPanel) {
+	    	public UpdateWeatherRunner(JPanel targetPanel, WeatherDataForeCast wdf, WeatherWidget ww) {
 	    		this.uwrPanel = targetPanel;
-	    		this.uwrInnerPanel = innerPanel;
-    			Logger.log(Logger.DEBUG, "UpdateRunner Constructor");
+	    		this.uwrWdf = wdf;
+	    		this.uwrWW = ww;
 	    	}
 	    	
 	    	public void run() {
 	    		try {
+
+	    			getInnerPannel();
+	    			
 	    			uwrPanel.removeAll();
-	    			uwrPanel.add(uwrInnerPanel, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
+	    			uwrPanel.add(uwrInnerPanel, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER,
 	    					GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 	    			uwrPanel.revalidate();
-	    			Logger.log(Logger.DEBUG, "UpdateRunner updater");
-
-        			
+	    			
 	    		} catch (Exception e){
 	    			Logger.log(e);
 	    		}
+	    	}
+	    	
+	    	private void getInnerPannel() {
+    			
+    			uwrInnerPanel = new JPanel();
+    			uwrInnerPanel.setLayout(new GridBagLayout());
+    			uwrInnerPanel.setBackground(Daten.efaConfig.getToolTipBackgroundColor());
+    			uwrInnerPanel.setForeground(Daten.efaConfig.getToolTipForegroundColor());
+    			uwrInnerPanel.setBorder(BorderFactory.createEmptyBorder());
+    			uwrInnerPanel.setName("WeatherWidget-InnerPanel");
+    			
+	    		if (uwrWdf != null && uwrWdf.getStatus() == true) {
+            		if (getWeatherLayout().equals(WEATHER_LAYOUT_CURRENT_CLASSIC)) {
+    					WeatherRendererCurrentClassic.renderWeather(uwrWdf, uwrInnerPanel, uwrWW);
+    				} else if (getWeatherLayout().equals(WEATHER_LAYOUT_CURRENT_WIND)) {
+    					WeatherRendererCurrentWind.renderWeather(uwrWdf, uwrInnerPanel, uwrWW);
+    				} else if (getWeatherLayout().equals(WEATHER_LAYOUT_CURRENT_UVINDEX)) {
+    					WeatherRendererCurrentUVIndex.renderWeather(uwrWdf, uwrInnerPanel, uwrWW);
+    				} else if (getWeatherLayout().equals(WEATHER_LAYOUT_FORECASTSIMPLE)){
+    					WeatherRendererForeCastSimple.renderWeather(uwrWdf, uwrInnerPanel, uwrWW);
+    				} else {
+    					WeatherRendererForeCastComplex.renderWeather(uwrWdf, uwrInnerPanel, uwrWW);
+    				}
+    			} else {
+            		WeatherRendererError.renderWeather(uwrWdf, uwrInnerPanel, uwrWW);
+    			}
 	    	}
 	    }
 	

@@ -35,6 +35,7 @@ import de.nmichael.efa.data.storage.IDataAccess;
 import de.nmichael.efa.data.storage.MetaData;
 import de.nmichael.efa.data.types.DataTypeDate;
 import de.nmichael.efa.data.types.DataTypeList;
+import de.nmichael.efa.gui.EfaGuiUtils;
 import de.nmichael.efa.gui.ImagesAndIcons;
 import de.nmichael.efa.gui.util.TableItem;
 import de.nmichael.efa.gui.util.TableItemHeader;
@@ -77,6 +78,8 @@ public class PersonRecord extends DataRecord implements IItemFactory {
     public static final String FREEUSE1 = "FreeUse1";
     public static final String FREEUSE2 = "FreeUse2";
     public static final String FREEUSE3 = "FreeUse3";
+    public static final String ECRID = "ecrid";
+
     public static final String[] IDX_NAME_NAMEAFFIX = new String[]{FIRSTLASTNAME, NAMEAFFIX};
     private static String GUIITEM_GROUPS = "GUIITEM_GROUPS";
     private static String CAT_BASEDATA = "%01%" + International.getString("Basisdaten");
@@ -154,6 +157,8 @@ public class PersonRecord extends DataRecord implements IItemFactory {
         f.add(FREEUSE3);
         t.add(IDataAccess.DATA_STRING);
         f.add(EFBID);
+        t.add(IDataAccess.DATA_STRING);
+        f.add(ECRID);
         t.add(IDataAccess.DATA_STRING);
         MetaData metaData = constructMetaData(Persons.DATATYPE, f, t, true);
         metaData.setKey(new String[]{ID}); // plus VALID_FROM
@@ -776,7 +781,7 @@ public class PersonRecord extends DataRecord implements IItemFactory {
             		CAT_MOREDATA, International.getString("Externe ID")));
             
             if (Daten.efaConfig.getValueUseFunctionalityCanoeingGermany()) {
-            	v.add(item = addHint("efbKanuIDHint", (Daten.efaConfig.getValueKanuEfb_AlwaysShowKanuEFBFields() ? IItemType.TYPE_PUBLIC : IItemType.TYPE_EXPERT),
+            	v.add(item = EfaGuiUtils.createHint("efbKanuIDHint", (Daten.efaConfig.getValueKanuEfb_AlwaysShowKanuEFBFields() ? IItemType.TYPE_PUBLIC : IItemType.TYPE_EXPERT),
             			CAT_MOREDATA,  International.onlyFor("Sie können die Kanu-eFB ID (numerisch) oder den Kanu-eFB Benutzernamen eingeben.","de"), 3, 20, 3));            	
                 v.add(item = new ItemTypeString(PersonRecord.EFBID, getEfbId(),
                 		(Daten.efaConfig.getValueKanuEfb_AlwaysShowKanuEFBFields() ? IItemType.TYPE_PUBLIC : IItemType.TYPE_EXPERT), 

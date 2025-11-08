@@ -48,6 +48,7 @@ public class ItemTypeStringList extends ItemTypeLabelValue {
     	retValue.setPadding(padXbefore, padXafter, padYbefore, padYafter);
     	retValue.setFieldGrid(fieldGridWidth, fieldGridHeight, fieldGridAnchor, fieldGridFill);
 
+    	retValue.setIcon((label == null ? null : label.getIcon()));
     	return retValue;
     }
 

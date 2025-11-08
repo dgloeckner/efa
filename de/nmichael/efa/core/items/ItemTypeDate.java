@@ -45,7 +45,10 @@ public class ItemTypeDate extends ItemTypeLabelTextfield {
     }
 
     public IItemType copyOf() {
-        return new ItemTypeDate(name, new DataTypeDate(value), type, category, description);
+        ItemTypeDate copy = new ItemTypeDate(name, new DataTypeDate(value), type, category, description);
+        copy.setPadding(padXbefore, padXafter, padYbefore, padYafter);
+        copy.setIcon((label == null ? null : label.getIcon()));
+        return copy;
     }
 
     public void showWeekday(boolean showWeekday) {

@@ -28,7 +28,9 @@ import java.util.*;
 
 public class AdminDialog extends BaseDialog implements IItemListener {
 
-    private EfaBoathouseFrame efaBoathouseFrame;
+
+	private static final long serialVersionUID = -4629950422212915082L;
+	private EfaBoathouseFrame efaBoathouseFrame;
     private AdminRecord admin;
     private JLabel projectName;
     private JLabel logbookName;
@@ -223,6 +225,8 @@ public class AdminDialog extends BaseDialog implements IItemListener {
                 ? efaBoathouseFrame.getLogbook().getName() : "- " + International.getString("Kein Fahrtenbuch geöffnet.") + " -"));
         if (efaBoathouseFrame.getClubwork() != null && efaBoathouseFrame.getClubwork().isOpen()) {
             clubworkName.setText(International.getString("Vereinsarbeitsbuch") + ": " + efaBoathouseFrame.getClubwork().getName());
+        } else {
+        	clubworkName.setText(International.getString("Kein Vereinsarbeitsbuch geöffnet."));
         }
 
         try {
@@ -255,14 +259,16 @@ public class AdminDialog extends BaseDialog implements IItemListener {
             messageButton.saveColor();
         }
         try {
-            long msg = (Daten.project != null ? Daten.project.getMessages(false).countUnreadMessages() : 0);
-            if (msg > 0) {
-                messageButton.setDescription(International.getString("Nachrichten") + " (" + msg + ")");
-                messageButton.setColor(Color.red);
-            } else {
-                messageButton.setDescription(International.getString("Nachrichten"));
-                messageButton.restoreColor();
-            }
+        	long msg = 0;
+            messageButton.setDescription(International.getString("Nachrichten"));
+            messageButton.restoreColor();
+        	if (Daten.project != null && Daten.project.isOpen()) {
+        		msg = Daten.project.getMessages(false).countUnreadMessages();
+	            if (msg > 0) {
+	                messageButton.setDescription(International.getString("Nachrichten") + " (" + msg + ")");
+	                messageButton.setColor(Color.red);
+	            }
+        	}
         } catch (Exception eignore) {
         }
     }
@@ -334,6 +340,7 @@ public class AdminDialog extends BaseDialog implements IItemListener {
                 updateInfos();
             }
             updateMessageButton(null);
+            updateInfos();            
         }
 
     }

@@ -1061,8 +1061,23 @@ public class EfaBaseFrameMultisession extends EfaBaseFrame implements IItemListe
                     
                     if (mode == MODE_BOATHOUSE_START || mode == MODE_BOATHOUSE_START_CORRECT || mode == MODE_BOATHOUSE_START_MULTISESSION ) {
                         currentRecord.setSessionIsOpen(true);
-                    } else {
+                    } else if (mode == MODE_BOATHOUSE_FINISH || mode == MODE_BOATHOUSE_LATEENTRY || mode == MODE_BOATHOUSE_LATEENTRY_MULTISESSION){
                         currentRecord.setSessionIsOpen(false); // all other updates to an open entry (incl. Admin Mode) will mark it as finished
+                    } else {
+                    	/* other modes are
+        				    MODE_BASE = 0;
+        				    MODE_BOATHOUSE = 1;
+        					MODE_BOATHOUSE_ABORT = 6;
+        				    MODE_ADMIN = 7;
+        				    MODE_ADMIN_SESSIONS = 8;
+        				    
+        				    We don't want to set the session to closed automatically in these modes.
+        				    Because: when editing an open trip occasionally in Admin/Base Mode AND saving it 
+        				    will set the trip to closed.
+        				    
+        				    The logbook should stay open unless closed manually otherwise.
+                    	 */
+                    	EfaUtil.foo();
                     }
 
                     logbook.data().add(currentRecord, lock);

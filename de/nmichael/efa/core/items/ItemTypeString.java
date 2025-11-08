@@ -42,6 +42,7 @@ public class ItemTypeString extends ItemTypeLabelTextfield {
         ItemTypeString copy = new ItemTypeString(name, value, type, category, description);
         copy.setPadding(padXbefore, padXafter, padYbefore, padYafter);
         copy.setFieldGrid(fieldGridWidth, fieldGridHeight, fieldGridAnchor, fieldGridFill);
+        copy.setIcon((label == null ? null : label.getIcon()));
         return copy;
     }
 

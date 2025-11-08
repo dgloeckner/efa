@@ -104,6 +104,7 @@ public class BoatRecord extends DataRecord implements IItemFactory, IItemListene
     public static final String FREEUSE1              = "FreeUse1";
     public static final String FREEUSE2              = "FreeUse2";
     public static final String FREEUSE3              = "FreeUse3";
+    public static final String ECRID                 = "ecrid";
 
     public static final String[] IDX_NAME_NAMEAFFIX = new String[] { NAME, NAMEAFFIX };
 
@@ -159,6 +160,7 @@ public class BoatRecord extends DataRecord implements IItemFactory, IItemListene
         f.add(FREEUSE2);                          t.add(IDataAccess.DATA_STRING);
         f.add(FREEUSE3);                          t.add(IDataAccess.DATA_STRING);
         f.add(EFBID);                             t.add(IDataAccess.DATA_STRING);
+        f.add(ECRID);                             t.add(IDataAccess.DATA_STRING);
         MetaData metaData = constructMetaData(Boats.DATATYPE, f, t, true);
         metaData.setKey(new String[] { ID }); // plus VALID_FROM
         metaData.addIndex(IDX_NAME_NAMEAFFIX);
@@ -1213,7 +1215,7 @@ public class BoatRecord extends DataRecord implements IItemFactory, IItemListene
                     IItemType.TYPE_PUBLIC, CAT_RESERVATIONS, International.getString("Reservierungen")));
             ((ItemTypeDataRecordTable) item).setButtonPanelPosition(BorderLayout.NORTH);
             item.setFieldSize(850, -1);
-            item.setPadding(0, 0, 0, 0);
+            item.setPadding(10,10,10,10);
             item.setFieldGrid(1, 1, GridBagConstraints.WEST, GridBagConstraints.BOTH);
         }
         
@@ -1227,7 +1229,7 @@ public class BoatRecord extends DataRecord implements IItemFactory, IItemListene
                     IItemType.TYPE_PUBLIC, CAT_DAMAGES, International.getString("Bootsschäden")));
             ((ItemTypeDataRecordTable) item).setButtonPanelPosition(BorderLayout.NORTH);
             item.setFieldSize(850, -1);
-            item.setPadding(0, 0, 0, 0);
+            item.setPadding(10, 10, 10, 10);
             item.setFieldGrid(1, 1, GridBagConstraints.WEST, GridBagConstraints.BOTH);
         }
 

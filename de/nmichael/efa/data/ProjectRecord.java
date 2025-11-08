@@ -20,6 +20,7 @@ import de.nmichael.efa.data.types.DataTypeDate;
 import de.nmichael.efa.data.types.DataTypePasswordCrypted;
 import de.nmichael.efa.gui.BaseDialog;
 import de.nmichael.efa.gui.BaseTabbedDialog;
+import de.nmichael.efa.gui.EfaGuiUtils;
 import de.nmichael.efa.gui.util.TableItem;
 import de.nmichael.efa.gui.util.TableItemHeader;
 import de.nmichael.efa.util.EfaUtil;
@@ -304,7 +305,9 @@ public class ProjectRecord extends DataRecord  {
         setString(STORAGELOCATION, storageLocation);
     }
 
-    public String getEfaCloudURL() { return getString(EFACLOUDURL); }
+    public String getEfaCloudURL() { 
+    	return getString(EFACLOUDURL); 
+    }
     public void setEfaCloudURL(String efaCloudURL) {
         setString(EFACLOUDURL, efaCloudURL);
     }
@@ -563,10 +566,6 @@ public class ProjectRecord extends DataRecord  {
         return getString(REMOTEPROJECTNAME);
     }
 
-    public String getEfaCoudURL() {
-        return getString(EFACLOUDURL);
-    }
-
     public boolean getEfaOnlineConnect() {
         return getBool(EFAONLINECONNECT);
     }
@@ -809,6 +808,13 @@ public class ProjectRecord extends DataRecord  {
                 }
 
                 if (getStorageType() != IDataAccess.TYPE_FILE_XML) {
+                	
+                    if (getStorageType() == IDataAccess.TYPE_EFA_CLOUD) {
+	                	v.add(item = EfaGuiUtils.createHintWordWrap(ProjectRecord.STORAGEUSERNAME+"_HINT", IItemType.TYPE_PUBLIC, category, 
+	                			International.getString("Jede efa-Installation in einem efaCloud-System benötigt einen eigenen Benutzernamen (efaCloud-UserID). Legen Sie in efaCloud ggfs. einen neuen Benutzer an, und tragen sie seine numerische UserID hier ein. Weitere Informationen finden Sie im efa-Dokuwiki."), 
+	                			3, 10, 10,630));
+                    }
+                	
                     v.add(item = new ItemTypeString(ProjectRecord.STORAGEUSERNAME, getStorageUsername(),
                             IItemType.TYPE_PUBLIC, category,
                             (getStorageType() == IDataAccess.TYPE_EFA_REMOTE
@@ -830,7 +836,7 @@ public class ProjectRecord extends DataRecord  {
                         ((ItemTypeString) item).setNotNull(true);
                     }
                     if (getStorageType() == IDataAccess.TYPE_EFA_CLOUD) {
-                        v.add(item = new ItemTypeString(ProjectRecord.EFACLOUDURL, getEfaCoudURL(),
+                        v.add(item = new ItemTypeString(ProjectRecord.EFACLOUDURL, getEfaCloudURL(),
                                 IItemType.TYPE_PUBLIC, category,
                                 International.getString("URL des efaCloud Servers")));
                         ((ItemTypeString) item).setNotNull(true);

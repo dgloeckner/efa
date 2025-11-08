@@ -307,7 +307,7 @@ public class ItemTypeDataRecordTable extends ItemTypeTable implements IItemListe
 
     public int displayOnGui(Window dlg, JPanel panel, int x, int y) {
         iniDisplayActionTable(dlg);
-        panel.add(myPanel, new GridBagConstraints(x, y, fieldGridWidth, fieldGridHeight, 0.0, 0.0,
+        panel.add(myPanel, new GridBagConstraints(x, y, fieldGridWidth, fieldGridHeight, 1.0, 1.0, // 1.0 means grow with the element size.-
                 fieldGridAnchor, fieldGridFill, new Insets(padYbefore, padXbefore, padYafter, padXafter), 0, 0));
         super.displayOnGui(dlg, tablePanel, 0, 0);
         return 1;

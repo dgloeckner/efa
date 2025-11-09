@@ -2,6 +2,7 @@ package de.nmichael.efa.gui.widgets;
 
 import javax.swing.ImageIcon;
 
+import de.nmichael.efa.Daten;
 import de.nmichael.efa.gui.ImagesAndIcons;
 
 public class WeatherIcons {
@@ -323,6 +324,6 @@ public class WeatherIcons {
 	}
 	
     public static ImageIcon getIcon(String name) {
-    	return ImagesAndIcons.getIcon(name);
+    	return ImagesAndIcons.getIcon(Daten.IMAGEPATH +name);
     }
 }

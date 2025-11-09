@@ -1075,23 +1075,21 @@ public class EfaBoathouseFrame extends BaseFrame implements IItemListener {
                 String position = wt.getPosition();
                 if (IWidget.POSITION_TOP.equals(position)) {
                 	showWidgetInstances(wt, widgetTopPanel, BorderLayout.CENTER, false);
-                }
-                if (IWidget.POSITION_BOTTOM.equals(position)) {
+                } else if (IWidget.POSITION_BOTTOM.equals(position)) {
                 	showWidgetInstances(wt, widgetBottomPanel, BorderLayout.CENTER, false);
-                }
-                if (IWidget.POSITION_LEFT.equals(position)) {
+                } else if (IWidget.POSITION_LEFT.equals(position)) {
                 	showWidgetInstances(wt, widgetLeftPanel, BorderLayout.CENTER, false);
-                }
-                if (IWidget.POSITION_RIGHT.equals(position)) {
+                } else if (IWidget.POSITION_RIGHT.equals(position)) {
                 	showWidgetInstances(wt, widgetRightPanel, BorderLayout.CENTER, false);
-                }
-                if (IWidget.POSITION_CENTER.equals(position)) {
+                } else if (IWidget.POSITION_CENTER.equals(position)) {
                 	showWidgetInstances(wt, widgetCenterPanel, BorderLayout.CENTER, false);
-                }
-                if (IWidget.POSITION_MULTIWIDGET.equals(position)) {
+                } else if (IWidget.POSITION_MULTIWIDGET.equals(position)) {
                 	JPanel innerPanel = new JPanel(new BorderLayout());
                 	showWidgetInstances(wt, multiWidgetInstance, true);
                 	multiWidgetUse=true;
+                } else {
+                	//no position set. We assume it is an widget that has no gui but shall show infos and warning on certain events
+                	createNonGUIWidgetInstances(wt);
                 }
             }
             if (multiWidgetUse==false) {
@@ -1132,6 +1130,11 @@ public class EfaBoathouseFrame extends BaseFrame implements IItemListener {
     	}
     }
 
+    private void createNonGUIWidgetInstances(IWidget wt) {
+    	//get Instances and put them in our cache.
+    	Vector<WidgetInstance> instances = wt.createInstances();
+    	widgetInstances.addAll(instances);
+    }
     
     private void iniGuiNorthPanel() {
         updateGuiNews();

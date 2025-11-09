@@ -12,7 +12,6 @@ package de.nmichael.efa.gui.widgets;
 
 import java.util.Vector;
 
-import de.nmichael.efa.Daten;
 import de.nmichael.efa.core.config.EfaTypes;
 import de.nmichael.efa.core.items.IItemFactory;
 import de.nmichael.efa.core.items.IItemType;
@@ -123,11 +122,11 @@ public class AlertWidget extends Widget implements IItemFactory {
             }
             for (int i = 0; i < list.size(); i++) {
                 ((ItemTypeMultiSelectList)list.getItem(i, PARAM_BOATTYPE)).setListData(
-                        Daten.efaTypes.makeBoatTypeArray(EfaTypes.ARRAY_STRINGLIST_VALUES),
-                        Daten.efaTypes.makeBoatTypeArray(EfaTypes.ARRAY_STRINGLIST_DISPLAY));
+                        EfaTypes.makeBoatTypeArray(EfaTypes.ARRAY_STRINGLIST_VALUES),
+                        EfaTypes.makeBoatTypeArray(EfaTypes.ARRAY_STRINGLIST_DISPLAY));
                 ((ItemTypeMultiSelectList)list.getItem(i, PARAM_BOATSEATS)).setListData(
-                        Daten.efaTypes.makeBoatSeatsArray(EfaTypes.ARRAY_STRINGLIST_VALUES),
-                        Daten.efaTypes.makeBoatSeatsArray(EfaTypes.ARRAY_STRINGLIST_DISPLAY));
+                        EfaTypes.makeBoatSeatsArray(EfaTypes.ARRAY_STRINGLIST_VALUES),
+                        EfaTypes.makeBoatSeatsArray(EfaTypes.ARRAY_STRINGLIST_DISPLAY));
             }
         } catch (Exception eignore) {
             Logger.logdebug(eignore);
@@ -148,14 +147,14 @@ public class AlertWidget extends Widget implements IItemFactory {
                 IItemType.TYPE_PUBLIC, "",
                 International.getString("bei Fahrtende"));
             items[2] = new ItemTypeMultiSelectList<String>(PARAM_BOATTYPE,
-                    new DataTypeList<String>(Daten.efaTypes.makeBoatTypeArray(EfaTypes.ARRAY_STRINGLIST_VALUES)),
-                    Daten.efaTypes.makeBoatTypeArray(EfaTypes.ARRAY_STRINGLIST_VALUES), Daten.efaTypes.makeBoatTypeArray(EfaTypes.ARRAY_STRINGLIST_DISPLAY),
+                    new DataTypeList<String>(EfaTypes.makeBoatTypeArray(EfaTypes.ARRAY_STRINGLIST_VALUES)),
+                    EfaTypes.makeBoatTypeArray(EfaTypes.ARRAY_STRINGLIST_VALUES),EfaTypes.makeBoatTypeArray(EfaTypes.ARRAY_STRINGLIST_DISPLAY),
                     IItemType.TYPE_PUBLIC, "",
                     International.getString("für Fahrten mit ..."));
             items[3] = new ItemTypeMultiSelectList<String>(PARAM_BOATSEATS,
-                    new DataTypeList<String>(Daten.efaTypes.makeBoatSeatsArray(EfaTypes.ARRAY_STRINGLIST_VALUES)),
-                    Daten.efaTypes.makeBoatSeatsArray(EfaTypes.ARRAY_STRINGLIST_VALUES),
-                    Daten.efaTypes.makeBoatSeatsArray(EfaTypes.ARRAY_STRINGLIST_DISPLAY),
+                    new DataTypeList<String>(EfaTypes.makeBoatSeatsArray(EfaTypes.ARRAY_STRINGLIST_VALUES)),
+                    EfaTypes.makeBoatSeatsArray(EfaTypes.ARRAY_STRINGLIST_VALUES),
+                    EfaTypes.makeBoatSeatsArray(EfaTypes.ARRAY_STRINGLIST_DISPLAY),
                     IItemType.TYPE_PUBLIC, "",
                     International.getString("für Fahrten mit ..."));
             ((ItemTypeMultiSelectList)items[3]).setXOffset(1);

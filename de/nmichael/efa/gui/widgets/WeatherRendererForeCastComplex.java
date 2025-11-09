@@ -3,6 +3,9 @@ package de.nmichael.efa.gui.widgets;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -10,6 +13,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 import de.nmichael.efa.Daten;
+import de.nmichael.efa.util.Logger;
 
 public class WeatherRendererForeCastComplex extends WeatherRenderer {
 	public static void renderWeather(WeatherDataForeCast wdf, JPanel roundPanel, WeatherWidgetInstance ww) {
@@ -110,6 +114,33 @@ public class WeatherRendererForeCastComplex extends WeatherRenderer {
    	    roundPanel.add(rainLabel, 			new GridBagConstraints(4, startY+1, 1, 1, 0.0, 0.0, GridBagConstraints.EAST,   GridBagConstraints.VERTICAL, 		new Insets(0,2,0,5), 0, 0));
    		roundPanel.add(rainLabelPercent, 	new GridBagConstraints(5, startY+1, 1, 1, 0.0, 1.0, GridBagConstraints.EAST, 	GridBagConstraints.VERTICAL, 		new Insets(0,2,4,2), 0, 0));
 
+		// Klick auf das Icon wird an Parent weitergeleitet
+   		weatherIconLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Simuliere Klick auf Parent
+            	try {
+                MouseEvent parentClick = new MouseEvent(
+                    roundPanel.getParent(),
+                    MouseEvent.MOUSE_CLICKED,
+                    System.currentTimeMillis(),
+                    e.getModifiersEx(),
+                    e.getX() + weatherIconLabel.getX(),
+                    e.getY() + weatherIconLabel.getY(),
+                    e.getClickCount(),
+                    e.isPopupTrigger(),
+                    e.getButton()
+                );
+                for (MouseListener ml : roundPanel.getParent().getMouseListeners()) {
+                    ml.mouseClicked(parentClick);
+                }
+            	} catch (Exception e1) {
+            		//should not occurr..
+            		Logger.logdebug(e1);
+            	}
+            }
+        });   		
+   		
    	    /*
 		myPanel.setLayout(new BorderLayout(0, 0));
 		myPanel.add(timeLabel, BorderLayout.NORTH);

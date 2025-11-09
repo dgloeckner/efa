@@ -4,6 +4,9 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.text.DecimalFormat;
 
 import javax.swing.JLabel;
@@ -12,6 +15,7 @@ import javax.swing.SwingConstants;
 
 import de.nmichael.efa.Daten;
 import de.nmichael.efa.util.International;
+import de.nmichael.efa.util.Logger;
 
 public class WeatherRendererCurrentWind extends WeatherRenderer {
 
@@ -133,5 +137,32 @@ public class WeatherRendererCurrentWind extends WeatherRenderer {
 
 		roundPanel.add(curWeather_wind, new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.NORTH,
 				GridBagConstraints.VERTICAL, new Insets(0, 2, 0, 2), 0, 0));
+		
+		// Klick auf das Icon wird an Parent weitergeleitet
+        curWeather_icon.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Simuliere Klick auf Parent
+            	try {
+                MouseEvent parentClick = new MouseEvent(
+                    roundPanel.getParent(),
+                    MouseEvent.MOUSE_CLICKED,
+                    System.currentTimeMillis(),
+                    e.getModifiersEx(),
+                    e.getX() + curWeather_icon.getX(),
+                    e.getY() + curWeather_icon.getY(),
+                    e.getClickCount(),
+                    e.isPopupTrigger(),
+                    e.getButton()
+                );
+                for (MouseListener ml : roundPanel.getParent().getMouseListeners()) {
+                    ml.mouseClicked(parentClick);
+                }
+            	} catch (Exception e1) {
+            		//should not occurr..
+            		Logger.logdebug(e1);
+            	}
+            }
+        });		
 	}
 }

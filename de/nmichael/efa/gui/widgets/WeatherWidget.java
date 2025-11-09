@@ -8,10 +8,12 @@ import java.util.Vector;
 import de.nmichael.efa.core.items.IItemType;
 import de.nmichael.efa.core.items.ItemTypeFile;
 import de.nmichael.efa.core.items.ItemTypeInteger;
+import de.nmichael.efa.core.items.ItemTypeItemList;
 import de.nmichael.efa.core.items.ItemTypeLongLat;
 import de.nmichael.efa.core.items.ItemTypeString;
 import de.nmichael.efa.core.items.ItemTypeStringList;
 import de.nmichael.efa.util.International;
+import de.nmichael.efa.util.Logger;
 
 /**
  * 
@@ -161,22 +163,65 @@ public class WeatherWidget extends Widget {
 	}
 
 	private String getWeatherLongitude() {
-		return getLongLat(PARAM_LONGITUDE);
-	}
-
-	private String getLongLat(String Name) {
-		ItemTypeLongLat val = (ItemTypeLongLat) getParameterInternal(Name);
-		if (val != null) {
-			int[] coords = val.getValueCoordinates();
-			return coords[0] + "." + coords[1];
-		}
-		return null;
+		return getLongLatTogether().getLongitude()+"";
 	}
 
 	private String getWeatherLatitude() {
-		return getLongLat(PARAM_LATITUDE);
+		return getLongLatTogether().getLatitude()+"";
 	}
 
+	private uk.me.jstott.coordconv.LatitudeLongitude getLongLatTogether(){
+
+		ItemTypeLongLat efa_longi;
+		ItemTypeLongLat efa_lati;
+		
+        try {
+        	efa_longi = (ItemTypeLongLat) getParameterInternal(PARAM_LONGITUDE);
+        } catch(Exception e) {
+            Logger.logdebug(e);
+            return null;
+        }
+
+        try {
+        	efa_lati =  (ItemTypeLongLat) getParameterInternal(PARAM_LATITUDE);
+        } catch(Exception e) {
+            Logger.logdebug(e);
+            return null;
+        }
+
+        int lat = uk.me.jstott.coordconv.LatitudeLongitude.NORTH;
+        int lon = uk.me.jstott.coordconv.LatitudeLongitude.EAST;
+        switch (efa_lati.getValueOrientation()) {
+            case ItemTypeLongLat.ORIENTATION_NORTH:
+                lat = uk.me.jstott.coordconv.LatitudeLongitude.NORTH;
+                break;
+            case ItemTypeLongLat.ORIENTATION_SOUTH:
+                lat = uk.me.jstott.coordconv.LatitudeLongitude.SOUTH;
+                break;
+        }
+        switch (efa_longi.getValueOrientation()) {
+            case ItemTypeLongLat.ORIENTATION_WEST:
+                lon = uk.me.jstott.coordconv.LatitudeLongitude.WEST;
+                break;
+            case ItemTypeLongLat.ORIENTATION_EAST:
+                lon = uk.me.jstott.coordconv.LatitudeLongitude.EAST;
+                break;
+        }
+
+        uk.me.jstott.coordconv.LatitudeLongitude ll =
+                new uk.me.jstott.coordconv.LatitudeLongitude(lat,
+                efa_lati.getValueCoordinates()[0],
+                efa_lati.getValueCoordinates()[1],
+                efa_lati.getValueCoordinates()[2],
+                lon,
+                efa_longi.getValueCoordinates()[0],
+                efa_longi.getValueCoordinates()[1],
+                efa_longi.getValueCoordinates()[2]);
+		
+		return ll;
+	}
+	
+	
 	private String getWeatherLayout() {
 		return ((ItemTypeStringList) getParameterInternal(PARAM_WEATHER_LAYOUT)).toString();
 	}

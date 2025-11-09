@@ -205,27 +205,62 @@ public class WeatherWidgetMulti extends Widget implements IItemFactory {
 	}
 
 	private String getWeatherLongitude(ItemTypeItemList list, int i) {
-		return getLongLat(PARAM_LONGITUDE, list, i);
+		return getLongLatTogether(list, i).getLongitude()+"";
 	}
 
-	private String getLongLat(String theName, ItemTypeItemList list, int i) {
-		ItemTypeLongLat val;
+	private uk.me.jstott.coordconv.LatitudeLongitude getLongLatTogether(ItemTypeItemList list, int index){
+
+		ItemTypeLongLat efa_longi;
+		ItemTypeLongLat efa_lati;
+		
         try {
-        	val = (ItemTypeLongLat)list.getItem(i, theName);
+        	efa_longi = (ItemTypeLongLat)list.getItem(index, PARAM_LONGITUDE);
         } catch(Exception e) {
             Logger.logdebug(e);
-            return "";
+            return null;
         }
-        
-		if (val != null) {
-			int[] coords = val.getValueCoordinates();
-			return coords[0] + "." + coords[1];
-		}
-		return null;
+
+        try {
+        	efa_lati = (ItemTypeLongLat)list.getItem(index, PARAM_LATITUDE);
+        } catch(Exception e) {
+            Logger.logdebug(e);
+            return null;
+        }
+
+        int lat = uk.me.jstott.coordconv.LatitudeLongitude.NORTH;
+        int lon = uk.me.jstott.coordconv.LatitudeLongitude.EAST;
+        switch (efa_lati.getValueOrientation()) {
+            case ItemTypeLongLat.ORIENTATION_NORTH:
+                lat = uk.me.jstott.coordconv.LatitudeLongitude.NORTH;
+                break;
+            case ItemTypeLongLat.ORIENTATION_SOUTH:
+                lat = uk.me.jstott.coordconv.LatitudeLongitude.SOUTH;
+                break;
+        }
+        switch (efa_longi.getValueOrientation()) {
+            case ItemTypeLongLat.ORIENTATION_WEST:
+                lon = uk.me.jstott.coordconv.LatitudeLongitude.WEST;
+                break;
+            case ItemTypeLongLat.ORIENTATION_EAST:
+                lon = uk.me.jstott.coordconv.LatitudeLongitude.EAST;
+                break;
+        }
+
+        uk.me.jstott.coordconv.LatitudeLongitude ll =
+                new uk.me.jstott.coordconv.LatitudeLongitude(lat,
+                efa_lati.getValueCoordinates()[0],
+                efa_lati.getValueCoordinates()[1],
+                efa_lati.getValueCoordinates()[2],
+                lon,
+                efa_longi.getValueCoordinates()[0],
+                efa_longi.getValueCoordinates()[1],
+                efa_longi.getValueCoordinates()[2]);
+		
+		return ll;
 	}
 
 	private String getWeatherLatitude(ItemTypeItemList list, int i) {
-		return getLongLat(PARAM_LATITUDE, list, i);
+		return getLongLatTogether(list, i).getLatitude()+"";
 	}
 
 	private String getWeatherLayout(ItemTypeItemList list, int i) {

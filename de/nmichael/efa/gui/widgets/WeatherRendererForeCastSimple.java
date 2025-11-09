@@ -3,6 +3,9 @@ package de.nmichael.efa.gui.widgets;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -14,6 +17,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 import de.nmichael.efa.Daten;
+import de.nmichael.efa.util.Logger;
 
 public class WeatherRendererForeCastSimple extends WeatherRenderer {
 
@@ -90,6 +94,33 @@ public class WeatherRendererForeCastSimple extends WeatherRenderer {
 		myPanel.add(weatherIconLabel, BorderLayout.CENTER);
 		myPanel.add(tempLabel, BorderLayout.SOUTH);
 */
+   	    
+		// Klick auf das Icon wird an Parent weitergeleitet
+   		weatherIconLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Simuliere Klick auf Parent
+            	try {
+                MouseEvent parentClick = new MouseEvent(
+                    roundPanel.getParent(),
+                    MouseEvent.MOUSE_CLICKED,
+                    System.currentTimeMillis(),
+                    e.getModifiersEx(),
+                    e.getX() + weatherIconLabel.getX(),
+                    e.getY() + weatherIconLabel.getY(),
+                    e.getClickCount(),
+                    e.isPopupTrigger(),
+                    e.getButton()
+                );
+                for (MouseListener ml : roundPanel.getParent().getMouseListeners()) {
+                    ml.mouseClicked(parentClick);
+                }
+            	} catch (Exception e1) {
+            		//should not occurr..
+            		Logger.logdebug(e1);
+            	}
+            }
+        });  
 		return myPanel;
 
 	}

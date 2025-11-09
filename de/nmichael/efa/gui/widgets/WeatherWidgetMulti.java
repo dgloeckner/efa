@@ -104,7 +104,7 @@ public class WeatherWidgetMulti extends Widget implements IItemFactory {
             
             IItemType[] items = new IItemType[9];
             i=0;
-            items[i] = new ItemTypeString(PARAM_CAPTION, "Dummy", IItemType.TYPE_PUBLIC, "",
+            items[i] = new ItemTypeString(PARAM_CAPTION, "Berlin", IItemType.TYPE_PUBLIC, "",
             				International.getString("Beschriftung"));
             items[i++].setPadding(0,0,0,10);
 

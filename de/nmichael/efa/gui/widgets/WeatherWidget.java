@@ -79,7 +79,7 @@ public class WeatherWidget extends Widget {
 
 		addHeader("WeatherWidgetLocationHeader"+"1", IItemType.TYPE_PUBLIC, "", International.getString("Ort"), 3);
 		
-		addParameterInternal(new ItemTypeString(PARAM_CAPTION, "Dummy", IItemType.TYPE_PUBLIC, "",
+		addParameterInternal(new ItemTypeString(PARAM_CAPTION, "Berlin", IItemType.TYPE_PUBLIC, "",
 				International.getString("Beschriftung")),0,10);
 
 		addParameterInternal(new ItemTypeLongLat(PARAM_LATITUDE, ItemTypeLongLat.ORIENTATION_NORTH, 52, 25, 9,

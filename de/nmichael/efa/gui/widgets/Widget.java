@@ -205,6 +205,7 @@ public abstract class Widget implements IWidget {
         result.add(WeatherWidget.class.getCanonicalName());
         result.add(WeatherWidgetMulti.class.getCanonicalName());
         result.add(HTMLWidget.class.getCanonicalName());
+        result.add(HTMLWidgetMulti.class.getCanonicalName());
         result.add(AlertWidget.class.getCanonicalName());
         return result;
     }

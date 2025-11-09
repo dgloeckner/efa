@@ -3,3 +3,7 @@
 # ignore idea project files
 /.idea/
 *.iml
+/build/
+/dist/
+/program/
+build-sources.list

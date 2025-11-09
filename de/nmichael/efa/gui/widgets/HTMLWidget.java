@@ -16,6 +16,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.io.IOException;
+import java.util.concurrent.ScheduledFuture;
 
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
@@ -30,10 +31,12 @@ import de.nmichael.efa.core.items.IItemType;
 import de.nmichael.efa.core.items.ItemTypeDouble;
 import de.nmichael.efa.core.items.ItemTypeFile;
 import de.nmichael.efa.core.items.ItemTypeInteger;
+import de.nmichael.efa.core.items.ItemTypeBoolean;
 import de.nmichael.efa.data.LogbookRecord;
 import de.nmichael.efa.util.EfaUtil;
 import de.nmichael.efa.util.International;
 import de.nmichael.efa.util.Logger;
+import de.nmichael.efa.util.HttpCachedFetcher;
 
 public class HTMLWidget extends Widget {
 
@@ -41,6 +44,7 @@ public class HTMLWidget extends Widget {
     public static final String PARAM_HEIGHT         = "Height";
     public static final String PARAM_SCALE          = "Scale";
     public static final String PARAM_URL            = "Url";
+    public static final String PARAM_USE_HTTP_CACHE = "UseHttpCache";
 
     private JScrollPane scrollPane = new JScrollPane();
     private JEditorPane htmlPane;
@@ -67,6 +71,10 @@ public class HTMLWidget extends Widget {
                 null,ItemTypeFile.MODE_OPEN,ItemTypeFile.TYPE_FILE,
                 IItemType.TYPE_PUBLIC, "",
                 "URL"));
+
+        addParameterInternal(new ItemTypeBoolean(PARAM_USE_HTTP_CACHE, true,
+                IItemType.TYPE_PUBLIC, "",
+                International.getString("UseHttpCache")));
     }
 
     void construct() {
@@ -100,7 +108,9 @@ public class HTMLWidget extends Widget {
         if (htmlUpdater == null) {
             htmlUpdater = new HTMLUpdater();
         }
-        htmlUpdater.start();
+        IItemType icache = getParameterInternal(PARAM_USE_HTTP_CACHE);
+        boolean useCache = (icache != null ? ((ItemTypeBoolean)icache).getValue() : true);
+        htmlUpdater.setUseHttpCaching(useCache);
         htmlUpdater.setPage(getParameterInternal(PARAM_URL).toString(), getUpdateInterval());
     }
 
@@ -131,78 +141,135 @@ public class HTMLWidget extends Widget {
         // nothing to do
     }
 
-    private class HTMLUpdater extends Thread {
+    private class HTMLUpdater {
 
-        volatile boolean keepRunning = true;
+        private final java.util.concurrent.ScheduledExecutorService scheduler = java.util.concurrent.Executors.newSingleThreadScheduledExecutor(r -> {
+            Thread t = new Thread(r, "HTMLWidget.HtmlUpdater");
+            t.setDaemon(true);
+            return t;
+        });
         private volatile String url = null;
         private volatile int updateIntervalInSeconds = 24*3600;
+        private volatile ScheduledFuture<?> future;
+        private final HttpCachedFetcher fetcher = new HttpCachedFetcher();
+        private volatile boolean useHttpCaching = true;
 
-        public void run() {
-        	this.setName("HTMLWidget.HtmlUpdater");
-            while (keepRunning) {
-                try {
-                    try {
-                        if (url != null && url.length() > 0) {
-                            url = EfaUtil.correctUrl(url);
-                            Document doc = new HTMLDocument();
-                            doc.putProperty("javax.swing.JEditorPane.postdata", "foobar"); // property must match JEditorPane.PostDataProperty
-                            
-                            // not thread safe
-                            // htmlPane.setDocument(doc);
-                            // htmlPane.setPage(url);
-                            
-                            // this is thread safe
-                        	SwingUtilities.invokeLater(new Runnable() {
-                        	      public void run() {
-                                      try {
-                                          htmlPane.setDocument(doc);                                    	  
-                                    	  htmlPane.setPage(url);
-                                      } catch (IOException ee) {
-                                          htmlPane.setText(International.getString("FEHLER") + ": "
-                                                  + International.getMessage("Kann Adresse '{url}' nicht öffnen: {message}", url, ee.toString()));
-                                      }
-                        	      }
-                          	});
-                            
-                        }
-                    } catch (Exception ee) {
-                        //htmlPane.setText(International.getString("FEHLER") + ": "
-                        //        + International.getMessage("Kann Adresse '{url}' nicht öffnen: {message}", url, ee.toString()));
-                    	
-                    	SwingUtilities.invokeLater(new Runnable() {
-                  	      public void run() {
-                              htmlPane.setText(International.getString("FEHLER") + ": "
-                                      + International.getMessage("Kann Adresse '{url}' nicht öffnen: {message}", url, ee.toString()));   
-                  	      }
-                    	});                    	
-                    }
-                    Thread.sleep(updateIntervalInSeconds*1000);
-                } catch (InterruptedException e) {
-                	//This is when the thread gets interrupted when it is sleeping.
-                	EfaUtil.foo();            
-                } catch (Exception e) {
-                	Throwable t = e.getCause();
-                	if (t.getClass().getName().equalsIgnoreCase("java.lang.InterruptedException")) {
-                		EfaUtil.foo();
-                	} else {
-                		Logger.logdebug(e);
-                	}
-                }
+        private void schedule() {
+            if (future != null) {
+                future.cancel(false);
+            }
+            int interval = (updateIntervalInSeconds <= 0 ? 24*3600 : updateIntervalInSeconds);
+            future = scheduler.scheduleAtFixedRate(this::updateOnceSafe, 0, interval, java.util.concurrent.TimeUnit.SECONDS);
+        }
+
+        private void updateOnceSafe() {
+            try {
+                updateOnce();
+            } catch (Throwable e) {
+                Logger.logdebug(new Exception(e));
             }
         }
 
-        public void setPage(String url, int updateIntervalInSeconds) {
+        private void updateOnce() {
+            String u = this.url;
+            if (u == null || u.trim().isEmpty()) {
+                return;
+            }
+            u = EfaUtil.correctUrl(u);
+            final String urlToLoad = u;
+            try {
+                java.net.URL urlObj = new java.net.URL(urlToLoad);
+                String protocol = urlObj.getProtocol();
+                // For local files or unsupported protocols, delegate to JEditorPane directly on EDT
+                if (!"http".equalsIgnoreCase(protocol) && !"https".equalsIgnoreCase(protocol)) {
+                    SwingUtilities.invokeLater(() -> {
+                        try {
+                            htmlPane.setPage(urlObj);
+                        } catch (IOException ee) {
+                            htmlPane.setText(International.getString("FEHLER") + ": "
+                                    + International.getMessage("Kann Adresse '{url}' nicht öffnen: {message}", urlToLoad, ee.toString()));
+                        }
+                    });
+                    return;
+                }
+
+                if (useHttpCaching) {
+                    // Use HttpCachedFetcher for HTTP(S) with conditional requests
+                    try {
+                        HttpCachedFetcher.FetchResult res = fetcher.fetch();
+                        if (res.isNotModified()) {
+                            Logger.log(Logger.INFO, Logger.MSG_GENERIC, "HTMLWidget: Content not modified (304) for " + urlToLoad);
+                            return;
+                        }
+                        if (res.isOk() && res.body != null) {
+                            String charset = (res.charset != null ? res.charset : "UTF-8");
+                            java.io.Reader reader = new java.io.InputStreamReader(new java.io.ByteArrayInputStream(res.body), charset);
+                            HTMLEditorKit kit = new HTMLEditorKit();
+                            final HTMLDocument doc = (HTMLDocument) kit.createDefaultDocument();
+                            doc.putProperty("IgnoreCharsetDirective", Boolean.TRUE);
+                            doc.setBase(res.baseUrl);
+                            try {
+                                kit.read(reader, doc, 0);
+                            } finally {
+                                try { reader.close(); } catch (Exception ignore) {}
+                            }
+                            SwingUtilities.invokeLater(() -> {
+                                try {
+                                    htmlPane.setDocument(doc);
+                                } catch (Exception ee) {
+                                    htmlPane.setText(International.getString("FEHLER") + ": "
+                                            + International.getMessage("Kann Adresse '{url}' nicht öffnen: {message}", urlToLoad, ee.toString()));
+                                }
+                            });
+                        } else {
+                            final String msg = "HTTP " + res.httpStatus + " for " + urlToLoad;
+                            SwingUtilities.invokeLater(() -> htmlPane.setText(International.getString("FEHLER") + ": " + msg));
+                        }
+                    } catch (UnsupportedOperationException uoe) {
+                        // Should not happen because we guard by protocol above, but just in case
+                        SwingUtilities.invokeLater(() -> htmlPane.setText(International.getString("FEHLER") + ": " + uoe.getMessage()));
+                    }
+                } else {
+                    // No ETag-based caching: let JEditorPane handle the HTTP URL directly
+                    SwingUtilities.invokeLater(() -> {
+                        try {
+                            htmlPane.setPage(urlObj);
+                        } catch (IOException ee) {
+                            htmlPane.setText(International.getString("FEHLER") + ": "
+                                    + International.getMessage("Kann Adresse '{url}' nicht öffnen: {message}", urlToLoad, ee.toString()));
+                        }
+                    });
+                }
+            } catch (Exception ee) {
+                SwingUtilities.invokeLater(() -> {
+                    htmlPane.setText(International.getString("FEHLER") + ": "
+                            + International.getMessage("Kann Adresse '{url}' nicht öffnen: {message}", urlToLoad, ee.toString()));
+                });
+            }
+        }
+
+        public synchronized void setUseHttpCaching(boolean use) {
+            this.useHttpCaching = use;
+        }
+
+        public synchronized void setPage(String url, int updateIntervalInSeconds) {
             this.url = url;
             if (updateIntervalInSeconds <= 0) {
                 updateIntervalInSeconds = 24*3600;
             }
             this.updateIntervalInSeconds = updateIntervalInSeconds;
-            this.interrupt();
+            // set URL in fetcher (resets validators internally)
+            fetcher.setUrl(this.url);
+            schedule();
         }
 
         public synchronized void stopHTML() {
-            keepRunning = false;
-            interrupt(); // wake up thread
+            try {
+                if (future != null) {
+                    future.cancel(true);
+                }
+            } catch (Exception ignore) {}
+            scheduler.shutdownNow();
         }
 
     }

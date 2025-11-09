@@ -67,6 +67,9 @@ SET CP=%CP%;program/plugins/xmlgraphics-commons.jar
 REM Classpath: EFA Flat Laf
 SET CP=%CP%;program/plugins/flatlaf-3.2.5.jar
 
+REM Classpath: JSON
+SET CP=%CP%;program/plugins/json-20250517.jar
+
 REM Classpath: Weather-Plugin
 SET CP=%CP%;program/plugins/commons-codec.jar
 SET CP=%CP%;program/plugins/signpost-core.jar

@@ -1,6 +1,8 @@
 package de.nmichael.efa.gui.widgets;
 
 public class WeatherDataForeCast {
+    private long lastUpdateTimeStamp;
+	private long secondsUntilNextUpdate=90000;
     private double latitude;
     private double longitude;
     private double elevation;
@@ -10,6 +12,29 @@ public class WeatherDataForeCast {
     private WeatherDataDaily daily;
     private boolean status=false;
     private String statusMessage="";
+    
+    
+    public WeatherDataForeCast() {
+    	lastUpdateTimeStamp = System.currentTimeMillis();
+    }
+    
+    public long getLastUpdateTimeStamp() {
+    	return lastUpdateTimeStamp;
+    }
+    
+    public long getSecondsUntilNextUpdate() {
+    	return secondsUntilNextUpdate;
+    }
+    
+    public void setSecondsUntilNextUpdate(long value) {
+    	if (value<secondsUntilNextUpdate) {
+    		secondsUntilNextUpdate=value;
+    	}
+    }
+
+    public boolean needsUpdate() {
+    	return System.currentTimeMillis()>(lastUpdateTimeStamp+secondsUntilNextUpdate*1000);
+    }
     
 	public WeatherDataHourly getHourly() {
 		return hourly;

@@ -8,18 +8,12 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
-
-import org.json.JSONObject;
 
 import de.nmichael.efa.Daten;
 import de.nmichael.efa.data.LogbookRecord;
@@ -278,9 +272,8 @@ public class WeatherWidgetInstance extends WidgetInstance implements IWidgetInst
 
             		// only download new weather data after an Interval...
             		if (needsToUpdateWeather()) {
-            			wdf = getWeather(ww.getSource(), ww.getLongitude(), ww.getLatitude());
+            			wdf = WeatherDataCache.getInstance().getWeatherData(ww.getSource(), ww.getLongitude(), ww.getLatitude());
             			lastWeatherUpdate=System.currentTimeMillis();
-            			Logger.log(Logger.DEBUG, "Wetterdaten geholt");
             		}
 	            	
 	            	//Use invokelater as swing threadsafe ways
@@ -312,71 +305,6 @@ public class WeatherWidgetInstance extends WidgetInstance implements IWidgetInst
         }
 
 
-    	private WeatherDataForeCast getWeather(String source, String longitude, String latitude) {
-
-    		if (source.equalsIgnoreCase(WeatherWidget.WEATHER_SOURCE_OPENMETEO)) {
-
-    			try {
-
-    				return fetchMeteoWeather(longitude, latitude);
-
-    			} catch (Exception e) {
-    				Logger.logdebug(e);
-    			}
-    		}
-    		return null;
-    	}
-
-    	private WeatherDataForeCast fetchMeteoWeather(String longitude, String latitude) {
-
-    		String urlStr = "https://api.open-meteo.com/v1/forecast?latitude=" + latitude + "&longitude=" + longitude
-    				+ "&daily=weather_code,sunshine_duration,uv_index_max,uv_index_clear_sky_max,precipitation_sum,temperature_2m_max,temperature_2m_min,wind_speed_10m_max"
-    				+ "&hourly=temperature_2m,weather_code,wind_speed_10m,wind_direction_10m,uv_index,is_day,precipitation,precipitation_probability"
-    				+ "&t=temperature_2m,is_day,weather_code,wind_speed_10m,wind_direction_10m"
-    				+ (ww.getTempScale().equals(WeatherWidget.TEMP_FAHRENHEIT) ? "&temperature_unit=fahrenheit" : "")
-    				+ (ww.getSpeedScale().equals(WeatherWidget.SPEEDSCALE_MPH) ? "&wind_speed_unit=mph" : "")
-    				+ "&current_weather=true"
-    				+ "&timezone=GMT&forecast_days=1&forecast_hours=24&temporal_resolution=hourly_3"
-    				//+ "error"
-    				;
-
-    		try {
-
-    			Logger.log(Logger.DEBUG, International.getString("Lade Wetterdaten von URL: ")+urlStr);
-
-    			String response = fetchJSonFromURL(urlStr);
-    			JSONObject json = new JSONObject(response.toString());
-    			return OpenMeteoApiParser.parseFromOpenMeteo(json);
-
-    		} catch (Exception e) {
-    			WeatherDataForeCast tmp=new WeatherDataForeCast();
-    			tmp.setStatus(false);
-    			tmp.setStatusMessage(International.getString("Fehler beim Abruf der Wetterdaten.")+"\n\n"+ e.getMessage());
-    			Logger.logdebug(e);
-    			return tmp;
-    		}
-    	}
-
-    	private String fetchJSonFromURL(String urlStr) throws Exception {
-    		HttpURLConnection conn = (HttpURLConnection) new URL(urlStr).openConnection();
-    		conn.setRequestMethod("GET");
-    		conn.setConnectTimeout(5000);//max 5 seconds for connect
-    		conn.setReadTimeout(10000); // max 10 seconds for reading data
-
-    		try (BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"))) {
-    			StringBuilder sb = new StringBuilder();
-    			String line;
-    			while ((line = reader.readLine()) != null)
-    				sb.append(line);
-    			
-    			int status = conn.getResponseCode();
-    			if (status != HttpURLConnection.HTTP_OK) {
-    				throw new RuntimeException("WebServer Reply Status " + status + sb.toString());
-    			}
-
-    			return sb.toString();
-    		}
-    	}	 
     	
 
         

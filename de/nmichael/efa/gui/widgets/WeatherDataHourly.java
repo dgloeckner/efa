@@ -1,9 +1,14 @@
 package de.nmichael.efa.gui.widgets;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.ImageIcon;
+
+import de.nmichael.efa.util.International;
+
 public class WeatherDataHourly {
-	private List<String> time;
+	private List<Long> time;
     private List<Double> temperature2m;
     private List<Integer> weatherCode;
     private List<Double> windSpeed10m;
@@ -12,8 +17,14 @@ public class WeatherDataHourly {
     private List<Integer> isDay;
     private List<Double> precipitation;
     private List<Double> precipitationProb;
+	private List<Integer> openMeteoCode;
+	private List<Integer> weatherApiCode;
+	private List<Integer> iconcode;
+	private List<String> description;
+	private List<ImageIcon> uv_index_icon;
+
     
-	public List<Integer> getIsDay() {
+ 	public List<Integer> getIsDay() {
 		return isDay;
 	}
 	public void setIsDay(List<Integer> isDay) {
@@ -49,10 +60,10 @@ public class WeatherDataHourly {
 	public void setTemperature2m(List<Double> temperature2m) {
 		this.temperature2m = temperature2m;
 	}
-	public List<String> getTime() {
+	public List<Long> getTime() {
 		return time;
 	}
-	public void setTime(List<String> time) {
+	public void setTime(List<Long> time) {
 		this.time = time;
 	}
 	public List<Double> getPrecipitation() {
@@ -67,4 +78,64 @@ public class WeatherDataHourly {
 	public void setPrecipitationProb(List<Double> precipitationProb) {
 		this.precipitationProb = precipitationProb;
 	}  
+	
+	public List<Integer> getOpenMeteoCode() {
+		return openMeteoCode;
+	}
+	public void setOpenMeteoCode(List<Integer> openMeteoCode) {
+		this.openMeteoCode = openMeteoCode;
+	}
+	public List<Integer> getWeatherApiCode() {
+		return weatherApiCode;
+	}
+	public void setWeatherApiCode(List<Integer> weatherApiCode) {
+		this.weatherApiCode = weatherApiCode;
+	}
+	public List<Integer> getIconcode() {
+		return iconcode;
+	}
+	public void setIconcode(List<Integer> iconcode) {
+		this.iconcode = iconcode;
+	}
+	public List<String> getDescription() {
+		return description;
+	}
+	public void setDescription(List<String> description) {
+		this.description = description;
+	}	
+	
+    public int getIndexForCurrentTime() {
+
+    	int index=0;
+    	long compareTimeStamp=System.currentTimeMillis();
+    	
+    	if (time !=null && time.size()>0) {
+	    	for(Long unixStamp : time)
+			{
+	    		//we are looking for the index BEFORE the first entry that is in the future compared to now.
+	    		//unix Stamp is always in GMT, so we don't have to worry about time zones.
+	    		
+	    		if (unixStamp.longValue()*1000>compareTimeStamp) {
+	    			index--; // we want the item before.
+	    			if (index<0) {index=0;}
+	    			break;
+	    		} else {
+	    			index++;
+	    		}
+			}
+	    	return index;
+    	} else {
+    		return -1;
+    	}
+    }
+	public List<ImageIcon> getUv_index_icon() {
+		return uv_index_icon;
+	}
+	public void setUv_index_icon(List<ImageIcon> uv_index_icon) {
+		this.uv_index_icon = uv_index_icon;
+	}
+    
+
+
+
 }

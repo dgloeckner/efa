@@ -4,7 +4,12 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
@@ -54,5 +59,45 @@ public abstract class WeatherRenderer {
 	protected static JPanel getLocationHeader(String caption) {
 		return getLocationHeader(caption, false);
 	}
+	
+	protected static ImageIcon getHourlyWeatherIcon(WeatherDataForeCast wdf, int hourlyIndex) {
+		return WeatherIcons.getWeatherIconForCode(wdf.getHourly().getIconcode().get(hourlyIndex), 48, wdf.getHourly().getIsDay().get(hourlyIndex)==1, false);
+	}
+	
+	protected static String getHourlyDescription (WeatherDataForeCast wdf, int hourlyIndex) {
+		return wdf.getHourly().getDescription().get(hourlyIndex);
+	}
+	
+	protected static String getHourlyTemp(WeatherDataForeCast wdf, int hourlyIndex, String tempLabel) {
+		return wdf.getHourly().getTemperature2m().get(hourlyIndex) + tempLabel;
+	}
+	
+	protected static String getHourlyUVIndexVal(WeatherDataForeCast wdf, int hourlyIndex) {
+		return wdf.getHourly().getUvIndex().get(hourlyIndex) +"";//convert to string effortlessly
+	}
+
+	protected static ImageIcon getHourlyUVIndexIcon(WeatherDataForeCast wdf, int hourlyIndex) {
+		return wdf.getHourly().getUv_index_icon().get(hourlyIndex);//convert to string effortlessly
+	}
+	
+	protected static String getHourlyRain(WeatherDataForeCast wdf, int hourlyIndex) {
+		return wdf.getHourly().getPrecipitation().get(hourlyIndex) +"";//convert to string effortlessly
+	}
+	
+	protected static String getHourlyRainPercentage(WeatherDataForeCast wdf, int hourlyIndex) {
+		return wdf.getHourly().getPrecipitationProb().get(hourlyIndex)+"";
+	}
+
+	
+	protected static String getHourlyHourRendering(WeatherDataForeCast wdf, int hourlyIndex) {
+		long timestamp = wdf.getHourly().getTime().get(hourlyIndex)*1000;
+		
+		Instant instant = Instant.ofEpochMilli(timestamp);
+
+		LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+		return localDateTime.format(formatter);
+	}
+	
 	
 }

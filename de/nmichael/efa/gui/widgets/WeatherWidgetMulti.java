@@ -156,6 +156,13 @@ public class WeatherWidgetMulti extends Widget implements IItemFactory {
 
 	@Override
     public Vector <WidgetInstance> createInstances(){
+		
+		//initialize Weather Data Cache for current widget
+		WeatherDataCache.getInstance().setSpeedScale(getWeatherSpeedScale());
+		WeatherDataCache.getInstance().setTempScale(getWeatherTempScale());
+		WeatherDataCache.getInstance().setUpdateIntervalSeconds(getUpdateInterval());
+		
+		//now initialize Instances
 		Vector <WidgetInstance> returnList = new Vector <WidgetInstance>();
 		
 		ItemTypeItemList myWList=this.getLocationList();

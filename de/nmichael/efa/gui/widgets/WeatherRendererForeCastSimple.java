@@ -3,6 +3,10 @@ package de.nmichael.efa.gui.widgets;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -17,39 +21,44 @@ public class WeatherRendererForeCastSimple extends WeatherRenderer {
 		String tempLabel = ww.getTempLabel(true);
 		
 		// Build the main panel view
-
+		
+		int hourlyIndex = wdf.getHourly().getIndexForCurrentTime();
+		
 		roundPanel.add(getLocationHeader(ww.getCaption()), new GridBagConstraints(0, 0, 4, 1, 1.0, 0.0, GridBagConstraints.CENTER,
 			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));		
 		
 		roundPanel.add(
-				addForeCastPanel("14:00", 
-						WeatherIcons.getIcon(WeatherIcons.IMAGE_WEATHER_116_48), 
-						"28" + tempLabel, roundPanel),
+				addForeCastPanel(WeatherRenderer.getHourlyHourRendering(wdf, hourlyIndex), 
+						WeatherRenderer.getHourlyWeatherIcon(wdf,hourlyIndex),
+						WeatherRenderer.getHourlyDescription(wdf,hourlyIndex),
+						WeatherRenderer.getHourlyTemp(wdf, hourlyIndex, tempLabel), roundPanel),
 						new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
 						new Insets(4, 2, 2, 4), 0, 0));
 		roundPanel.add(
-				addForeCastPanel("15:00", 
-						WeatherIcons.getIcon(WeatherIcons.IMAGE_WEATHER_113_48), 
-						"24" + tempLabel, roundPanel),
+				addForeCastPanel(WeatherRenderer.getHourlyHourRendering(wdf, hourlyIndex+1) , 
+						WeatherRenderer.getHourlyWeatherIcon(wdf,hourlyIndex+1),
+						WeatherRenderer.getHourlyDescription(wdf,hourlyIndex+1),
+						WeatherRenderer.getHourlyTemp(wdf, hourlyIndex+1, tempLabel), roundPanel),
 						new GridBagConstraints(1, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.VERTICAL,
 						new Insets(4, 2, 2, 4), 0, 0));
 		roundPanel.add(
-				addForeCastPanel("16:00", 
-						WeatherIcons.getIcon(WeatherIcons.IMAGE_WEATHER_320_48), 
-						"20" + tempLabel, roundPanel),
+				addForeCastPanel(WeatherRenderer.getHourlyHourRendering(wdf, hourlyIndex+2), 
+						WeatherRenderer.getHourlyWeatherIcon(wdf,hourlyIndex+2),
+						WeatherRenderer.getHourlyDescription(wdf,hourlyIndex+2),
+						WeatherRenderer.getHourlyTemp(wdf, hourlyIndex+2, tempLabel), roundPanel),
 						new GridBagConstraints(2, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.VERTICAL,
 						new Insets(4, 2, 2, 4), 0, 0));
 		roundPanel.add(
-				addForeCastPanel("17:00", 
-						WeatherIcons.getIcon(WeatherIcons.IMAGE_WEATHER_386_1_48), 
-						"18" + tempLabel, roundPanel),
+				addForeCastPanel(WeatherRenderer.getHourlyHourRendering(wdf, hourlyIndex+3), 
+						WeatherRenderer.getHourlyWeatherIcon(wdf,hourlyIndex+3),
+						WeatherRenderer.getHourlyDescription(wdf,hourlyIndex+3),
+						WeatherRenderer.getHourlyTemp(wdf, hourlyIndex+3, tempLabel), roundPanel),
 						new GridBagConstraints(3, 1, 1, 1, 1.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
 						new Insets(4, 2, 2, 4), 0, 0));
 	}
 
-	
 
-	private static JPanel addForeCastPanel(String time, ImageIcon weatherIcon, String temp, JPanel roundPanel) {
+	private static JPanel addForeCastPanel(String time, ImageIcon weatherIcon, String description, String temp, JPanel roundPanel) {
 		JPanel myPanel = initializePanel(roundPanel);
 		JLabel timeLabel = initializeLabel(roundPanel);
 		JLabel weatherIconLabel = initializeLabel(roundPanel);
@@ -66,6 +75,7 @@ public class WeatherRendererForeCastSimple extends WeatherRenderer {
 		weatherIconLabel.setIcon(weatherIcon);
 		weatherIconLabel.setIconTextGap(0);
 		weatherIconLabel.setHorizontalTextPosition(SwingConstants.CENTER);
+		weatherIconLabel.setToolTipText(description);
 		tempLabel.setText(temp);
 		tempLabel.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
 		tempLabel.setHorizontalTextPosition(SwingConstants.CENTER);

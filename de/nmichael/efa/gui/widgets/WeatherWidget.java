@@ -128,6 +128,12 @@ public class WeatherWidget extends Widget {
 
 	@Override
     public Vector <WidgetInstance> createInstances(){
+
+		//initialize Weather Data Cache for current widget
+		WeatherDataCache.getInstance().setSpeedScale(getWeatherSpeedScale());
+		WeatherDataCache.getInstance().setTempScale(getWeatherTempScale());
+		WeatherDataCache.getInstance().setUpdateIntervalSeconds(getUpdateInterval());
+		
 		Vector <WidgetInstance> returnList = new Vector <WidgetInstance>();
 		
 		WeatherWidgetInstance wwi = new WeatherWidgetInstance();

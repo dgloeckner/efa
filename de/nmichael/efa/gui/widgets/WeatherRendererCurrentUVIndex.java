@@ -50,7 +50,7 @@ public class WeatherRendererCurrentUVIndex extends WeatherRenderer {
 		curWeather_temp = new JLabel();
 		curWeather_temp.setForeground(Daten.efaConfig.getToolTipHeaderForegroundColor());
 		curWeather_temp.setFont(
-				roundPanel.getFont().deriveFont((float) (Daten.efaConfig.getValueEfaDirekt_BthsFontSize() + 6)));
+				roundPanel.getFont().deriveFont((float) (Daten.efaConfig.getValueEfaDirekt_BthsFontSize() + 8)));
 		curWeather_temp.setFont(curWeather_temp.getFont().deriveFont(Font.BOLD));
 		curWeather_temp.setText(" "+wdf.getCurrentWeather().getTemperature() +" "+ ww.getTempLabel(true));
 

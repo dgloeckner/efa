@@ -63,7 +63,6 @@ public class WeatherDataDaily {
 
 	public void setUv_index_max(double uv_index_max) {
 		this.uv_index_max = uv_index_max;
-		this.uv_index_icon = getUVIndexIcon(uv_index_max);
 	}
 
 	public double getUv_index_clear_sky_max() {
@@ -112,23 +111,6 @@ public class WeatherDataDaily {
 
 	public void setUv_index_icon(ImageIcon uv_index_icon) {
 		this.uv_index_icon = uv_index_icon;
-	}
-
-	private ImageIcon getUVIndexIcon(double uv_max) {
-		if (uv_max <3) {
-			return WeatherIcons.getIcon(WeatherIcons.IMAGE_UV_INDEX_LOW);
-		} else if (uv_max <5) {
-			return WeatherIcons.getIcon(WeatherIcons.IMAGE_UV_INDEX_MEDIUM);
-		} else if (uv_max <7) {
-			return WeatherIcons.getIcon(WeatherIcons.IMAGE_UV_INDEX_ABOVE_MEDIUM);
-		} else if (uv_max <9) {
-			return WeatherIcons.getIcon(WeatherIcons.IMAGE_UV_INDEX_HIGH);
-		} else if (uv_max <11) {
-			return WeatherIcons.getIcon(WeatherIcons.IMAGE_UV_INDEX_VERY_HIGH);
-		} else {
-			return WeatherIcons.getIcon(WeatherIcons.IMAGE_UV_INDEX_SEVERE);
-		}
-
 	}
 	
 }

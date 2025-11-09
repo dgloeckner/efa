@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.ImageIcon;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -12,9 +14,9 @@ import de.nmichael.efa.util.International;
 
 public class OpenMeteoApiParser {
 
-    private static final Map<Integer, Integer> weatherCodeMap = new HashMap<>();
-    private static final Map<Integer, String> weatherDescMap = new HashMap<>();
-    private static final Map<Integer, Integer> weatherApiCodeToWeatherApiIconMap = new HashMap<>();
+    public static final Map<Integer, Integer> weatherCodeMap = new HashMap<>();
+    public static final Map<Integer, String> weatherDescMap = new HashMap<>();
+    public static final Map<Integer, Integer> weatherApiCodeToWeatherApiIconMap = new HashMap<>();
 
     static {
         // vollständige Mapping-Tabelle (siehe vorherige Antwort)
@@ -144,6 +146,7 @@ public class OpenMeteoApiParser {
         wdd.setWeatherApiCode(weatherCodeMap.getOrDefault(openMeteoCode, 1000));
         wdd.setIconCode(weatherApiCodeToWeatherApiIconMap.getOrDefault(wdd.getWeatherApiCode(), 113));
         wdd.setDescription(weatherDescMap.getOrDefault(openMeteoCode, "Unknown"));
+		wdd.setUv_index_icon(getUVIndexIcon(wdd.getUv_index_max()));
 
         wdf.setDaily(wdd);
         
@@ -162,7 +165,7 @@ public class OpenMeteoApiParser {
         // Hourly Data -------------------------------
         JSONObject hd = root.getJSONObject("hourly");
         WeatherDataHourly hourly = new WeatherDataHourly();
-        hourly.setTime(toStringList(hd.getJSONArray("time")));
+        hourly.setTime(toLongList(hd.getJSONArray("time")));
         hourly.setTemperature2m(toDoubleList(hd.getJSONArray("temperature_2m")));
         hourly.setWeatherCode(toIntList(hd.getJSONArray("weather_code")));
         hourly.setWindSpeed10m(toDoubleList(hd.getJSONArray("wind_speed_10m")));
@@ -171,12 +174,48 @@ public class OpenMeteoApiParser {
         hourly.setIsDay(toIntList(hd.getJSONArray("is_day")));
         hourly.setPrecipitation(toDoubleList(hd.getJSONArray("precipitation")));
         hourly.setPrecipitationProb(toDoubleList(hd.getJSONArray("precipitation_probability")));
+        calculateHourlyWeatherCodeAndIcons(hourly);
         wdf.setHourly(hourly);
         
         wdf.setStatus(true);
         wdf.setStatusMessage("");
         return wdf;
     }
+    
+    
+	private static void calculateHourlyWeatherCodeAndIcons(WeatherDataHourly data) {
+		
+		List<Integer> openMeteoCode = new ArrayList<Integer>();
+		List<Integer>  weatherApiCode = new ArrayList<Integer>();
+		List<Integer>  iconcode = new ArrayList<Integer>();
+		List<String>  description = new ArrayList<String>();
+		List<ImageIcon> uvicon = new ArrayList<ImageIcon>();
+		
+		if (data.getWeatherCode()!=null && data.getWeatherCode().size()>0) {
+			int index=0;
+			for(Integer curWCode: data.getWeatherCode())
+			{
+	    		int openMeteoCodeSingle = curWCode.intValue();
+	    		int weatherApiCodeSingle = weatherCodeMap.getOrDefault(openMeteoCodeSingle, 1000);
+	    		int iconCodeSingle = weatherApiCodeToWeatherApiIconMap.getOrDefault(weatherApiCodeSingle, 113);
+	    		String descriptionSingle = weatherDescMap.getOrDefault(openMeteoCodeSingle, International.getString("Unbekannt"));
+	    		ImageIcon uvIconSingle = getUVIndexIcon(data.getUvIndex().get(index));
+	    		openMeteoCode.add(openMeteoCodeSingle);
+	    		weatherApiCode.add(weatherApiCodeSingle);
+	    		iconcode.add(iconCodeSingle);
+	    		description.add(descriptionSingle);
+	    		uvicon.add(uvIconSingle);
+	    		
+			}
+		}
+		
+		data.setOpenMeteoCode(openMeteoCode);
+		data.setWeatherApiCode(weatherApiCode);
+		data.setIconcode(iconcode);
+		data.setDescription(description);
+		data.setUv_index_icon(uvicon);
+
+	}    
     
     private static List<String> toStringList(JSONArray arr) {
         List<String> list = new ArrayList<>();
@@ -201,4 +240,29 @@ public class OpenMeteoApiParser {
         }
         return list;
     }
+    
+    private static List<Long> toLongList(JSONArray arr) {
+        List<Long> list = new ArrayList<>();
+        for (int i = 0; i < arr.length(); i++) {
+            list.add(arr.getLong(i));
+        }
+        return list;
+    }    
+    
+	private static ImageIcon getUVIndexIcon(double uv_max) {
+		if (uv_max <3) {
+			return WeatherIcons.getIcon(WeatherIcons.IMAGE_UV_INDEX_LOW);
+		} else if (uv_max <5) {
+			return WeatherIcons.getIcon(WeatherIcons.IMAGE_UV_INDEX_MEDIUM);
+		} else if (uv_max <7) {
+			return WeatherIcons.getIcon(WeatherIcons.IMAGE_UV_INDEX_ABOVE_MEDIUM);
+		} else if (uv_max <9) {
+			return WeatherIcons.getIcon(WeatherIcons.IMAGE_UV_INDEX_HIGH);
+		} else if (uv_max <11) {
+			return WeatherIcons.getIcon(WeatherIcons.IMAGE_UV_INDEX_VERY_HIGH);
+		} else {
+			return WeatherIcons.getIcon(WeatherIcons.IMAGE_UV_INDEX_SEVERE);
+		}
+
+	}
 }    

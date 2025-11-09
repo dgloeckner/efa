@@ -13,60 +13,45 @@ import de.nmichael.efa.Daten;
 
 public class WeatherRendererForeCastComplex extends WeatherRenderer {
 	public static void renderWeather(WeatherDataForeCast wdf, JPanel roundPanel, WeatherWidgetInstance ww) {
-		String tempLabel = ww.getTempLabel(true);
+		String tempLabel = ww.getTempLabel(false);
 		
 		int startY=1;
 		// Build the main panel view
+		int hourlyIndex = wdf.getHourly().getIndexForCurrentTime();
 
 		roundPanel.add(getLocationHeader(ww.getCaption()), new GridBagConstraints(0, 0, 7, 1, 1.0, 0.0, GridBagConstraints.CENTER,
 			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));		
 		
-		//roundPanel.add(
-				addForeCastPanel("14:00", 
-						WeatherIcons.getIcon(WeatherIcons.IMAGE_WEATHER_116_48),
-						"Heiter bis wolkig",
-						"28" + tempLabel, 
-						"3.5", 
-						WeatherIcons.getIcon(WeatherIcons.IMAGE_UV_INDEX_SEVERE),
-						"3mm", "0 %", roundPanel,startY);
-				/*,
-						new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
-						new Insets(4, 2, 2, 4), 0, 0));*/
-		//roundPanel.add(
-				startY=startY+2;
-				addForeCastPanel("15:00", 
-						WeatherIcons.getIcon(WeatherIcons.IMAGE_WEATHER_113_48), 
-						"Sonnig",
-						"24" + tempLabel, 
-						"3.5",
-						WeatherIcons.getIcon(WeatherIcons.IMAGE_UV_INDEX_VERY_HIGH),
-						"10mm","5 %", roundPanel, startY);
-				/*,
-						new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
-						new Insets(4, 2, 2, 4), 0, 0));*/
-		//roundPanel.add(
-	/*			startY=startY+2;
+				addForeCastPanel(WeatherRenderer.getHourlyHourRendering(wdf, hourlyIndex), 
+						WeatherRenderer.getHourlyWeatherIcon(wdf,hourlyIndex),
+						WeatherRenderer.getHourlyDescription(wdf,hourlyIndex),
+						WeatherRenderer.getHourlyTemp(wdf, hourlyIndex, tempLabel), 
+						WeatherRenderer.getHourlyUVIndexVal(wdf, hourlyIndex), 
+						WeatherRenderer.getHourlyUVIndexIcon(wdf, hourlyIndex),
+						WeatherRenderer.getHourlyRain(wdf, hourlyIndex)+" mm",
+						WeatherRenderer.getHourlyRainPercentage(wdf, hourlyIndex)+" %", roundPanel, startY);
 
-				addForeCastPanel("16:00", 
-						WeatherIcons.getIcon(WeatherIcons.IMAGE_WEATHER_320_48),
-						"leichter Regen", 
-						"20" + tempLabel, 
-						"3.5", 
-						WeatherIcons.getIcon(WeatherIcons.IMAGE_UV_INDEX_HIGH),
-						
-						"50mm", "80 %",roundPanel, startY);/*,
-						new GridBagConstraints(0, 3, 1, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
-						new Insets(4, 2, 2, 4), 0, 0));*/
-	/*	roundPanel.add(
-				addForeCastPanel("17:00", 
-						WeatherIcons.getIcon(WeatherIcons.IMAGE_WEATHER_386_1_48), 
-						"18" + tempLabel, 
-						"3.5", 
-						WeatherIcons.getIcon(WeatherIcons.IMAGE_UV_INDEX_MEDIUM),
-						"3mm"),
-						new GridBagConstraints(3, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.VERTICAL,
-						new Insets(4, 2, 2, 18), 0, 0));
-	*/
+				startY=startY+2;
+				hourlyIndex++;
+				addForeCastPanel(WeatherRenderer.getHourlyHourRendering(wdf, hourlyIndex), 
+						WeatherRenderer.getHourlyWeatherIcon(wdf,hourlyIndex),
+						WeatherRenderer.getHourlyDescription(wdf,hourlyIndex),
+						WeatherRenderer.getHourlyTemp(wdf, hourlyIndex, tempLabel), 
+						WeatherRenderer.getHourlyUVIndexVal(wdf, hourlyIndex), 
+						WeatherRenderer.getHourlyUVIndexIcon(wdf, hourlyIndex),
+						WeatherRenderer.getHourlyRain(wdf, hourlyIndex)+" mm",
+						WeatherRenderer.getHourlyRainPercentage(wdf, hourlyIndex)+" %", roundPanel, startY);
+				
+				startY=startY+2;
+				hourlyIndex++;		
+				addForeCastPanel(WeatherRenderer.getHourlyHourRendering(wdf, hourlyIndex), 
+						WeatherRenderer.getHourlyWeatherIcon(wdf,hourlyIndex),
+						WeatherRenderer.getHourlyDescription(wdf,hourlyIndex),
+						WeatherRenderer.getHourlyTemp(wdf, hourlyIndex, tempLabel), 
+						WeatherRenderer.getHourlyUVIndexVal(wdf, hourlyIndex), 
+						WeatherRenderer.getHourlyUVIndexIcon(wdf, hourlyIndex),
+						WeatherRenderer.getHourlyRain(wdf, hourlyIndex)+" mm",
+						WeatherRenderer.getHourlyRainPercentage(wdf, hourlyIndex)+" %", roundPanel, startY);
 	}
 
 	
@@ -115,15 +100,15 @@ public class WeatherRendererForeCastComplex extends WeatherRenderer {
 		rainLabelPercent.setHorizontalTextPosition(SwingConstants.CENTER);
 
 		
-   	    roundPanel.add(timeLabel,   		new GridBagConstraints(0, startY, 1, 2, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.VERTICAL, 		new Insets(0,0,0,2), 0, 0));
-   	    roundPanel.add(weatherIconLabel, 	new GridBagConstraints(1, startY, 1, 2, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.VERTICAL, 	    new Insets(0,2,0,2), 0, 0));
+   	    roundPanel.add(timeLabel,   		new GridBagConstraints(0, startY, 1, 2, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.VERTICAL, 		new Insets(4,0,0,2), 0, 0));
+   	    roundPanel.add(weatherIconLabel, 	new GridBagConstraints(1, startY, 1, 2, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.VERTICAL, 	    new Insets(4,2,0,2), 0, 0));
    	    
-   	    roundPanel.add(tempLabel, 			new GridBagConstraints(2, startY, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.VERTICAL, 		new Insets(0,4,0,4), 0, 0));	
-   	    roundPanel.add(uvIndexLabel, 		new GridBagConstraints(2, startY+1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.VERTICAL, 	new Insets(0,4,3,4), 0, 0));
+   	    roundPanel.add(tempLabel, 			new GridBagConstraints(4, startY, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.VERTICAL, 		new Insets(4,4,0,4), 0, 0));	
+   	    roundPanel.add(uvIndexLabel, 		new GridBagConstraints(5, startY, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.VERTICAL, 	new Insets(4,4,3,4), 0, 0));
    		
-   	    roundPanel.add(rainIcon, 			new GridBagConstraints(3, startY, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,   GridBagConstraints.VERTICAL, 	new Insets(0,2,0,0), 0, 0));
-   	    roundPanel.add(rainLabel, 			new GridBagConstraints(4, startY, 1, 1, 0.0, 0.0, GridBagConstraints.EAST,   GridBagConstraints.VERTICAL, 		new Insets(0,2,0,5), 0, 0));
-   		roundPanel.add(rainLabelPercent, 	new GridBagConstraints(5, startY, 1, 1, 0.0, 1.0, GridBagConstraints.EAST, 	GridBagConstraints.VERTICAL, 		new Insets(0,2,0,2), 0, 0));
+   	    roundPanel.add(rainIcon, 			new GridBagConstraints(3, startY+1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,   GridBagConstraints.VERTICAL, 	new Insets(0,2,0,0), 0, 0));
+   	    roundPanel.add(rainLabel, 			new GridBagConstraints(4, startY+1, 1, 1, 0.0, 0.0, GridBagConstraints.EAST,   GridBagConstraints.VERTICAL, 		new Insets(0,2,0,5), 0, 0));
+   		roundPanel.add(rainLabelPercent, 	new GridBagConstraints(5, startY+1, 1, 1, 0.0, 1.0, GridBagConstraints.EAST, 	GridBagConstraints.VERTICAL, 		new Insets(0,2,4,2), 0, 0));
 
    	    /*
 		myPanel.setLayout(new BorderLayout(0, 0));

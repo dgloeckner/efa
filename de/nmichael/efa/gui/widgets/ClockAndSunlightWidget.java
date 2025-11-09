@@ -56,7 +56,7 @@ public class ClockAndSunlightWidget extends Widget {
                 IItemType.TYPE_PUBLIC, "",
                 International.getString("Uhrzeit anzeigen")));
         
-        addParameterInternal(new ItemTypeBoolean(PARAM_SHOWDATE, false,
+        addParameterInternal(new ItemTypeBoolean(PARAM_SHOWDATE, true,
                 IItemType.TYPE_PUBLIC, "",
                 International.getString("Datum anzeigen")));
         

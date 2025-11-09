@@ -16,7 +16,7 @@ public class MultiWidgetContainer extends Widget {
         addHint("MultiWidgetInfo1",IItemType.TYPE_PUBLIC, "", International.getString("Das Multi-Widget kann in einem Platzbereich mehrere Widgets anzeigen."), 3,6,6);
         addHint("MultiWidgetInfo2",IItemType.TYPE_PUBLIC, "", International.getString("Wählen Sie dazu jeweils in den anderen Widgets als Position \"MultiWidget\" aus."), 3,6,6);
         
-        addParameterInternal(new ItemTypeInteger(PARAM_AUTOCHANGE, 15, 0, 90, false,
+        addParameterInternal(new ItemTypeInteger(PARAM_AUTOCHANGE, 10, 0, 90, false,
                 IItemType.TYPE_PUBLIC, "",
                 International.getString("Wechsel zum nächsten Widget nach ... Sekunden")));
         

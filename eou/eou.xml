@@ -1,6 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <efaOnlineUpdate>
     <Version>
+        <VersionID>2.5.1#1</VersionID>
+        <ReleaseDate>09.11.2025</ReleaseDate>
+        <DownloadUrl>TODO</DownloadUrl>
+        <DownloadSize>TODO</DownloadSize>
+     	<MinimumJavaVersion>1.8</MinimumJavaVersion>
+		<MinimumEfaCloudVersion>2.3.3</MinimumEfaCloudVersion>
+        <ShowNotics lang="de">Early Access für Test der Widget-Überarbeitung. Basiert auf Beta 2.5.0#21. Einsatz auf eigene Gefahr.</ShowNotics>
+        <ShowNotice lang="de">Wenn efaCloud eingesetzt wird, muss der Server mindestens Version 2.3.3 unterstützen. EfaCloud 2.4.0_12 und höher werden empfohlen.</ShowNotice>
+        <ShowNotics lang="en">Early Access for testing efa widget refactoring. Based on Beta 2.5.0#21. Use at own risk.</ShowNotics>
+        <ShowNotice lang="en">If you use efaCloud, make sure your server at least supports efaCloud Version 2.3.3. It is recommended to upgrade to EfaCloud 2.4.0_12 or above.</ShowNotice>
+        <Changes lang="de">
+            <ChangeItem>Neu: Widget: Das Widget-System wesentlich überarbeitet und ergänzt.</ChangeItem>
+            <ChangeItem>Neu: Widget: Uhrzeit Widget: Datumsanzeige. Sonnenauf/Untergang kann bei der Uhr angezeigt werden.</ChangeItem>
+            <ChangeItem>Neu: Widget: Wetter Widget: Initiale Version der Wetteranzeige mit mehren Darstellungsmöglichkeiten.</ChangeItem>
+            <ChangeItem>Neu: Widget: Wetter Widget: Möglichkeit, mehrere Wetter-Widgets anzuzeigen.</ChangeItem>
+            <ChangeItem>Neu: Widget: HTML Widget: Möglichkeit, mehrere HTML-Widgets anzuzeigen.</ChangeItem>
+            <ChangeItem>Neu: Widget: Multi Widget zur Anzeige mehrerer Widgets, die automatisch durchlaufen.</ChangeItem>
+        </Changes>
+        <Changes lang="en">
+            <ChangeItem>New: Widget: The widget system has been refactored and extended by new features.</ChangeItem>
+            <ChangeItem>New: Widget: Clock widget: Ability to show date. Sunrise/sunset times can be shown beneath the clock.</ChangeItem>
+            <ChangeItem>New: Widget: Weather Widget: Initial release with multiple Weather presentations.</ChangeItem>
+            <ChangeItem>New: Widget: Weather Widget: efa can show multiple Weather Widgets.</ChangeItem>
+            <ChangeItem>New: Widget: HTML Widget: efa can show multiple HTML Widgets.</ChangeItem>
+            <ChangeItem>New: Widget: Multi-Widget which is a container for multiple other Widgets. Automatic switch between several Widgets.</ChangeItem>
+        </Changes>
+    </Version>
+    <Version>
         <VersionID>2.5.0#21</VersionID>
         <ReleaseDate>03.11.2025</ReleaseDate>
         <DownloadUrl>TODO</DownloadUrl>

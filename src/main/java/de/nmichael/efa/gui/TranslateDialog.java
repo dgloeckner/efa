@@ -19,6 +19,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.File;
 import java.util.Hashtable;
 import java.util.Locale;
 import java.util.Properties;
@@ -231,21 +233,68 @@ public class TranslateDialog extends BaseDialog implements IItemListener, ITable
         }
     }
 
-    private Properties readProperties(String filename) {
+    private Properties readProperties(String name) {
+        InputStream in = null;
         try {
+            // 1) Try classpath (resources inside fat jar)
+            ClassLoader cl = Thread.currentThread().getContextClassLoader();
+            if (cl == null) {
+                cl = this.getClass().getClassLoader();
+            }
+            in = cl.getResourceAsStream(name);
+            if (in == null) {
+                // 2) Try file system path as-is
+                File f = new File(name);
+                if (!f.isAbsolute() && (name.indexOf('/') < 0 && name.indexOf('\\') < 0)) {
+                    // 3) Try program directory (distribution layout)
+                    if (Daten.efaProgramDirectory != null) {
+                        f = new File(Daten.efaProgramDirectory, name);
+                    }
+                }
+                if (f.exists()) {
+                    in = new FileInputStream(f);
+                }
+            }
+            if (in == null) {
+                return null;
+            }
             Properties prop = new Properties();
-            prop.load(new FileInputStream(filename));
+            prop.load(in);
             return prop;
         } catch(Exception e) {
             Logger.logdebug(e);
             return null;
+        } finally {
+            if (in != null) {
+                try { in.close(); } catch (Exception ignore) {}
+            }
         }
+    }
+
+    private String resolveBundleOutputPath(String name) {
+        File f = new File(name);
+        if (f.isAbsolute() || name.indexOf('/') >= 0 || name.indexOf('\\') >= 0) {
+            return f.getPath();
+        }
+        // Prefer writing into the program directory if available
+        String baseDir = Daten.efaProgramDirectory;
+        if (baseDir == null || baseDir.length() == 0) {
+            baseDir = ".";
+        }
+        File dir = new File(baseDir);
+        if (!dir.exists()) {
+            try { dir.mkdirs(); } catch (Exception ignore) {}
+        }
+        return new File(dir, name).getPath();
     }
 
     private Properties createProperties(String filename, String description) {
         try {
+            String outPath = resolveBundleOutputPath(filename);
+            // Remember the real file we write to, so later saves use the same path
+            this.workLangFile = outPath;
             Properties prop = new Properties();
-            prop.store(new FileOutputStream(filename), description);
+            prop.store(new FileOutputStream(outPath), description);
             return prop;
         } catch(Exception e) {
             Logger.logdebug(e);

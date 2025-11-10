@@ -1,0 +1,358 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>de.nmichael</groupId>
+  <artifactId>efa</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>efa</name>
+  <description>Basic Maven build to replace the proprietary build script incrementally</description>
+  <url>https://example.invalid/efa</url>
+  <packaging>jar</packaging>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.release>8</maven.compiler.release>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+
+    <!-- Dependency versions -->
+    <flatlaf.version>3.6</flatlaf.version>
+    <jsch.version>0.1.55</jsch.version>
+    <json.version>20250517</json.version>
+    <javahelp.version>2.0.05</javahelp.version>
+    <javax.mail.version>1.6.2</javax.mail.version>
+    <javax.activation.version>1.2.0</javax.activation.version>
+    <fop.version>2.11</fop.version>
+    <xmlgraphics.commons.version>2.9</xmlgraphics.commons.version>
+    <commons.io.version>2.17.0</commons.io.version>
+    <commons.logging.version>1.3.4</commons.logging.version>
+    <commons.codec.version>1.17.1</commons.codec.version>
+    <signpost.version>1.2.1.2</signpost.version>
+  </properties>
+
+  <dependencies>
+    <!-- UI theme -->
+    <dependency>
+      <groupId>com.formdev</groupId>
+      <artifactId>flatlaf</artifactId>
+      <version>${flatlaf.version}</version>
+    </dependency>
+
+    <!-- SSH/SFTP support (legacy) -->
+    <dependency>
+      <groupId>com.jcraft</groupId>
+      <artifactId>jsch</artifactId>
+      <version>${jsch.version}</version>
+    </dependency>
+
+    <!-- JSON (org.json) -->
+    <dependency>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+      <version>${json.version}</version>
+    </dependency>
+
+    <!-- JavaHelp runtime (legacy, still used at runtime) -->
+    <dependency>
+      <groupId>javax.help</groupId>
+      <artifactId>javahelp</artifactId>
+      <version>${javahelp.version}</version>
+    </dependency>
+
+    <!-- JavaMail (javax flavor to match existing code) -->
+    <dependency>
+      <groupId>com.sun.mail</groupId>
+      <artifactId>javax.mail</artifactId>
+      <version>${javax.mail.version}</version>
+      <exclusions>
+        <!-- Ommitted due to direct dependency -->
+        <exclusion>
+          <artifactId>activation</artifactId>
+          <groupId>javax.activation</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <!-- Activation (javax flavor to match existing code) -->
+    <dependency>
+      <groupId>com.sun.activation</groupId>
+      <artifactId>javax.activation</artifactId>
+      <version>${javax.activation.version}</version>
+    </dependency>
+
+    <!-- Apache FOP (pulls xmlgraphics-commons and batik transitively) -->
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>fop</artifactId>
+      <version>${fop.version}</version>
+      <!-- Exclude XML apis as they are provided by JRE >= 11 -->
+      <exclusions>
+        <exclusion>
+          <artifactId>xml-apis-ext</artifactId>
+          <groupId>xml-apis</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>xml-apis</artifactId>
+          <groupId>xml-apis</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <!-- In case the code relies directly on xmlgraphics-commons classes -->
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>xmlgraphics-commons</artifactId>
+      <version>${xmlgraphics.commons.version}</version>
+    </dependency>
+
+    <!-- Commons stack used around PDF/weather code -->
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>${commons.io.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>${commons.logging.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-codec</groupId>
+      <artifactId>commons-codec</artifactId>
+      <version>${commons.codec.version}</version>
+    </dependency>
+
+    <!-- OAuth signpost (legacy) -->
+    <dependency>
+      <groupId>oauth.signpost</groupId>
+      <artifactId>signpost-core</artifactId>
+      <version>${signpost.version}</version>
+    </dependency>
+
+    <!-- Temporary system-scoped dependencies for non-Maven/unknown jars -->
+    <!-- edtftpj: If you prefer Maven Central version, replace with normal dependency on com.enterprisedt:edtftpj -->
+    <dependency>
+      <groupId>local.plugins</groupId>
+      <artifactId>edtftpj</artifactId>
+      <version>0</version>
+      <scope>system</scope>
+      <systemPath>${project.basedir}/plugins/ftp/edtftpj.jar</systemPath>
+    </dependency>
+
+    <!-- jsuntimes appears to be custom or not on Central; keep as system for now. -->
+    <dependency>
+      <groupId>local.plugins</groupId>
+      <artifactId>jsuntimes</artifactId>
+      <version>0</version>
+      <scope>system</scope>
+      <systemPath>${project.basedir}/plugins/jsuntimes/jsuntimes.jar</systemPath>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <resources>
+      <!-- Default resources directory (may be empty) -->
+      <resource>
+        <directory>${project.basedir}/src/main/resources</directory>
+      </resource>
+      <!-- Include help folder into jar under help/ so runtime can load JavaHelp from classpath -->
+      <resource>
+        <directory>${project.basedir}/help</directory>
+        <targetPath>help</targetPath>
+        <filtering>false</filtering>
+      </resource>
+      <!-- Include non-.java resources that historically lived under src/main/java (images, css, xml, etc.) -->
+      <resource>
+        <directory>${project.basedir}/src/main/java</directory>
+        <includes>
+          <include>**/*.gif</include>
+          <include>**/*.png</include>
+          <include>**/*.txt</include>
+          <include>**/*.css</include>
+          <include>**/*.xml</include>
+          <include>**/*.xsl</include>
+        </includes>
+      </resource>
+      <!-- Also embed i18n bundles into the jar for classpath-based lookups (while assembly still copies them to program/) -->
+      <resource>
+        <directory>${project.basedir}</directory>
+        <includes>
+          <include>efa*.properties</include>
+        </includes>
+        <targetPath>.</targetPath>
+      </resource>
+    </resources>
+
+    <plugins>
+      <!-- Add non-standard source directory for legacy tools like SecFileCreator -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>3.6.0</version>
+        <executions>
+          <execution>
+            <id>add-extra-sources</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>${project.basedir}/tools</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Use Java 8 toolchain -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.13.0</version>
+        <configuration>
+          <release>${maven.compiler.release}</release>
+          <encoding>${project.build.sourceEncoding}</encoding>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.4.2</version>
+      </plugin>
+
+      <!-- Workaround for JARs not available as Maven dependencies -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>3.6.1</version>
+        <executions>
+          <execution>
+            <id>unpack-system-deps</id>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>unpack-dependencies</goal>
+            </goals>
+            <configuration>
+              <includeGroupIds>local.plugins</includeGroupIds>
+              <includeArtifactIds>edtftpj,jsuntimes</includeArtifactIds>
+              <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Build a fat (shaded) jar that includes all runtime dependencies -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.4.1</version>
+        <executions>
+          <execution>
+            <id>shade-fat-jar</id>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <createDependencyReducedPom>false</createDependencyReducedPom>
+              <shadedArtifactAttached>false</shadedArtifactAttached>
+              <filters>
+                <filter>
+                  <artifact>*:*</artifact>
+                  <excludes>
+                    <exclude>META-INF/*.SF</exclude>
+                    <exclude>META-INF/*.DSA</exclude>
+                    <exclude>META-INF/*.RSA</exclude>
+                    <!-- Silence JPMS module descriptor warnings when shading into a single jar -->
+                    <exclude>module-info.class</exclude>
+                    <exclude>META-INF/versions/*/module-info.class</exclude>
+                    <exclude>META-INF/MANIFEST.MF</exclude>
+                    <exclude>META-INF/DEPENDENCIES</exclude>
+                  </excludes>
+                </filter>
+              </filters>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformer"/>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer"/>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <mainClass>de.nmichael.efa.base.Main</mainClass>
+                </transformer>
+              </transformers>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Run tools.SecFileCreator to generate program/efa.sec containing the SHA of efa.jar AFTER shading -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.5.0</version>
+        <executions>
+          <execution>
+            <id>generate-efa-sec</id>
+            <phase>package</phase>
+            <goals>
+              <goal>java</goal>
+            </goals>
+            <configuration>
+              <mainClass>tools.SecFileCreator</mainClass>
+              <classpathScope>runtime</classpathScope>
+              <arguments>
+                <!-- cfgDir where efa.sec will be written -->
+                <argument>${project.build.directory}</argument>
+                <!-- path to the built application jar whose SHA is written into efa.sec -->
+                <argument>${project.build.directory}/${project.artifactId}-${project.version}.jar</argument>
+              </arguments>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Create distribution ZIP/TAR with expected layout -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>3.7.1</version>
+        <configuration>
+          <descriptors>
+            <descriptor>src/assembly/efa.xml</descriptor>
+          </descriptors>
+          <!-- Name artifacts like efa${project.version}.zip/tar -->
+          <finalName>efa${project.version}</finalName>
+          <appendAssemblyId>false</appendAssemblyId>
+          <!-- Ensure archives are attached and not skipped during package -->
+          <attach>true</attach>
+          <skipAssembly>false</skipAssembly>
+        </configuration>
+        <executions>
+          <execution>
+            <id>make-dist</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <repositories>
+    <!-- Use Maven Central; explicit declaration is optional but shown for clarity. -->
+    <repository>
+      <id>central</id>
+      <name>Maven Central</name>
+      <url>https://repo1.maven.org/maven2/</url>
+      <releases><enabled>true</enabled></releases>
+      <snapshots><enabled>false</enabled></snapshots>
+    </repository>
+  </repositories>
+
+</project>

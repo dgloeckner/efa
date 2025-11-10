@@ -157,35 +157,35 @@ public class International {
         }
     }
 
+    /**
+     * Returns the resource name for a bundle on the classpath, e.g. "efa_de.properties".
+     * Formerly returned an absolute file system path in the distribution.
+     */
     public static String getBundleFilename(String languageId) {
-        return Daten.efaProgramDirectory + BUNDLE_NAME + "_" + languageId + ".properties";
+        return BUNDLE_NAME + "_" + languageId + ".properties";
     }
 
+    /**
+     * Detect available language bundles from the classpath by probing for
+     * resources named "efa_<lang>.properties" for all ISO languages.
+     * Falls back to an empty list if none found.
+     */
     public static String[] getLanguageBundles() {
-        if (Daten.efaProgramDirectory == null) {
-            // not yet initialized
-            // This can happen when we try to translate something before Daten.initialize() calls iniLanguageSupport()
-            return null;
-        }
         if (Logger.isTraceOn(Logger.TT_INTERNATIONALIZATION)) {
-            Logger.log(Logger.DEBUG, Logger.MSG_INTERNATIONAL_DEBUG, "Available Languages:");
+            Logger.log(Logger.DEBUG, Logger.MSG_INTERNATIONAL_DEBUG, "Available Languages (classpath):");
         }
-        File dir = new File(Daten.efaProgramDirectory);
-        File[] files = dir.listFiles();
-        if (files == null) {
-            return null;
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        if (cl == null) {
+            cl = International.class.getClassLoader();
         }
         ArrayList<String> bundles = new ArrayList<String>();
-        for (File f : files) {
-            String name = f.getName();
-            if (name.startsWith(BUNDLE_NAME + "_") && name.endsWith(".properties")) {
-                int pos = name.indexOf(".properties");
-                String lang = name.substring(BUNDLE_NAME.length() + 1, pos);
-                if (lang.length() > 0) {
-                    if (Logger.isTraceOn(Logger.TT_INTERNATIONALIZATION)) {
-                        Logger.log(Logger.DEBUG, Logger.MSG_INTERNATIONAL_DEBUG, "    " + lang);
-                    }
-                    bundles.add(lang);
+        String[] iso = Locale.getISOLanguages();
+        for (String lang : iso) {
+            String res = BUNDLE_NAME + "_" + lang + ".properties";
+            if (cl.getResource(res) != null) {
+                bundles.add(lang);
+                if (Logger.isTraceOn(Logger.TT_INTERNATIONALIZATION)) {
+                    Logger.log(Logger.DEBUG, Logger.MSG_INTERNATIONAL_DEBUG, "    " + lang);
                 }
             }
         }

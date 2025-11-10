@@ -28,7 +28,6 @@ public class SecFileCreator {
       EfaSec efaSec = new EfaSec(secFile);
       efaSec.writeSecFile(sha,false);
       System.out.println("Success: SHA from "+efaJar+" written to "+secFile+". Value="+sha);
-      System.exit(0);
     } catch(Exception e) {
       System.out.println("Error: "+e.toString());
       System.exit(1);

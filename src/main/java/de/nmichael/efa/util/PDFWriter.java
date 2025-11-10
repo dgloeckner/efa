@@ -9,7 +9,10 @@
  */
 package de.nmichael.efa.util;
 
+import org.apache.fop.apps.FopFactoryBuilder;
+
 import java.io.*;
+import java.net.URI;
 
 // @i18n complete
 public class PDFWriter {
@@ -37,7 +40,8 @@ public class PDFWriter {
                 if (Logger.isTraceOn(Logger.TT_PDF, 5)) {
                     Logger.log(Logger.DEBUG, Logger.MSG_DEBUG_PDF, "Initializing up FOP Factory ...");
                 }
-                org.apache.fop.apps.FopFactory fopFactory = org.apache.fop.apps.FopFactory.newInstance();
+                URI baseUri = new File(".").toURI();
+                org.apache.fop.apps.FopFactory fopFactory = new FopFactoryBuilder(baseUri).build();
 
                 if (Logger.isTraceOn(Logger.TT_PDF, 5)) {
                     Logger.log(Logger.DEBUG, Logger.MSG_DEBUG_PDF, "Getting FOP Instance ...");

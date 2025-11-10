@@ -1123,9 +1123,6 @@ public class Daten {
 			try {
 				flatLafInitializationOK = false;// init
 				try {
-					// Check and log for debugging purposes
-					checkFlatLafIsInClassPath();
-
 					// turn off os specific features
 					EfaFlatLafHelper.setupFlatLafSystemSettings();
 
@@ -1762,21 +1759,5 @@ public class Daten {
 
 	public static Boolean isEfaFlatLafActive() {
 		return (lookAndFeel.endsWith(Daten.LAF_EFAFLAT_LIGHT) || lookAndFeel.endsWith(Daten.LAF_EFAFLAT_DARK));
-	}
-
-	/**
-	 * Checks whether there is a flatlaf mention in ClassPath. This method needs to
-	 * be in daten.java and not in efaFlatLafHelper: An initialization of
-	 * efaFlatLafHelper will lead java to load FlatLab library, which may not be
-	 * available. To be able to put a warning in the log, we need to check the
-	 * ClassPath outside of efaFlatLafHelper.
-	 */
-	public static void checkFlatLafIsInClassPath() {
-		String cp = System.getProperty("java.class.path");
-
-		if (!cp.toLowerCase().matches(".*flatlaf.*")) {
-			Logger.log(Logger.WARNING, Logger.MSG_WARN_CANTSETLOOKANDFEEL,
-					International.getString("Flatlaf nicht im ClassPath gefunden.") + " " + cp);
-		}
 	}
 }

@@ -6,22 +6,13 @@
 # Originally created by Nicolas Michael. Updated by Stefan Gebers.
 #
 # This script needs some libraries:
-# - javahelp 2.0 
-#   Outdated, cannot be obtained from official sources any more. But efa uses this help format for the initial help file, and it has not yet been removed.
-#   should be placed in the same directory as makedist.sh  ./jh2.0/*
-#
 # - perl for creating International support keys from the efa_de.properties file
 #   this is broken and has been commented out.
 #
-# - xsltproc to create changelog from eou.xml
 #
 # ######################################
 # How to run
 # makeDist.sh 2.4.1#19 2.4.1_19      (creates a distro for efa 2.4.1 beta 19, the beta numbers are behind a #)
-# 
-# makeDist.sh 2drv 2.4.1_19          (creates a distro for DRV-Deutscher Ruder Verband which includes additional source not included in the main distro)
-#                                    It includes some programs which are only neccessary for the headquaters of DRV.
-#
 #
 # ######################################
 # 
@@ -43,7 +34,6 @@
 # automatically created:
 # ./dist		directory where the output of the makedist.sh script is stored: a .tgz and a .zip file
 # ./makedist		temporary folder with efa dist files, which get zipped in ./dist/*.tgz and ./dist/*.zip
-# ./versions		any run of makedist.sh creates a new directory here, storing both the source from ./src AND the resulting zip file of the distribution
 # ./winmedia		files where the (outdated) windows installer may take the dist files from
 #
 #
@@ -52,35 +42,43 @@ if [ $# -lt 1 ] ; then
   echo "usage: $0 <version> [versionid]"
   echo "       e.g. version: '200'"
   echo "       e.g. version: '2_beta'"
-  echo "       e.g. version: '2drv'"
   echo "       e.g. versionid: '2.0.0_03'"
   exit 1
 fi
 VERSION=${1:?}
 VERSIONID=$2
 
-DRV=0
-if [ "$VERSION" = "2drv" ] ; then
-  DRV=1
+#MAIN Programs
+# Prefer JAVA_HOME if set, otherwise derive from the current javac on PATH
+if [ -n "$JAVA_HOME" ] ; then
+  JDK="$JAVA_HOME"
+else
+  # Derive JDK from javac path (works on macOS/Linux)
+  if command -v javac >/dev/null 2>&1 ; then
+    JAVAC_BIN="$(command -v javac)"
+    JDK="$(cd "$(dirname "$JAVAC_BIN")/.." && pwd)"
+  else
+    echo "Error: javac not found in PATH and JAVA_HOME not set. Please install a JDK or set JAVA_HOME."
+    exit 1
+  fi
 fi
 
-#MAIN Programs
-JDK=/usr/lib/jvm/java-17-openjdk-amd64/
-JHINDEXER=/home/efa/efadev/jh2.0/javahelp/bin/jhindexer
 JAVA=$JDK/bin/java
 JAVAC=$JDK/bin/javac
 JAR=$JDK/bin/jar
 TARGET=1.8
 
 #EFA SOURCE AND OTHER RESOURCES
-EFABASE=/home/efa/efadev
-EFASRC=$EFABASE/src
-EFADOC=$EFABASE/src/help/main
-EFACFG=$EFABASE/src/cfg
-EFAFMT=$EFABASE/src/fmt
-EFAHELP=$EFABASE/src/help
-EFAROOT=$EFABASE/src/root
-PLUGINS=$EFABASE/src/plugins
+# Determine project root (EFABASE) as the parent directory of this script (tools/..)
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+EFABASE="$(cd "$SCRIPT_DIR/.." && pwd)"
+EFASRC=$EFABASE
+EFADOC=$EFABASE/help/main
+EFACFG=$EFABASE/cfg
+EFAFMT=$EFABASE/fmt
+EFAHELP=$EFABASE/help
+EFAROOT=$EFABASE/root
+PLUGINS=$EFABASE/plugins
 EFAVERSIONS=$EFABASE/versions
 MAKEDIST=$EFABASE/makedist
 MAKEDIST_JAVA=$MAKEDIST/program
@@ -91,7 +89,8 @@ MAKEDIST_DOC=$MAKEDIST/doc
 MAKEDIST_CFG=$MAKEDIST/cfg
 MAKEDIST_FMT=$MAKEDIST/fmt
 DIST=$EFABASE/dist
-SRCBACKUP=/home/efa/Backup
+SRCBACKUP=$EFABASE/Backup
+
 
 #WHERE TO PUT EFA2 AFTER BUILD FOR LATER WINDOWS SETUP
 EFAWINDSETUP=$EFABASE/winmedia
@@ -112,21 +111,17 @@ mkdir -p ${MAKEDIST:?}
 #BACKUP SOURCE FILES
 echo "Backup of Source Files ..."
 echo "------------------------------------------------------------------"
+mkdir -p "$SRCBACKUP"
 cd $EFASRC
-zip -r $SRCBACKUP/efasrc_`date +%Y%m%d%H%M%S`.zip .
+zip -r "$SRCBACKUP/efasrc_`date +%Y%m%d%H%M%S`.zip" .
 
 #COPY SOURCE FILES AND CREATE DIRECTORIES IF NECCESSARY
 echo "Copying Source Files ..."
 echo "------------------------------------------------------------------"
 mkdir -p ${MAKEDIST_JAVA:?}
 cd $EFASRC
-# only include efaDRV java files and classes, if we are creating a dist for DRV
-# (Deutscher Ruder Verband). This dist contains some extra tools only suitable and only provided for DRV.
-if [ $DRV -eq 0 ] ; then
-  find . -name '*.java' | grep -v '\.git' | grep -v '/drv/' > ${MAKEDIST:?}/filelist.tmp
-else
-  find . -name '*.java' | grep -v '\.git' > ${MAKEDIST:?}/filelist.tmp
-fi
+# Copy Java sources (DRV variant removed; always exclude drv-specific sources)
+find . -name '*.java' | grep -v '\.git' | grep -v '/drv/' > ${MAKEDIST:?}/filelist.tmp
 rm -f ${MAKEDIST:?}/dirlist.tmp
 for f in `cat  ${MAKEDIST:?}/filelist.tmp`
 do
@@ -143,10 +138,17 @@ done
 echo "Compiling Classes ..."
 echo "------------------------------------------------------------------"
 cd ${MAKEDIST_JAVA:?}
-rm ~/compile.log
+rm -f ~/compile.log
+# Prefer modern JDK flag --release 8 if available; fallback to -source/-target 1.8
+JAVAC_FLAGS=""
+if $JAVAC --release 8 -version >/dev/null 2>&1 ; then
+  JAVAC_FLAGS="--release 8 -classpath $CLASSPATH"
+else
+  JAVAC_FLAGS="-target $TARGET -source $TARGET -classpath $CLASSPATH"
+fi
 for f in `cat  ${MAKEDIST:?}/dirlist.tmp`
 do
-  $JAVAC -target $TARGET -source $TARGET -classpath $CLASSPATH $f/*.java >>~/compile.log 2>&1 || exit 1
+  $JAVAC $JAVAC_FLAGS $f/*.java >>~/compile.log 2>&1 || exit 1
   rm $f/*.java
 done
 rm -f ${MAKEDIST:?}/dirlist.tmp
@@ -216,31 +218,15 @@ cp ${EFADOC:?}/*.gif ${MAKEDIST_DOC:?}
 cp ${EFADOC:?}/*.png ${MAKEDIST_DOC:?}
 cp ${EFADOC:?}/*.html ${MAKEDIST_DOC:?}
 
-# Online help creation need javahelp 2.0 programs in ./jh2.0/...
-# should be commented out if javahelp not available
+# Package existing help files without indexing (jhindexer removed)
 echo "Creating Online Help ..."
 echo "------------------------------------------------------------------"
 mkdir -p ${MAKEDIST_HELP:?}
 cd ${MAKEDIST_HELP:?}
 cp -r ${EFAHELP:?}/* .
-
-$JHINDEXER main gui
 cd ${MAKEDIST_JAVA:?}
 $JAR cfv efahelp.jar help || exit 1
 
-#Addendum SGB: create changelog files
-#creates /src/changelog_de.html and changelog_en.html
-#requires xsltproc program.
-echo "Creating Changelog files..."
-echo "------------------------------------------------------------------"
-echo ${EFABASE}
-echo ${EFASRC}
-echo ${MAKEDIST_DOC}
-
-xsltproc  ${EFABASE}/eoutransform_de.xslt ${EFASRC}/eou/eou.xml >${MAKEDIST_DOC:?}/changelog_de.html
-xsltproc  ${EFABASE}/eoutransform_en.xslt ${EFASRC}/eou/eou.xml >${MAKEDIST_DOC:?}/changelog_en.html
-# Addendum SGB: eou changelog refers do some png images for showing the structure.
-cp ${EFASRC}/eou/*.png ${MAKEDIST_DOC:?}
 
 echo "DONE. Check"
 
@@ -259,10 +245,8 @@ echo "Copying Root Files ..."
 echo "------------------------------------------------------------------"
 cp ${EFAROOT:?}/* ${MAKEDIST:?}
 chmod +x ${MAKEDIST:?}/*.sh
-if [ $DRV -eq 0 ] ; then
-  rm ${MAKEDIST:?}/efaDRV.sh
-  rm ${MAKEDIST:?}/efaDRV.bat
-fi
+rm -f ${MAKEDIST:?}/efaDRV.sh
+rm -f ${MAKEDIST:?}/efaDRV.bat
 
 echo "Converting DOS Files ..."
 echo "------------------------------------------------------------------"
@@ -298,18 +282,6 @@ rm -f ${DIST:?}/efa${VERSION:?}.zip
 rm -f ${DIST:?}/efa${VERSION:?}.tar
 zip -r ${DIST:?}/efa${VERSION:?}.zip .
 tar cfv ${DIST:?}/efa${VERSION:?}.tar .
-
-if [ "$VERSIONID" != "" ] ; then
-  mkdir ${EFAVERSIONS}/${VERSIONID}
-  cp ${DIST:?}/efa${VERSION:?}.zip ${EFAVERSIONS}/${VERSIONID}/
-  cp -r ${EFASRC:?} ${EFAVERSIONS}/${VERSIONID}/
-  cp -r ${MAKEDIST:?}/* ${EFAWINDSETUP:?}
-  echo "============================================="
-  echo "Run After Windows Build:"
-  echo "mv /media/exchange/efa_setup/efa*exe ${EFAVERSIONS}/${VERSIONID}/"
-  echo "cp ${EFAVERSIONS}/${VERSIONID}/efa${VERSION}* /home/nick/html/nmichael/1und1/efa/download/"
-  echo "============================================="
-fi
 
 echo "Done."
 cd $EFABASE

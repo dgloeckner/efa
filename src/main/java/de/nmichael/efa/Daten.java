@@ -286,7 +286,7 @@ public class Daten {
 	// at all.
 	// if not, flatLaf-3.2.5.jar may be missing in classpath.
 	public static Boolean flatLafInitializationOK = false;
-	
+
 	public static Boolean isShutdownRequested=false;
 
 	// Applikations- PID
@@ -399,8 +399,8 @@ public class Daten {
                 Logger.log(Logger.ERROR, Logger.MSG_ERR_EFARESTARTEXEC_FAILED,
                         LogString.cantExecCommand(EfaUtil.arr2string(cmd), International.getString("Kommando")));
             }
-        }		
-		
+        }
+
 		// PROGRAMMENDE log entry must be the last to be shown on efa shutdown/restart,
 		// as efa looks for this line on startup and will state efa has not been shut down correctly if it is missing.
 		if (exitCode != 0) {
@@ -417,7 +417,7 @@ public class Daten {
 		} else {
 			Logger.log(Logger.INFO, Logger.MSG_CORE_HALT, International.getString("PROGRAMMENDE"));
 		}
-		
+
 		if (program != null) {
 			program.exit(exitCode);
 		} else {
@@ -1414,13 +1414,13 @@ public class Daten {
 		infos.sort(new EfaSortStringComparator());
 		return infos;
 	}
-	
+
 	public static Vector <String>getDisplayInfos() {
 
 		Vector<String> infos = new Vector<String>();
 		int curDevice=0;
 		try {
-			
+
 			GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 			GraphicsDevice[] gs = ge.getScreenDevices();
 			infos.add("Number of Displays" + KEY_VALUE_DELIMITER+ gs.length);
@@ -1429,26 +1429,26 @@ public class Daten {
 			{
 			      GraphicsConfiguration gc = curGs.getDefaultConfiguration();
 			      Rectangle bounds = gc.getBounds();
-			      
+
 			      infos.add("Display "+curDevice+" Name"+KEY_VALUE_DELIMITER+curGs.getIDstring());
 			      infos.add("Display "+curDevice+" Offset (X/Y)"+KEY_VALUE_DELIMITER+bounds.getX()+" / " +bounds.getY());
 			      infos.add("Display "+curDevice+" Dimensions (Width/Height)"+KEY_VALUE_DELIMITER+bounds.getWidth()+" / "+bounds.getHeight());
-			      infos.add("Display "+curDevice+" Scaling factor" +KEY_VALUE_DELIMITER+ gc.getDefaultTransform().getScaleY());      
+			      infos.add("Display "+curDevice+" Scaling factor" +KEY_VALUE_DELIMITER+ gc.getDefaultTransform().getScaleY());
 			      infos.add("");
 			      curDevice++;
-			}			
+			}
 		} catch (Exception e) {
 			infos.add("Error during getting display infos.\n"+e.getLocalizedMessage());
 		}
-	
+
 		if (curDevice==0) {infos.add("");}
 		infos.add("sun.java2d.uiScale.enabled" +KEY_VALUE_DELIMITER+  System.getProperty("sun.java2d.uiScale.enabled"));
 		infos.add("sun.java2d.uiScale" +KEY_VALUE_DELIMITER+  System.getProperty("sun.java2d.uiScale"));
-		infos.add("flatlaf.uiScale.enabled" +KEY_VALUE_DELIMITER+  System.getProperty("flatlaf.uiScale.enabled"));	
-		infos.add("flatlaf.uiScale" +KEY_VALUE_DELIMITER+  System.getProperty("flatlaf.uiScale"));	
+		infos.add("flatlaf.uiScale.enabled" +KEY_VALUE_DELIMITER+  System.getProperty("flatlaf.uiScale.enabled"));
+		infos.add("flatlaf.uiScale" +KEY_VALUE_DELIMITER+  System.getProperty("flatlaf.uiScale"));
 		infos.add("laf.scaleFactor" +KEY_VALUE_DELIMITER+ Dialog.getUiDefaults().get("laf.scaleFactor"));
 		return infos;
-		
+
 	}
 
 	public static Vector <String>getCSSInfo() {

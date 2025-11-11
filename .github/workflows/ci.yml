@@ -1,0 +1,36 @@
+name: CI (Maven)
+
+on:
+  pull_request:
+    branches: ['feat/**']
+  push:
+    branches: [ master ]
+
+permissions:
+  contents: read
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Temurin JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: 'maven'
+
+      - name: Build & test (no transfer progress)
+        run: ./mvnw -B -ntp -Dstyle.color=always verify
+
+      - name: Upload JAR(s)
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-jars
+          path: |
+            **/target/*.jar
+            !**/*-sources.jar
+            !**/*-javadoc.jar

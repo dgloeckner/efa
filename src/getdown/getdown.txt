@@ -1,0 +1,8 @@
+appbase = ${getdown.appbase}
+allow_offline = true
+ui.name = efa
+main = de.nmichael.efa.base.Main
+jvmarg = -Xmx192m
+jvmarg = -XX:NewSize=32m
+jvmarg = -XX:MaxNewSize=32m
+code = efa.jar

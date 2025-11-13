@@ -20,8 +20,16 @@ check_online_update()
 # ##########################################
 
 # change to efa directory
-cd `dirname $0`
+cd "$(dirname "$0")"
 PROG=$0
+
+# Prefer Getdown launcher if available (non-breaking fallback below)
+if [ -f program/getdown.jar ] && [ -f program/getdown.txt ]; then
+  if [ $EFA_VERBOSE ]; then
+    echo "[$(date +%Y-%m-%d_%H:%M:%S) $PROG] launching via Getdown ..."
+  fi
+  exec java -cp "program/*" io.github.bekoenig.getdown.launcher.GetdownApp program "$@"
+fi
 
 # ##########################################
 # Get Arguments                            #

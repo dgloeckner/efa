@@ -33,6 +33,9 @@ REM # ##########################################
 REM Preparing to run ...
 
 
+REM Prefer Getdown launcher if available (non-breaking fallback below)
+IF EXIST program\getdown.jar IF EXIST program\getdown.txt GOTO STARTGETDOWN
+
 REM # ##########################################
 REM # JVM Settings                             #
 REM # ##########################################
@@ -64,6 +67,11 @@ IF "%EFA_RUN_CLI%" == "1" GOTO STARTCLI
 IF "%EFA_RUN_DEBUG%" == "1" GOTO STARTCLIDBG
 IF "%OS%" == "Windows_NT" GOTO STARTNT
 GOTO START9X
+
+:STARTGETDOWN
+ECHO launching via Getdown ...
+START /B javaw -cp program\* io.github.bekoenig.getdown.launcher.GetdownApp program %*
+GOTO END
 
 :STARTNT
 REM Path for Windows 7 (64 Bit)

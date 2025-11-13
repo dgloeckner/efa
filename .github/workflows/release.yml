@@ -38,6 +38,7 @@ jobs:
       - name: Build
         run: ./mvnw -B -ntp package
 
+
       - name: Generate SHA-256 checksums (optional)
         run: |
           shopt -s globstar
@@ -45,14 +46,18 @@ jobs:
             sha256sum "$f" > "$f.sha256"
           done
 
-      - name: Create GitHub Release & upload JARs
+      - name: Create GitHub Release & upload artifacts
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            **/target/efa*.jar
-            **/target/efa*.jar.sha256
             **/target/efa*.zip
             **/target/efa*.tar
+            **/target/efa*.jar
+            **/target/efa*.jar.sha256
+            **/target/update-site/efa.jar
+            **/target/update-site/getdown.txt
+            **/target/update-site/digest.txt
+            **/target/update-site/version.txt
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

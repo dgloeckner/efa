@@ -31,6 +31,13 @@
     <commons.logging.version>1.3.4</commons.logging.version>
     <commons.codec.version>1.17.1</commons.codec.version>
     <signpost.version>1.2.1.2</signpost.version>
+
+    <!-- Getdown configuration -->
+    <getdown.groupId>io.github.bekoenig.getdown</getdown.groupId>
+    <!-- Use the latest available release; can be pinned later for reproducibility -->
+    <getdown.version>2.0.1</getdown.version>
+    <!-- Default appbase can be overridden at build time: -Dgetdown.appbase=http://127.0.0.1:8000/ -->
+    <getdown.appbase>https://github.com/dgloeckner/efa/releases/latest/download/</getdown.appbase>
   </properties>
 
   <dependencies>
@@ -150,8 +157,21 @@
       <scope>system</scope>
       <systemPath>${project.basedir}/plugins/jsuntimes/jsuntimes.jar</systemPath>
     </dependency>
+    <!-- Getdown runtime (to resolve transitive runtime deps like SLF4J/Logback) -->
+    <dependency>
+      <groupId>${getdown.groupId}</groupId>
+      <artifactId>getdown-launcher</artifactId>
+      <version>${getdown.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>${getdown.groupId}</groupId>
+      <artifactId>getdown-core</artifactId>
+      <version>${getdown.version}</version>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
-
+  
   <build>
     <resources>
       <!-- Default resources directory (may be empty) -->
@@ -261,6 +281,14 @@
             <configuration>
               <createDependencyReducedPom>false</createDependencyReducedPom>
               <shadedArtifactAttached>false</shadedArtifactAttached>
+              <artifactSet>
+                <excludes>
+                  <!-- Do not embed Getdown or its logging stack into efa.jar -->
+                  <exclude>io.github.bekoenig.getdown:*:*</exclude>
+                  <exclude>org.slf4j:*:*</exclude>
+                  <exclude>ch.qos.logback:*:*</exclude>
+                </excludes>
+              </artifactSet>
               <filters>
                 <filter>
                   <artifact>*:*</artifact>
@@ -311,6 +339,191 @@
                 <argument>${project.build.directory}/${project.artifactId}-${project.version}.jar</argument>
               </arguments>
             </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Prepare Getdown artifacts and update-site during the Maven build -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>3.6.1</version>
+        <executions>
+          <!-- Copy Getdown launcher jar to target/program/getdown.jar -->
+          <execution>
+            <id>copy-getdown-launcher</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>${getdown.groupId}</groupId>
+                  <artifactId>getdown-launcher</artifactId>
+                  <version>${getdown.version}</version>
+                  <type>jar</type>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${project.build.directory}/program</outputDirectory>
+                  <destFileName>getdown.jar</destFileName>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+          <execution>
+            <id>copy-getdown-core</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>${getdown.groupId}</groupId>
+                  <artifactId>getdown-core</artifactId>
+                  <version>${getdown.version}</version>
+                  <type>jar</type>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${project.build.directory}/program</outputDirectory>
+                  <destFileName>getdown-core.jar</destFileName>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+          <!-- Copy Getdown runtime dependencies (logging, etc.) into program/ so launcher can run -->
+          <execution>
+            <id>copy-getdown-runtime-deps</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <includeGroupIds>io.github.bekoenig.getdown,org.slf4j,ch.qos.logback</includeGroupIds>
+              <excludeArtifactIds>getdown-core,getdown-launcher</excludeArtifactIds>
+              <outputDirectory>${project.build.directory}/program</outputDirectory>
+              <excludeTransitive>false</excludeTransitive>
+              <overWriteReleases>true</overWriteReleases>
+            </configuration>
+          </execution>
+          <!-- Copy shaded app jar to a stable name for update-site: target/update-site/efa.jar -->
+          <execution>
+            <id>copy-stable-app-jar</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>${project.artifactId}</artifactId>
+                  <version>${project.version}</version>
+                  <type>jar</type>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${project.build.directory}/update-site</outputDirectory>
+                  <destFileName>efa.jar</destFileName>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Create getdown.txt (filtered) and version.txt; also copy program/getdown.txt -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>3.3.1</version>
+        <executions>
+          <execution>
+            <id>write-getdown-config</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/update-site</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${project.basedir}/src/getdown</directory>
+                  <filtering>true</filtering>
+                  <includes>
+                    <include>getdown.txt</include>
+                  </includes>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
+            <id>copy-getdown-config-into-program</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/program</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${project.build.directory}/update-site</directory>
+                  <filtering>false</filtering>
+                  <includes>
+                    <include>getdown.txt</include>
+                  </includes>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Generate target/update-site/version.txt with the current ${project.version} -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>3.1.0</version>
+        <dependencies>
+          <dependency>
+            <groupId>${getdown.groupId}</groupId>
+            <artifactId>getdown-ant</artifactId>
+            <version>${getdown.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>${getdown.groupId}</groupId>
+            <artifactId>getdown-core</artifactId>
+            <version>${getdown.version}</version>
+          </dependency>
+        </dependencies>
+        <executions>
+          <execution>
+            <id>write-version-text</id>
+            <phase>prepare-package</phase>
+            <configuration>
+              <target>
+                <mkdir dir="${project.build.directory}/update-site"/>
+                <echo file="${project.build.directory}/update-site/version.txt" message="${project.version}"/>
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+          <!-- Run Getdown Digester to produce digest.txt in update-site -->
+          <execution>
+            <id>run-getdown-digester</id>
+            <phase>verify</phase>
+            <configuration>
+              <target>
+                <mkdir dir="${project.build.directory}/update-site"/>
+                <!-- Generate digest.txt using Digester from getdown-core on the plugin classpath -->
+                <java classname="io.github.bekoenig.getdown.tools.Digester" fork="true" dir="${project.build.directory}/update-site">
+                  <classpath refid="maven.plugin.classpath"/>
+                  <arg value="."/>
+                </java>
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
           </execution>
         </executions>
       </plugin>

@@ -23,6 +23,23 @@
       <destName>efa.sec</destName>
     </file>
 
+    <!-- Include Getdown launcher and config produced by Maven build -->
+    <file>
+      <source>${project.build.directory}/program/getdown.jar</source>
+      <outputDirectory>program</outputDirectory>
+      <destName>getdown.jar</destName>
+    </file>
+    <file>
+      <source>${project.build.directory}/program/getdown-core.jar</source>
+      <outputDirectory>program</outputDirectory>
+      <destName>getdown-core.jar</destName>
+    </file>
+    <file>
+      <source>${project.build.directory}/program/getdown.txt</source>
+      <outputDirectory>program</outputDirectory>
+      <destName>getdown.txt</destName>
+    </file>
+
   </files>
 
   <fileSets>
@@ -42,6 +59,16 @@
       <outputDirectory>program</outputDirectory>
       <includes>
         <include>efa*.properties</include>
+      </includes>
+      <useDefaultExcludes>true</useDefaultExcludes>
+    </fileSet>
+
+    <!-- Include all Getdown runtime jars copied to target/program (launcher, core, logback, slf4j, etc.) -->
+    <fileSet>
+      <directory>${project.build.directory}/program</directory>
+      <outputDirectory>program</outputDirectory>
+      <includes>
+        <include>*.jar</include>
       </includes>
       <useDefaultExcludes>true</useDefaultExcludes>
     </fileSet>

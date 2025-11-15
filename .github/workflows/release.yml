@@ -57,6 +57,7 @@ jobs:
             **/target/update-site/efa.jar
             **/target/update-site/getdown.txt
             **/target/update-site/digest.txt
+            **/target/update-site/digest2.txt
             **/target/update-site/version.txt
           generate_release_notes: true
         env:

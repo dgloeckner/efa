@@ -408,7 +408,7 @@
           <!-- Copy shaded app jar to a stable name for update-site: target/update-site/efa.jar -->
           <execution>
             <id>copy-stable-app-jar</id>
-            <phase>verify</phase>
+            <phase>package</phase>
             <goals>
               <goal>copy</goal>
             </goals>
@@ -476,7 +476,7 @@
         </executions>
       </plugin>
 
-      <!-- Generate target/update-site/version.txt with the current ${project.version} -->
+      <!-- Generate target/update-site/version.txt and run Getdown digester by default -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-antrun-plugin</artifactId>
@@ -500,6 +500,7 @@
             <configuration>
               <target>
                 <mkdir dir="${project.build.directory}/update-site"/>
+                <echo message="[antrun] writing version.txt with ${project.version} into ${project.build.directory}/update-site"/>
                 <echo file="${project.build.directory}/update-site/version.txt" message="${project.version}"/>
               </target>
             </configuration>
@@ -507,23 +508,35 @@
               <goal>run</goal>
             </goals>
           </execution>
-          <!-- Run Getdown Digester to produce digest.txt in update-site -->
+        </executions>
+      </plugin>
+
+      <!-- Run Getdown Digester via exec (avoids Ant task issues) -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.5.0</version>
+        <dependencies>
+          <dependency>
+            <groupId>${getdown.groupId}</groupId>
+            <artifactId>getdown-core</artifactId>
+            <version>${getdown.version}</version>
+          </dependency>
+        </dependencies>
+        <executions>
           <execution>
-            <id>run-getdown-digester</id>
-            <phase>verify</phase>
-            <configuration>
-              <target>
-                <mkdir dir="${project.build.directory}/update-site"/>
-                <!-- Generate digest.txt using Digester from getdown-core on the plugin classpath -->
-                <java classname="io.github.bekoenig.getdown.tools.Digester" fork="true" dir="${project.build.directory}/update-site">
-                  <classpath refid="maven.plugin.classpath"/>
-                  <arg value="."/>
-                </java>
-              </target>
-            </configuration>
+            <id>run-getdown-digester-exec</id>
+            <phase>package</phase>
             <goals>
-              <goal>run</goal>
+              <goal>java</goal>
             </goals>
+            <configuration>
+              <includePluginDependencies>true</includePluginDependencies>
+              <mainClass>io.github.bekoenig.getdown.tools.Digester</mainClass>
+              <arguments>
+                <argument>${project.build.directory}/update-site</argument>
+              </arguments>
+            </configuration>
           </execution>
         </executions>
       </plugin>
@@ -556,6 +569,73 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>getdown-digest</id>
+      <activation>
+        <property>
+          <name>getdown.digest</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>3.1.0</version>
+            <dependencies>
+              <dependency>
+                <groupId>${getdown.groupId}</groupId>
+                <artifactId>getdown-ant</artifactId>
+                <version>${getdown.version}</version>
+              </dependency>
+              <dependency>
+                <groupId>${getdown.groupId}</groupId>
+                <artifactId>getdown-core</artifactId>
+                <version>${getdown.version}</version>
+              </dependency>
+            </dependencies>
+            <executions>
+              <execution>
+                <id>run-getdown-digester</id>
+                <phase>package</phase>
+                <configuration>
+                  <target xmlns:getdown="antlib:io.github.bekoenig.getdown.ant">
+                    <mkdir dir="${project.build.directory}/update-site"/>
+                    <taskdef uri="antlib:io.github.bekoenig.getdown.ant" classpathref="maven.plugin.classpath"/>
+
+                    <condition property="efa.jar.present">
+                      <available file="${project.build.directory}/update-site/efa.jar"/>
+                    </condition>
+                    <fail unless="efa.jar.present" message="Missing ${project.build.directory}/update-site/efa.jar before digest generation"/>
+
+                    <echo message="[getdown] Generating digest.txt (SHA-1) in ${project.build.directory}/update-site"/>
+                    <getdown:digest appdir="${project.build.directory}/update-site"/>
+
+                    <echo message="[getdown] Generating digest2.txt (SHA-256) in ${project.build.directory}/update-site"/>
+                    <getdown:digest appdir="${project.build.directory}/update-site" algorithm="SHA-256" outfile="digest2.txt"/>
+
+                    <condition property="digests.present">
+                      <and>
+                        <available file="${project.build.directory}/update-site/digest.txt"/>
+                        <available file="${project.build.directory}/update-site/digest2.txt"/>
+                      </and>
+                    </condition>
+                    <fail unless="digests.present" message="Getdown digest files missing: expected digest.txt and digest2.txt in ${project.build.directory}/update-site"/>
+                  </target>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
   <repositories>
     <!-- Use Maven Central; explicit declaration is optional but shown for clarity. -->

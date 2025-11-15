@@ -20,8 +20,16 @@ check_online_update()
 # ##########################################
 
 # change to efa directory
-cd `dirname $0`
+cd "$(dirname "$0")"
 PROG=$0
+
+# Prefer Getdown launcher if available (non-breaking fallback below)
+if [ -f program/getdown.jar ] && [ -f program/getdown.txt ]; then
+  if [ $EFA_VERBOSE ]; then
+    echo "[$(date +%Y-%m-%d_%H:%M:%S) $PROG] launching via Getdown ..."
+  fi
+  exec java -cp "program/*" io.github.bekoenig.getdown.launcher.GetdownApp program "$@"
+fi
 
 # ##########################################
 # Get Arguments                            #
@@ -31,44 +39,7 @@ if [ $# -eq 0 ] ; then
   exit 1
 fi
 CLASSNAME=$1
-
-# ##########################################
-# Classpath                                #
-# ##########################################
-
-# efa
-CP=program/efa.jar:program/efahelp.jar:program
-
-# OnlineHelp Plugin
-CP=$CP:program/plugins/jh.jar
-
-# FTP Plugin
-CP=$CP:program/plugins/edtftpj.jar
-
-# SFTP support for FTP Plugin
-CP=$CP:program/plugins/jsch-0.1.55.jar
-
-# Mail Plugin
-CP=$CP:program/plugins/javax.mail.jar
-CP=$CP:program/plugins/activation.jar
-
-# JSUNTIMES Plugin
-CP=$CP:program/plugins/jsuntimes.jar
-
-# PDF Plugin
-CP=$CP:program/plugins/avalon-framework.jar
-CP=$CP:program/plugins/batik-all.jar
-CP=$CP:program/plugins/commons-io.jar
-CP=$CP:program/plugins/commons-logging.jar
-CP=$CP:program/plugins/fop.jar
-CP=$CP:program/plugins/xmlgraphics-commons.jar
-
-# EFA Flat Laf
-CP=$CP:program/plugins/flatlaf-3.2.5.jar
-
-# Weather Plugin
-CP=$CP:program/plugins/commons-codec.jar
-CP=$CP:program/plugins/signpost-core.jar
+shift
 
 # ##########################################
 # JVM Settings                             #
@@ -82,7 +53,7 @@ fi
 if [ "$EFA_JAVA_HEAP" = "" ] ; then
 # A higher Java Heaps helps to speed up efa on slower computers
 # As garbage collection needs to run at lower frequencies
-  EFA_JAVA_HEAP=160m
+  EFA_JAVA_HEAP=192m
 fi
 if [ "$EFA_NEW_SIZE" = "" ] ; then
   EFA_NEW_SIZE=32m
@@ -90,6 +61,10 @@ fi
 
 # JVM-Optionen
 JVMOPTIONS="-Xmx$EFA_JAVA_HEAP -XX:NewSize=$EFA_NEW_SIZE -XX:MaxNewSize=$EFA_NEW_SIZE"
+# Enable remote debugging if requested
+if [ "$EFA_JVM_DEBUG" = "1" ] ; then
+  JVMOPTIONS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005 $JVMOPTIONS"
+fi
 
 
 # ##########################################
@@ -97,7 +72,7 @@ JVMOPTIONS="-Xmx$EFA_JAVA_HEAP -XX:NewSize=$EFA_NEW_SIZE -XX:MaxNewSize=$EFA_NEW
 # ##########################################
 
 # Java Arguments
-EFA_JAVA_ARGUMENTS="$JVMOPTIONS -cp $CP"
+EFA_JAVA_ARGUMENTS="$JVMOPTIONS -cp program/efa.jar $CLASSNAME"
 
 # Run Program
 if [ $EFA_VERBOSE ] ; then

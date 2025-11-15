@@ -1,10 +1,10 @@
 name: CI (Maven)
 
 on:
-  pull_request:
-    branches: ['feat/**']
   push:
-    branches: [ master ]
+    branches: ['**']          # run on any branch push (or narrow to 'feat/**', 'fix/**', etc.)
+  pull_request:
+    branches: [ master ]      # PRs targeting master
 
 permissions:
   contents: read

@@ -12,9 +12,9 @@ PROG=$0
 # Get Arguments                            #
 # ##########################################
 if [ $# -eq 0 ] ; then
-  echo "usage: $PROG <mainclass> [arguments]"
+  echo "usage: $PROG <appid> [arguments]"
   exit 1
 fi
-CLASSNAME=$1
+APP_ID=$1
 
-exec java -Dgetdown.appid=$CLASSNAME -cp "program/*" de.nmichael.efa.EfaGetdownLauncher program "$@"
+exec java -Dappid=$APP_ID -cp "program/*" de.nmichael.efa.EfaGetdownLauncher program "$@"

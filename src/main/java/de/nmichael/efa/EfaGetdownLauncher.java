@@ -6,17 +6,20 @@ import io.github.bekoenig.getdown.data.Resource;
 import io.github.bekoenig.getdown.net.Connector;
 import io.github.bekoenig.getdown.net.Downloader;
 import io.github.bekoenig.getdown.util.ProgressObserver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.event.Level;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.*;
 import java.util.List;
-import java.util.Set;
 
 public final class EfaGetdownLauncher {
+
+    private static final Logger log = LoggerFactory.getLogger(EfaGetdownLauncher.class);
 
     public static void main(String[] args) {
         // Always start Swing from EDT
@@ -25,7 +28,7 @@ public final class EfaGetdownLauncher {
 
     private void start(String[] args) {
         SplashUI ui = new SplashUI();
-        ui.showSplash("Starte …", 0);
+        ui.showSplash("Starte EFA", 0);
 
         Thread worker = new Thread(() -> {
             int exitCode = 0;
@@ -55,15 +58,20 @@ public final class EfaGetdownLauncher {
     private void runGetdown(String[] args, SplashUI ui) throws Exception {
         // 1) Resolve EnvConfig (appdir, appbase, appid, etc.)
         List<EnvConfig.Note> notes = new ArrayList<>();
+
+        log.debug("Run Getdown with args: {}", Arrays.toString(args));
         EnvConfig env = EnvConfig.create(args, notes);
         if (env == null) {
             throw new IllegalStateException("EnvConfig.create() returned null (ungültiges appdir?)");
         }
 
-        // Optional: log / inspect notes if you want
+        // Log returned notes from config creation
         for (EnvConfig.Note note : notes) {
-            System.out.println("EnvConfig: " + note.level + " - " + note.message);
+            log.atLevel(this.getLevelForNote(note))
+                            .log("Note from EnvConfig {}", note.message);
         }
+        log.info("Will start Getdown with this configuration: appDir={}, appBase={}, appId={}, appArgs={}",
+                env.appDir, env.appBase, env.appId, env.appArgs);
 
         // 2) Create Application with default Connector
         Connector connector = Connector.DEFAULT;
@@ -143,7 +151,7 @@ public final class EfaGetdownLauncher {
         // Important: do NOT wait for the child here, Getdown-style launchers usually exit
         // so the actual app becomes the “main” process.
         // If you want to wait, you could do:
-        // child.waitFor();
+        child.waitFor();
         ui.showSplash("Anwendung gestartet.", 100);
     }
 
@@ -245,6 +253,17 @@ public final class EfaGetdownLauncher {
                 e.printStackTrace();
                 return null;
             }
+        }
+    }
+
+    private Level getLevelForNote(EnvConfig.Note note) {
+        switch (note.level) {
+            case WARN:
+                return Level.WARN;
+            case ERROR:
+                return Level.ERROR;
+            default:
+                return Level.INFO;
         }
     }
 }

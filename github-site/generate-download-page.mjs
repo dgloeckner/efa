@@ -102,21 +102,39 @@ function renderRelease(release) {
     const bodyHtml = simpleMarkdownToHtml(release.body || "");
     const assets = release.assets || [];
 
+    // Only show ZIP files and their corresponding checksum links (e.g., .sha1, .sha256, .sha512)
+    const zipAssets = (assets || []).filter(a => a.name && a.name.toLowerCase().endsWith(".zip"));
+
     const assetButtons =
-        assets.length === 0
-            ? `<span class="meta">No downloadable assets attached. View on <a href="${release.html_url}" target="_blank" rel="noreferrer">GitHub</a>.</span>`
-            : assets
-                .map((asset) => {
-                    const isJar = asset.name.toLowerCase().endsWith(".jar");
-                    const isZip = asset.name.toLowerCase().endsWith(".zip");
-                    const icon = isJar ? "☕" : isZip ? "📦" : "⬇︎";
-                    const label = isJar ? "JAR" : isZip ? "ZIP" : "Asset";
+        zipAssets.length === 0
+            ? `<span class="meta">No ZIP assets attached. View on <a href="${release.html_url}" target="_blank" rel="noreferrer">GitHub</a>.</span>`
+            : zipAssets
+                .map((zip) => {
+                    const lowerZipName = zip.name.toLowerCase();
+                    const checksumAssets = (assets || []).filter(a => {
+                        const n = (a.name || "").toLowerCase();
+                        if (n === lowerZipName) return false; // it's the zip itself
+                        const isSha = /\.sha(\d+)?(\.txt)?$/.test(n) || /sha(\d+)?sum/.test(n);
+                        if (!isSha) return false;
+                        // Associate checksum with ZIP by name prefix or including the zip name
+                        return n.startsWith(lowerZipName) || n.includes(lowerZipName + ".");
+                    });
+
+                    const checksumsHtml = checksumAssets.length
+                        ? `<span class="meta">Checksums: ` + checksumAssets
+                            .map(cs => `<a href="${cs.browser_download_url}" download>${cs.name.replace(zip.name, "").replace(/^([._-])/, "").replace(/^\./, "") || cs.name}</a>`)
+                            .join(" · ") + `</span>`
+                        : "";
+
                     return `
-<a class="asset-button" href="${asset.browser_download_url}" download>
-  <span class="asset-kind">${icon}</span>
-  <span class="asset-name">${asset.name}</span>
-  <span class="meta">${label} · ${humanFileSize(asset.size)}</span>
-</a>`;
+<div class="asset-zip">
+  <a class="asset-button" href="${zip.browser_download_url}" download>
+    <span class="asset-kind">📦</span>
+    <span class="asset-name">${zip.name}</span>
+    <span class="meta">ZIP · ${humanFileSize(zip.size)}</span>
+  </a>
+  ${checksumsHtml}
+</div>`;
                 })
                 .join("\n");
 

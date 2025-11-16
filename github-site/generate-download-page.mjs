@@ -143,7 +143,6 @@ function renderRelease(release) {
   <div class="release-header">
     <div>
       <div class="release-title">${title}</div>
-      <div class="release-tag"><span>Release</span><strong>${tag}</strong></div>
     </div>
     <div class="release-date">${date}</div>
   </div>

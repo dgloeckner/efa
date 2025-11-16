@@ -162,13 +162,11 @@
       <groupId>${getdown.groupId}</groupId>
       <artifactId>getdown-launcher</artifactId>
       <version>${getdown.version}</version>
-      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>${getdown.groupId}</groupId>
       <artifactId>getdown-core</artifactId>
       <version>${getdown.version}</version>
-      <scope>runtime</scope>
     </dependency>
   </dependencies>
   
@@ -451,6 +449,16 @@
                     <include>getdown.txt</include>
                   </includes>
                 </resource>
+                <!-- Copy images used by custom Getdown UI -->
+                <resource>
+                  <directory>${project.basedir}/src/main/resources/de/nmichael/efa/img</directory>
+                  <filtering>false</filtering>
+                  <includes>
+                    <include>efaIntro.png</include>
+                    <include>efa_icon.png</include>
+                    <include>efa_large.png</include>
+                  </includes>
+                </resource>
               </resources>
             </configuration>
           </execution>
@@ -468,6 +476,9 @@
                   <filtering>false</filtering>
                   <includes>
                     <include>getdown.txt</include>
+                    <include>efaIntro.png</include>
+                    <include>efa_icon.png</include>
+                    <include>efa_large.png</include>
                   </includes>
                 </resource>
               </resources>

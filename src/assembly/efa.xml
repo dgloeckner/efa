@@ -39,6 +39,22 @@
       <outputDirectory>program</outputDirectory>
       <destName>getdown.txt</destName>
     </file>
+    <!-- Include custom Getdown UI assets -->
+    <file>
+      <source>${project.build.directory}/program/efaIntro.png</source>
+      <outputDirectory>program</outputDirectory>
+      <destName>efaIntro.png</destName>
+    </file>
+    <file>
+      <source>${project.build.directory}/program/efa_icon.png</source>
+      <outputDirectory>program</outputDirectory>
+      <destName>efa_icon.png</destName>
+    </file>
+    <file>
+      <source>${project.build.directory}/program/efa_large.png</source>
+      <outputDirectory>program</outputDirectory>
+      <destName>efa_large.png</destName>
+    </file>
 
   </files>
 

@@ -300,9 +300,6 @@ public class EfaBaseFrame extends BaseDialog implements IItemListener {
         iniGuiMain();
         iniGuiRemaining();
         iniApplication();
-        if (isModeBase()) {
-            Daten.iniSplashScreen(false);
-        }
         AdminTask.startAdminTask(admin, this);
     }
 

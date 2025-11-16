@@ -35,20 +35,12 @@ public final class EfaGetdownLauncher {
             try {
                 runGetdown(args, ui);
             } catch (Throwable t) {
-                t.printStackTrace();
+                log.error("Error while starting EFA via Getdown", t);
                 ui.showError("Update / Start fehlgeschlagen:\n" + t.getMessage());
+                // TODO: show a modal dialog and wait for user confirmation
                 exitCode = 1;
-            } finally {
-                if (exitCode == 0) {
-                    ui.close();
-                } else {
-                    // leave window open on error; user closes manually
-                }
-                // In a real app you might delay System.exit to let user read the error
-                if (exitCode == 0) {
-                    System.exit(0);
-                }
             }
+            System.exit(exitCode);
         }, "getdown-launcher-worker");
 
         worker.setDaemon(false);
@@ -113,10 +105,10 @@ public final class EfaGetdownLauncher {
 
                 @Override
                 protected void downloadFailed(Resource rsrc, Exception cause) {
-                    cause.printStackTrace();
+                    log.warn("Download failed for resource {}", rsrc.getPath(), cause);
                     SwingUtilities.invokeLater(() -> ui.showError(
                             "Download fehlgeschlagen für: " +
-                                    (rsrc != null ? rsrc.getPath() : "<unbekannt>")
+                                    rsrc.getPath()
                                     + "\n" + cause.getMessage()));
                 }
             };
@@ -147,12 +139,11 @@ public final class EfaGetdownLauncher {
         ui.showSplash("Starte Anwendung …", 95);
 
         Process child = app.createProcess(true); // true => use optimum JVM args if configured
+        
+        // TODO: wait here till the app has logged that it's up.
+        ui.close();
 
-        // Important: do NOT wait for the child here, Getdown-style launchers usually exit
-        // so the actual app becomes the “main” process.
-        // If you want to wait, you could do:
         child.waitFor();
-        ui.showSplash("Anwendung gestartet.", 100);
     }
 
     /**
@@ -180,17 +171,9 @@ public final class EfaGetdownLauncher {
             JLabel logoLabel = new JLabel();
             logoLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-            // Load logo from classpath
             ImageIcon icon = loadLogo();
-            if (icon != null) {
-                logoLabel.setIcon(icon);
-                // optional fixed size
-                frame.setPreferredSize(new Dimension(400, 300));
-            } else {
-                logoLabel.setText("Meine App");
-                logoLabel.setFont(logoLabel.getFont().deriveFont(Font.BOLD, 24f));
-                frame.setPreferredSize(new Dimension(300, 200));
-            }
+            logoLabel.setIcon(icon);
+            //frame.setPreferredSize(new Dimension(462, 120));
 
             progressBar = new JProgressBar(0, 100);
             progressBar.setStringPainted(false);
@@ -239,20 +222,15 @@ public final class EfaGetdownLauncher {
         }
 
         private ImageIcon loadLogo() {
-            // Hard-coded resource path; adjust to your actual location
-            try {
-                URL url = getClass().getClassLoader().getResource("launcher-logo.png");
-                if (url == null) {
-                    return null;
-                }
-                Image img = new ImageIcon(url).getImage();
-                // Optional scaling
-                Image scaled = img.getScaledInstance(256, 256, Image.SCALE_SMOOTH);
-                return new ImageIcon(scaled);
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
+            URL url = getClass().getClassLoader().getResource("de/nmichael/efa/img/efaIntro.png");
+            Image img = null;
+            if (url != null) {
+                img = new ImageIcon(url).getImage();
             }
+            if (img == null) {
+                throw new IllegalStateException("Could not load EFA logo");
+            }
+            return new ImageIcon(img);
         }
     }
 

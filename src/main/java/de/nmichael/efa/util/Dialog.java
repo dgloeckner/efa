@@ -292,7 +292,6 @@ public class Dialog {
     }
 
     private static void prepareWindow(Window frame) {
-        Daten.iniSplashScreen(false);
         if (frame != null && !frame.isEnabled()) {
             frame.setEnabled(true);
         }

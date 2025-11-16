@@ -53,8 +53,7 @@ public class Main extends Program {
         } catch (Exception e) {
         	Logger.logdebug(e);
         }       
-        Daten.iniSplashScreen(false);
-        Logger.log(Logger.INFO, Logger.MSG_EVT_EFAREADY, International.getString("BEREIT"));   
+        Logger.log(Logger.INFO, Logger.MSG_EVT_EFAREADY, International.getString("BEREIT"));
     }
 
     public void printUsage(String wrongArgument) {

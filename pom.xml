@@ -35,9 +35,12 @@
     <!-- Getdown configuration -->
     <getdown.groupId>io.github.bekoenig.getdown</getdown.groupId>
     <!-- Use the latest available release; can be pinned later for reproducibility -->
-    <getdown.version>2.0.1</getdown.version>
+    <getdown.launcher.version>2.0.1</getdown.launcher.version>
     <!-- Default appbase can be overridden at build time: -Dgetdown.appbase=http://127.0.0.1:8000/ -->
     <getdown.appbase>https://github.com/dgloeckner/efa/releases/latest/download/</getdown.appbase>
+    <!-- Artifact version for Getdown as integer.
+      Set from Release version during release build. -->
+    <getdown.version>1</getdown.version>
   </properties>
 
   <dependencies>
@@ -161,12 +164,12 @@
     <dependency>
       <groupId>${getdown.groupId}</groupId>
       <artifactId>getdown-launcher</artifactId>
-      <version>${getdown.version}</version>
+      <version>${getdown.launcher.version}</version>
     </dependency>
     <dependency>
       <groupId>${getdown.groupId}</groupId>
       <artifactId>getdown-core</artifactId>
-      <version>${getdown.version}</version>
+      <version>${getdown.launcher.version}</version>
     </dependency>
   </dependencies>
   
@@ -359,7 +362,7 @@
                 <artifactItem>
                   <groupId>${getdown.groupId}</groupId>
                   <artifactId>getdown-launcher</artifactId>
-                  <version>${getdown.version}</version>
+                  <version>${getdown.launcher.version}</version>
                   <type>jar</type>
                   <overWrite>true</overWrite>
                   <outputDirectory>${project.build.directory}/program</outputDirectory>
@@ -379,7 +382,7 @@
                 <artifactItem>
                   <groupId>${getdown.groupId}</groupId>
                   <artifactId>getdown-core</artifactId>
-                  <version>${getdown.version}</version>
+                  <version>${getdown.launcher.version}</version>
                   <type>jar</type>
                   <overWrite>true</overWrite>
                   <outputDirectory>${project.build.directory}/program</outputDirectory>
@@ -427,7 +430,7 @@
         </executions>
       </plugin>
 
-      <!-- Create getdown.txt (filtered) and version.txt; also copy program/getdown.txt -->
+      <!-- Create getdown.txt (filtered); also copy program/getdown.txt -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
@@ -449,16 +452,6 @@
                     <include>getdown.txt</include>
                   </includes>
                 </resource>
-                <!-- Copy images used by custom Getdown UI -->
-                <resource>
-                  <directory>${project.basedir}/src/main/resources/de/nmichael/efa/img</directory>
-                  <filtering>false</filtering>
-                  <includes>
-                    <include>efaIntro.png</include>
-                    <include>efa_icon.png</include>
-                    <include>efa_large.png</include>
-                  </includes>
-                </resource>
               </resources>
             </configuration>
           </execution>
@@ -474,12 +467,6 @@
                 <resource>
                   <directory>${project.build.directory}/update-site</directory>
                   <filtering>false</filtering>
-                  <includes>
-                    <include>getdown.txt</include>
-                    <include>efaIntro.png</include>
-                    <include>efa_icon.png</include>
-                    <include>efa_large.png</include>
-                  </includes>
                 </resource>
               </resources>
             </configuration>
@@ -496,12 +483,12 @@
           <dependency>
             <groupId>${getdown.groupId}</groupId>
             <artifactId>getdown-ant</artifactId>
-            <version>${getdown.version}</version>
+            <version>${getdown.launcher.version}</version>
           </dependency>
           <dependency>
             <groupId>${getdown.groupId}</groupId>
             <artifactId>getdown-core</artifactId>
-            <version>${getdown.version}</version>
+            <version>${getdown.launcher.version}</version>
           </dependency>
         </dependencies>
         <executions>
@@ -512,7 +499,7 @@
               <target>
                 <mkdir dir="${project.build.directory}/update-site"/>
                 <echo message="[antrun] writing version.txt with ${project.version} into ${project.build.directory}/update-site"/>
-                <echo file="${project.build.directory}/update-site/version.txt" message="${project.version}"/>
+                <echo file="${project.build.directory}/update-site/version.txt" message="${getdown.version}"/>
               </target>
             </configuration>
             <goals>
@@ -531,7 +518,7 @@
           <dependency>
             <groupId>${getdown.groupId}</groupId>
             <artifactId>getdown-core</artifactId>
-            <version>${getdown.version}</version>
+            <version>${getdown.launcher.version}</version>
           </dependency>
         </dependencies>
         <executions>
@@ -600,12 +587,12 @@
               <dependency>
                 <groupId>${getdown.groupId}</groupId>
                 <artifactId>getdown-ant</artifactId>
-                <version>${getdown.version}</version>
+                <version>${getdown.launcher.version}</version>
               </dependency>
               <dependency>
                 <groupId>${getdown.groupId}</groupId>
                 <artifactId>getdown-core</artifactId>
-                <version>${getdown.version}</version>
+                <version>${getdown.launcher.version}</version>
               </dependency>
             </dependencies>
             <executions>

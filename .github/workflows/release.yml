@@ -35,8 +35,23 @@ jobs:
             -DprocessAllModules=true \
             -DgenerateBackupPoms=false
 
+      - name: Compute integer Getdown version
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"  # e.g. 1.99.7
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
+          
+          # default if parts are missing (e.g. "1" or "1.2")
+          : "${MINOR:=0}"
+          : "${PATCH:=0}"
+          
+          GETDOWN_VERSION=$(( MAJOR * 1000000 + MINOR * 1000 + PATCH ))
+          
+          echo "SemVer: $VERSION"
+          echo "Getdown integer version: $GETDOWN_VERSION"
+          echo "GETDOWN_VERSION=$GETDOWN_VERSION" >> "$GITHUB_ENV"
+
       - name: Build
-        run: ./mvnw -B -ntp package
+        run: ./mvnw -B -ntp package -Dgetdown.version=$GETDOWN_VERSION
 
 
       - name: Generate SHA-256 checksums (optional)
@@ -58,7 +73,6 @@ jobs:
             **/target/update-site/getdown.txt
             **/target/update-site/digest.txt
             **/target/update-site/digest2.txt
-            **/target/update-site/version.txt
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

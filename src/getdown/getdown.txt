@@ -1,5 +1,8 @@
 appbase = ${getdown.appbase}
+version = ${getdown.version}
+
 allow_offline = true
+ui.name = EFA
 
 class = de.nmichael.efa.boathouse.Main
 jvmarg = -Xmx192m

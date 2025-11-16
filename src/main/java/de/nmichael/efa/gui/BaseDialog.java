@@ -165,7 +165,6 @@ public abstract class BaseDialog extends JDialog implements ActionListener {
     }
 
     public void showDialog() {
-        Daten.iniSplashScreen(false);
         if (!_prepared && !prepareDialog()) {
             return;
         }

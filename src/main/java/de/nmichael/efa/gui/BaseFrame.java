@@ -91,7 +91,6 @@ public abstract class BaseFrame extends JFrame implements ActionListener {
             Logger.log(Logger.ERROR, "FRAME NOT PREPARED");
         	return;
         }
-        Daten.iniSplashScreen(false);
         Dialog.setDlgLocation(this);
         Dialog.frameOpened(this);
         if (focusItem != null) {

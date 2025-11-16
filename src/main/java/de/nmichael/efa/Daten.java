@@ -31,7 +31,6 @@ import java.util.Enumeration;
 import java.util.Vector;
 import java.util.jar.JarFile;
 
-import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.plaf.ColorUIResource;
@@ -241,7 +240,6 @@ public class Daten {
 	public static EfaRunning efaRunning; // efa Running (Doppelstarts verhindern)
 	public static EmailSenderThread emailSenderThread;
 
-	private static StartLogo splashScreen; // Efa Splash Screen
 	public static boolean firstEfaStart = false; // true wenn efa das erste Mal gestartet wurde und EfaBaseConfig neu
 													// erzeugt wurde
 
@@ -305,7 +303,6 @@ public class Daten {
 		iniLanguageSupport();
 		iniUserDirectory();
 		iniLogging();
-		iniSplashScreen(true);
 		iniEnvironmentSettings();
 		iniDirectories();
 		iniEfaSec();
@@ -772,43 +769,6 @@ public class Daten {
 		}
 	}
 
-	public static void iniSplashScreen(boolean show) {
-		if (Logger.isTraceOn(Logger.TT_CORE, 9) || Logger.isDebugLoggingActivatedByCommandLine()) {
-			Logger.log(Logger.DEBUG, Logger.MSG_CORE_STARTUPINITIALIZATION, "iniSplashScreen(" + show + ")");
-		}
-		if (!isGuiAppl()) {
-			return;
-		}
-		if (show) {
-			splashScreen = new StartLogo(IMAGEPATH + "efaIntro.png");
-
-			// also showing the splash screen needs to be run thread-safe for swing.
-			// this function "iniSplashScreen" is called from outside the AWT main thread.
-			SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-					splashScreen.show();
-				}
-			});
-			try {
-				Thread.sleep(1000); // Damit nach automatischem Restart genügend Zeit vergeht
-			} catch (InterruptedException e) {
-			}
-		} else {
-			if (splashScreen != null) {
-				SwingUtilities.invokeLater(new Runnable() {
-					public void run() {
-						// splashScreen can be set to null by another thread, so check at
-						// actual execution time.
-						if (splashScreen != null) {
-							splashScreen.remove();
-							splashScreen = null;
-						}
-					}
-				});
-			}
-		}
-	}
-
 	public static void iniEfaSec() {
 		if (Logger.isTraceOn(Logger.TT_CORE, 9) || Logger.isDebugLoggingActivatedByCommandLine()) {
 			Logger.log(Logger.DEBUG, Logger.MSG_CORE_STARTUPINITIALIZATION, "iniEfaSec()");
@@ -920,7 +880,6 @@ public class Daten {
 						"efa is not yet fully set up. Please launch GUI program first.");
 				Daten.haltProgram(HALT_BASICCONFIG);
 			}
-			iniSplashScreen(false);
 			EfaFirstSetupDialog dlg = new EfaFirstSetupDialog(createNewAdmin, firstEfaStart);
 			dlg.showDialog();
 			if (!dlg.getDialogResult()) {

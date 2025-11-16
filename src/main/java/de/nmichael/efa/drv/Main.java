@@ -70,7 +70,6 @@ public class Main extends Program {
         }
         Dialog.setDlgLocation(frame);
         frame.setVisible(true);
-        Daten.iniSplashScreen(false);
     }
 
     public void printUsage(String wrongArgument) {

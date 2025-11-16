@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write  # needed to create/update GitHub Releases
+  packages: write
 
 jobs:
   release:
@@ -34,8 +35,24 @@ jobs:
             -DprocessAllModules=true \
             -DgenerateBackupPoms=false
 
+      - name: Compute integer Getdown version
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"  # e.g. 1.99.7
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
+          
+          # default if parts are missing (e.g. "1" or "1.2")
+          : "${MINOR:=0}"
+          : "${PATCH:=0}"
+          
+          GETDOWN_VERSION=$(( MAJOR * 1000000 + MINOR * 1000 + PATCH ))
+          
+          echo "SemVer: $VERSION"
+          echo "Getdown integer version: $GETDOWN_VERSION"
+          echo "GETDOWN_VERSION=$GETDOWN_VERSION" >> "$GITHUB_ENV"
+
       - name: Build
-        run: ./mvnw -B -ntp package
+        run: ./mvnw -B -ntp package -Dgetdown.version=$GETDOWN_VERSION
+
 
       - name: Generate SHA-256 checksums (optional)
         run: |
@@ -44,12 +61,18 @@ jobs:
             sha256sum "$f" > "$f.sha256"
           done
 
-      - name: Create GitHub Release & upload JARs
+      - name: Create GitHub Release & upload artifacts
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            **/target/*.jar
-            **/target/*.jar.sha256
+            **/target/efa*.zip
+            **/target/efa*.tar
+            **/target/efa*.jar
+            **/target/efa*.jar.sha256
+            **/target/update-site/efa.jar
+            **/target/update-site/getdown.txt
+            **/target/update-site/digest.txt
+            **/target/update-site/digest2.txt
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

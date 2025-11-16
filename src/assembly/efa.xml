@@ -1,0 +1,110 @@
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.3"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.3 https://maven.apache.org/xsd/assembly-1.1.3.xsd">
+  <id>dist</id>
+  <formats>
+    <format>zip</format>
+    <format>tar</format>
+  </formats>
+  <includeBaseDirectory>false</includeBaseDirectory>
+
+  <!-- Place the built application jar as program/efa.jar -->
+  <files>
+    <file>
+      <source>${project.build.directory}/${project.artifactId}-${project.version}.jar</source>
+      <outputDirectory>program</outputDirectory>
+      <destName>efa.jar</destName>
+    </file>
+
+    <!-- Include the generated efa.sec (written to ${project.build.directory}) into program/ -->
+    <file>
+      <source>${project.build.directory}/efa.sec</source>
+      <outputDirectory>program</outputDirectory>
+      <destName>efa.sec</destName>
+    </file>
+
+    <!-- Include Getdown launcher and config produced by Maven build -->
+    <file>
+      <source>${project.build.directory}/program/getdown.jar</source>
+      <outputDirectory>program</outputDirectory>
+      <destName>getdown.jar</destName>
+    </file>
+    <file>
+      <source>${project.build.directory}/program/getdown-core.jar</source>
+      <outputDirectory>program</outputDirectory>
+      <destName>getdown-core.jar</destName>
+    </file>
+    <file>
+      <source>${project.build.directory}/program/getdown.txt</source>
+      <outputDirectory>program</outputDirectory>
+      <destName>getdown.txt</destName>
+    </file>
+    <file>
+      <source>${project.build.directory}/update-site/digest.txt</source>
+      <outputDirectory>program</outputDirectory>
+      <destName>digest.txt</destName>
+    </file>
+    <file>
+      <source>${project.build.directory}/update-site/digest2.txt</source>
+      <outputDirectory>program</outputDirectory>
+      <destName>digest2.txt</destName>
+    </file>
+    <file>
+      <source>${project.build.directory}/update-site/version.txt</source>
+      <outputDirectory>program</outputDirectory>
+      <destName>version.txt</destName>
+    </file>
+  </files>
+
+  <fileSets>
+    <!-- Config files (.cfg) at cfg/ -->
+    <fileSet>
+      <directory>${project.basedir}/cfg</directory>
+      <outputDirectory>cfg</outputDirectory>
+      <includes>
+        <include>*.cfg</include>
+      </includes>
+      <useDefaultExcludes>true</useDefaultExcludes>
+    </fileSet>
+
+    <!-- Internationalization bundles expected under program/ at runtime -->
+    <fileSet>
+      <directory>${project.basedir}</directory>
+      <outputDirectory>program</outputDirectory>
+      <includes>
+        <include>efa*.properties</include>
+      </includes>
+      <useDefaultExcludes>true</useDefaultExcludes>
+    </fileSet>
+
+    <!-- Include all Getdown runtime jars copied to target/program (launcher, core, logback, slf4j, etc.) -->
+    <fileSet>
+      <directory>${project.build.directory}/program</directory>
+      <outputDirectory>program</outputDirectory>
+      <includes>
+        <include>*.jar</include>
+      </includes>
+      <useDefaultExcludes>true</useDefaultExcludes>
+    </fileSet>
+
+    <!-- Documentation extracted from help/main to doc/ -->
+    <fileSet>
+      <directory>${project.basedir}/help/main</directory>
+      <outputDirectory>doc</outputDirectory>
+      <includes>
+        <include>*.gif</include>
+        <include>*.png</include>
+        <include>*.html</include>
+      </includes>
+      <useDefaultExcludes>true</useDefaultExcludes>
+    </fileSet>
+
+    <!-- Root launch scripts and other files to the distro root; mark executable where applicable -->
+    <fileSet>
+      <directory>${project.basedir}/root</directory>
+      <outputDirectory>.</outputDirectory>
+      <fileMode>0755</fileMode>
+      <useDefaultExcludes>true</useDefaultExcludes>
+    </fileSet>
+  </fileSets>
+</assembly>

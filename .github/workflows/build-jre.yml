@@ -195,45 +195,40 @@ jobs:
             ${{ env.ARCHIVE_NAME }}
             ${{ env.ARCHIVE_NAME }}.sha256
 
-      # 11. Publish to GitHub Packages as a generic package
-      #     GitHub Packages supports generic packages via the API
-      #     We'll use the GitHub CLI (gh) which is pre-installed on runners
-      - name: Publish to GitHub Packages
+      # 11. Publish JRE as GitHub Package (Maven)
+      - name: Publish JRE as GitHub Package (Maven)
         shell: bash
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Package details
-          PACKAGE_NAME="${{ github.repository }}-jre"
+          PACKAGE_GROUP_ID="io.github.dgloeckner.efa"
+          PACKAGE_ARTIFACT_ID="${{ github.repository }}-jre"
           PACKAGE_VERSION="${{ env.VERSION }}"
-
-          echo "Publishing package: $PACKAGE_NAME"
-          echo "Version: $PACKAGE_VERSION"
-          echo "File: ${{ env.ARCHIVE_NAME }}"
-
-          # Upload the archive to GitHub Packages using the API
-          # GitHub Packages requires uploading to a specific endpoint
-          # Format: https://maven.pkg.github.com/OWNER/REPO
-
-          # For generic packages, we can use the Releases API or Maven registry
-          # Since we're already creating a release workflow, we'll upload to releases
-          # For true generic package support, consider using a Maven-compatible approach
-          # or the Container registry with additional metadata
-
-          # Create a release if it doesn't exist
-          if ! gh release view "v${{ env.VERSION }}" >/dev/null 2>&1; then
-            gh release create "v${{ env.VERSION }}" \
-              --title "Release v${{ env.VERSION }}" \
-              --notes "Custom JRE runtime images for version ${{ env.VERSION }}" \
-              --draft=false \
-              --prerelease=false || true
+          
+          # Determine packaging type based on file extension
+          if [[ "${{ env.ARCHIVE_NAME }}" == *.tar.gz ]]; then
+            PACKAGING="tar.gz"
+          elif [[ "${{ env.ARCHIVE_NAME }}" == *.zip ]]; then
+            PACKAGING="zip"
+          else
+            PACKAGING="jar"
           fi
 
-          # Upload the archive to the release
-          gh release upload "v${{ env.VERSION }}" \
-            "${{ env.ARCHIVE_NAME }}" \
-            "${{ env.ARCHIVE_NAME }}.sha256" \
-            --clobber
+          echo "Publishing Maven package:"
+          echo "  GAV: ${PACKAGE_GROUP_ID}:${PACKAGE_ARTIFACT_ID}:${PACKAGE_VERSION}"
+          echo "  File: ${{ env.ARCHIVE_NAME }}"
+          echo "  Packaging: ${PACKAGING}"
+          echo "  Classifier: ${{ matrix.os_name }}-${{ env.ARCH }}"
+
+          mvn --batch-mode deploy:deploy-file \
+            -Dfile="${{ env.ARCHIVE_NAME }}" \
+            -DgroupId="${PACKAGE_GROUP_ID}" \
+            -DartifactId="${PACKAGE_ARTIFACT_ID}" \
+            -Dversion="${PACKAGE_VERSION}" \
+            -Dpackaging="${PACKAGING}" \
+            -Dclassifier="${{ matrix.os_name }}-${{ env.ARCH }}" \
+            -DrepositoryId=github \
+            -Durl="https://maven.pkg.github.com/${{ github.repository }}"
 
       # 12. Add download instructions as a comment
       - name: Display download instructions
@@ -243,32 +238,63 @@ jobs:
           cat << 'EOF'
 
           ═══════════════════════════════════════════════════════════════
-          📦 JRE Runtime Package Published Successfully!
+          📦 JRE Runtime Package Published Successfully to GitHub Packages!
           ═══════════════════════════════════════════════════════════════
 
-          To download the runtime packages, use one of these methods:
+          To consume the runtime packages via Maven, add this configuration:
 
-          1️⃣  Using GitHub CLI (gh):
+          1️⃣  Maven pom.xml configuration:
           ───────────────────────────────────────────────────────────────
-          gh release download v${{ env.VERSION }} \
-            --repo ${{ github.repository }} \
-            --pattern "efa-jre-*"
+          <repositories>
+            <repository>
+              <id>github</id>
+              <url>https://maven.pkg.github.com/${{ github.repository }}</url>
+            </repository>
+          </repositories>
 
-          2️⃣  Using curl (example for Linux x64):
+          <dependency>
+            <groupId>io.github.dgloeckner.efa</groupId>
+            <artifactId>${{ github.repository }}-jre</artifactId>
+            <version>${{ env.VERSION }}</version>
+            <classifier>linux-x64</classifier> <!-- or macos-x64, macos-aarch64, windows-x64 -->
+            <type>tar.gz</type> <!-- or zip for Windows -->
+          </dependency>
+
+          2️⃣  Gradle build.gradle configuration:
           ───────────────────────────────────────────────────────────────
-          curl -L -o efa-jre.tar.gz \
-            "https://github.com/${{ github.repository }}/releases/download/v${{ env.VERSION }}/efa-jre-${{ env.VERSION }}-linux-x64.tar.gz"
+          repositories {
+              maven {
+                  url = uri("https://maven.pkg.github.com/${{ github.repository }}")
+                  credentials {
+                      username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+                      password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+                  }
+              }
+          }
 
-          3️⃣  Direct browser download:
+          dependencies {
+              implementation("io.github.dgloeckner.efa:${{ github.repository }}-jre:${{ env.VERSION }}:linux-x64@tar.gz")
+          }
+
+          3️⃣  Authentication (required for GitHub Packages):
           ───────────────────────────────────────────────────────────────
-          https://github.com/${{ github.repository }}/releases/tag/v${{ env.VERSION }}
+          Add to ~/.m2/settings.xml:
 
-          Available packages:
-            • efa-jre-${{ env.VERSION }}-linux-x64.tar.gz
-            • efa-jre-${{ env.VERSION }}-macos-<arch>.tar.gz
-            • efa-jre-${{ env.VERSION }}-windows-x64.zip
+          <servers>
+            <server>
+              <id>github</id>
+              <username>YOUR_GITHUB_USERNAME</username>
+              <password>YOUR_GITHUB_TOKEN</password>
+            </server>
+          </servers>
 
-          Each package includes a .sha256 checksum file for verification.
+          Available classifiers:
+            • linux-x64 (tar.gz)
+            • macos-x64 (tar.gz)
+            • macos-aarch64 (tar.gz)
+            • windows-x64 (zip)
+
+          Each package includes JavaFX support and a minimal JRE runtime.
           ═══════════════════════════════════════════════════════════════
 
           EOF

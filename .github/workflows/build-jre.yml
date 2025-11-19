@@ -89,21 +89,45 @@ jobs:
       - name: Verify JAVA_HOME and add to PATH
         shell: bash
         run: |
-          echo "JAVA_HOME: $JAVA_HOME"
+          echo "JAVA_HOME before detection: $JAVA_HOME"
+          # Try to detect JAVA_HOME if not already set
+          if [ -z "$JAVA_HOME" ]; then
+            # macOS helper
+            if [ -x "/usr/libexec/java_home" ]; then
+              JAVA_HOME=$(/usr/libexec/java_home) || true
+            fi
+          fi
+          
+          # Fallback: derive from `java` on PATH (Linux/Windows via msys/WSL may differ)
+          if [ -z "$JAVA_HOME" ]; then
+            if command -v java >/dev/null 2>&1; then
+              JAVA_BIN=$(command -v java)
+              # resolve symlink if readlink -f is available
+              if command -v readlink >/dev/null 2>&1 && readlink -f "$JAVA_BIN" >/dev/null 2>&1; then
+                REAL_JAVA_BIN=$(readlink -f "$JAVA_BIN")
+              else
+                REAL_JAVA_BIN="$JAVA_BIN"
+              fi
+              JAVA_HOME=$(dirname "$(dirname "$REAL_JAVA_BIN")")
+            fi
+          fi
+          
           if [ -z "$JAVA_HOME" ]; then
             echo "ERROR: JAVA_HOME is not set"
             exit 1
           fi
+          
           if [ ! -d "$JAVA_HOME/bin" ]; then
             echo "ERROR: $JAVA_HOME/bin not found"
             echo "Contents of $JAVA_HOME:" || true
             ls -la "$JAVA_HOME" || true
             exit 1
           fi
+          
           echo "$JAVA_HOME/bin" >> $GITHUB_PATH
           java -version
           javac -version || true
-          jlink --version
+          jlink --version || true
 
       # 6. Create custom JRE runtime using jlink
       #    This creates a minimal runtime with JavaFX modules included
@@ -211,7 +235,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           PACKAGE_GROUP_ID="io.github.dgloeckner.efa"
-          PACKAGE_ARTIFACT_ID="${{ github.repository }}-jre"
+          PACKAGE_ARTIFACT_ID="${GITHUB_REPOSITORY#*/}-jre"
           PACKAGE_VERSION="${{ env.VERSION }}"
           
           # Determine packaging type based on file extension
@@ -245,7 +269,10 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         shell: bash
         run: |
-          cat << 'EOF'
+          # Compute the artifact ID (strip owner prefix)
+          PACKAGE_ARTIFACT_ID="${GITHUB_REPOSITORY#*/}-jre"
+          
+          cat << EOF
 
           ═══════════════════════════════════════════════════════════════
           📦 JRE Runtime Package Published Successfully to GitHub Packages!
@@ -264,7 +291,7 @@ jobs:
 
           <dependency>
             <groupId>io.github.dgloeckner.efa</groupId>
-            <artifactId>${{ github.repository }}-jre</artifactId>
+            <artifactId>${PACKAGE_ARTIFACT_ID}</artifactId>
             <version>${{ env.VERSION }}</version>
             <classifier>linux-x64</classifier> <!-- or macos-x64, macos-aarch64, windows-x64 -->
             <type>tar.gz</type> <!-- or zip for Windows -->
@@ -283,7 +310,7 @@ jobs:
           }
 
           dependencies {
-              implementation("io.github.dgloeckner.efa:${{ github.repository }}-jre:${{ env.VERSION }}:linux-x64@tar.gz")
+              implementation("io.github.dgloeckner.efa:${PACKAGE_ARTIFACT_ID}:${{ env.VERSION }}:linux-x64@tar.gz")
           }
 
           3️⃣  Authentication (required for GitHub Packages):

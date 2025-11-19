@@ -131,16 +131,15 @@ jobs:
 
       # 6. Create custom JRE runtime using jlink
       #    This creates a minimal runtime with JavaFX modules included
-      - name: Build custom JRE with jlink
+      - name: Build custom JRE with jlink (Unix)
+        if: matrix.os != 'windows-latest'
         shell: bash
         run: |
-          # Remove any existing runtime directory to avoid conflicts and ensure jlink can create it
+          # Ensure a clean output directory
           rm -rf build/runtime
           mkdir -p build/runtime
 
           # Run jlink to create custom runtime
-          # Module path points to JDK's jmods directory
-          # Add all required modules for JavaFX application
           "$JAVA_HOME/bin/jlink" \
             --module-path "$JAVA_HOME/jmods" \
             --add-modules java.base,java.logging,java.desktop,java.sql,java.naming,java.management,java.xml,java.prefs,javafx.controls,javafx.fxml,javafx.graphics,javafx.swing,javafx.media \
@@ -152,6 +151,27 @@ jobs:
 
           echo "Custom JRE created successfully"
           ls -la build/runtime
+
+      - name: Build custom JRE with jlink (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          # Ensure a clean output directory on Windows
+          if (Test-Path 'build/runtime') { Remove-Item 'build/runtime' -Recurse -Force }
+          New-Item -ItemType Directory -Path 'build/runtime' | Out-Null
+
+          # Run jlink using Windows paths
+          & "$env:JAVA_HOME\bin\jlink.exe" `
+            --module-path "$env:JAVA_HOME\jmods" `
+            --add-modules java.base,java.logging,java.desktop,java.sql,java.naming,java.management,java.xml,java.prefs,javafx.controls,javafx.fxml,javafx.graphics,javafx.swing,javafx.media `
+            --output build/runtime `
+            --strip-debug `
+            --no-header-files `
+            --no-man-pages `
+            --compress=2
+
+          Write-Output "Custom JRE created successfully"
+          Get-ChildItem build\runtime -Force | Format-List
 
       # 7. Create archive name based on OS, architecture, and version
       - name: Set archive name

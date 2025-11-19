@@ -110,7 +110,6 @@ jobs:
         run: |
           # Ensure a clean output directory
           rm -rf build/runtime
-          mkdir -p build/runtime
 
           # Run jlink to create custom runtime
           "$JAVA_HOME/bin/jlink" \
@@ -131,7 +130,6 @@ jobs:
         run: |
           # Ensure a clean output directory on Windows
           if (Test-Path 'build/runtime') { Remove-Item 'build/runtime' -Recurse -Force }
-          New-Item -ItemType Directory -Path 'build/runtime' | Out-Null
 
           # Run jlink using Windows paths
           & "$env:JAVA_HOME\bin\jlink.exe" `

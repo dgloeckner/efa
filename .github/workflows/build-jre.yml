@@ -75,57 +75,30 @@ jobs:
           echo "ARCH=$ARCH" >> $GITHUB_ENV
           echo "Detected architecture: $ARCH"
 
-      # 4. Download and install Liberica Full JDK with JavaFX
-      #    We'll download the JDK directly from BellSoft for all platforms
-      - name: Download Liberica Full JDK (Linux)
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          # Download Liberica Full JDK with JavaFX for Linux x64
-          wget -q https://download.bell-sw.com/java/${{ env.JAVA_VERSION }}/bellsoft-jdk${{ env.JAVA_VERSION }}-linux-amd64-full.tar.gz
-          tar -xzf bellsoft-jdk${{ env.JAVA_VERSION }}-linux-amd64-full.tar.gz
-          # Extract major version for directory name
-          MAJOR_VERSION=$(echo "${{ env.JAVA_VERSION }}" | cut -d'.' -f1)
-          JDK_DIR=$(find . -maxdepth 1 -type d -name "jdk-${MAJOR_VERSION}*-full" | head -n1)
-          echo "JAVA_HOME=$(pwd)/$JDK_DIR" >> $GITHUB_ENV
+      # 4. Set up JDK 21 using actions/setup-java with JavaFX support
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: liberica
+          java-version: 21
+          java-package: jdk+fx
 
-      - name: Download Liberica Full JDK (macOS)
-        if: matrix.os == 'macos-latest'
-        run: |
-          # Download Liberica Full JDK with JavaFX for macOS
-          ARCH_SUFFIX=""
-          if [ "${{ env.ARCH }}" = "aarch64" ]; then
-            ARCH_SUFFIX="aarch64"
-            wget -q https://download.bell-sw.com/java/${{ env.JAVA_VERSION }}/bellsoft-jdk${{ env.JAVA_VERSION }}-macos-aarch64-full.tar.gz
-            tar -xzf bellsoft-jdk${{ env.JAVA_VERSION }}-macos-aarch64-full.tar.gz
-          else
-            ARCH_SUFFIX="amd64"
-            wget -q https://download.bell-sw.com/java/${{ env.JAVA_VERSION }}/bellsoft-jdk${{ env.JAVA_VERSION }}-macos-amd64-full.tar.gz
-            tar -xzf bellsoft-jdk${{ env.JAVA_VERSION }}-macos-amd64-full.tar.gz
-          fi
-          # Extract major version for directory name
-          MAJOR_VERSION=$(echo "${{ env.JAVA_VERSION }}" | cut -d'.' -f1)
-          JDK_DIR=$(find . -maxdepth 1 -type d -name "jdk-${MAJOR_VERSION}*-full.jdk" | head -n1)
-          echo "JAVA_HOME=$(pwd)/$JDK_DIR/Contents/Home" >> $GITHUB_ENV
-
-      - name: Download Liberica Full JDK (Windows)
-        if: matrix.os == 'windows-latest'
-        shell: pwsh
-        run: |
-          # Download Liberica Full JDK with JavaFX for Windows x64
-          Invoke-WebRequest -Uri "https://download.bell-sw.com/java/${{ env.JAVA_VERSION }}/bellsoft-jdk${{ env.JAVA_VERSION }}-windows-amd64-full.zip" -OutFile "bellsoft-jdk.zip"
-          Expand-Archive -Path "bellsoft-jdk.zip" -DestinationPath "."
-          # Extract major version for directory name
-          $majorVersion = "${{ env.JAVA_VERSION }}".Split('.')[0]
-          $jdkDir = Get-ChildItem -Directory -Filter "jdk-${majorVersion}*-full" | Select-Object -First 1
-          $javaHome = $jdkDir.FullName
-          echo "JAVA_HOME=$javaHome" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-
-      # 5. Verify JAVA_HOME and jlink availability
-      - name: Verify Java installation
+      # 5. Verify JAVA_HOME and add to PATH
+      - name: Verify JAVA_HOME and add to PATH
         shell: bash
         run: |
           echo "JAVA_HOME: $JAVA_HOME"
-          ls -la "$JAVA_HOME/bin"
+          if [ -z "$JAVA_HOME" ]; then
+            echo "ERROR: JAVA_HOME is not set"
+            exit 1
+          fi
+          if [ ! -d "$JAVA_HOME/bin" ]; then
+            echo "ERROR: $JAVA_HOME/bin not found"
+            echo "Contents of $JAVA_HOME:" || true
+            ls -la "$JAVA_HOME" || true
+            exit 1
+          fi
+          echo "$JAVA_HOME/bin" >> $GITHUB_PATH
           "$JAVA_HOME/bin/java" -version
           "$JAVA_HOME/bin/jlink" --version
 

@@ -4,6 +4,18 @@ on:
   push:
     tags:
       - 'v*'   # Trigger on version tags like v1.0.0
+  workflow_dispatch:
+    inputs:
+      java_version:
+        description: 'Java version (e.g., 21.0.5+11)'
+        required: false
+        default: '21.0.5+11'
+        type: string
+      tag_version:
+        description: 'Version tag for the runtime (e.g., 1.0.0)'
+        required: false
+        default: '1.0.0-manual'
+        type: string
 
 permissions:
   contents: read
@@ -33,13 +45,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Extract version from tag (strip leading 'v')
-      - name: Extract version from tag
+      # 2. Set Java and version parameters
+      - name: Set Java and version parameters
         shell: bash
         run: |
-          VERSION="${GITHUB_REF_NAME#v}"
+          # Set Java version (from input or default)
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            JAVA_VERSION="${{ inputs.java_version }}"
+            VERSION="${{ inputs.tag_version }}"
+          else
+            JAVA_VERSION="21.0.5+11"
+            VERSION="${GITHUB_REF_NAME#v}"
+          fi
+          echo "JAVA_VERSION=$JAVA_VERSION" >> $GITHUB_ENV
           echo "VERSION=$VERSION" >> $GITHUB_ENV
-          echo "Using version: $VERSION"
+          echo "Using Java version: $JAVA_VERSION"
+          echo "Using runtime version: $VERSION"
 
       # 3. Detect architecture
       - name: Detect architecture
@@ -54,40 +75,49 @@ jobs:
           echo "ARCH=$ARCH" >> $GITHUB_ENV
           echo "Detected architecture: $ARCH"
 
-      # 4. Download and install Liberica Full JDK 21 with JavaFX
+      # 4. Download and install Liberica Full JDK with JavaFX
       #    We'll download the JDK directly from BellSoft for all platforms
-      - name: Download Liberica Full JDK 21 (Linux)
+      - name: Download Liberica Full JDK (Linux)
         if: matrix.os == 'ubuntu-latest'
         run: |
-          # Download Liberica Full JDK 21 with JavaFX for Linux x64
-          wget -q https://download.bell-sw.com/java/21.0.5+11/bellsoft-jdk21.0.5+11-linux-amd64-full.tar.gz
-          tar -xzf bellsoft-jdk21.0.5+11-linux-amd64-full.tar.gz
-          echo "JAVA_HOME=$(pwd)/jdk-21.0.5-full" >> $GITHUB_ENV
+          # Download Liberica Full JDK with JavaFX for Linux x64
+          wget -q https://download.bell-sw.com/java/${{ env.JAVA_VERSION }}/bellsoft-jdk${{ env.JAVA_VERSION }}-linux-amd64-full.tar.gz
+          tar -xzf bellsoft-jdk${{ env.JAVA_VERSION }}-linux-amd64-full.tar.gz
+          # Extract major version for directory name
+          MAJOR_VERSION=$(echo "${{ env.JAVA_VERSION }}" | cut -d'.' -f1)
+          JDK_DIR=$(find . -maxdepth 1 -type d -name "jdk-${MAJOR_VERSION}*-full" | head -n1)
+          echo "JAVA_HOME=$(pwd)/$JDK_DIR" >> $GITHUB_ENV
 
-      - name: Download Liberica Full JDK 21 (macOS)
+      - name: Download Liberica Full JDK (macOS)
         if: matrix.os == 'macos-latest'
         run: |
-          # Download Liberica Full JDK 21 with JavaFX for macOS
+          # Download Liberica Full JDK with JavaFX for macOS
           ARCH_SUFFIX=""
           if [ "${{ env.ARCH }}" = "aarch64" ]; then
             ARCH_SUFFIX="aarch64"
-            wget -q https://download.bell-sw.com/java/21.0.5+11/bellsoft-jdk21.0.5+11-macos-aarch64-full.tar.gz
-            tar -xzf bellsoft-jdk21.0.5+11-macos-aarch64-full.tar.gz
+            wget -q https://download.bell-sw.com/java/${{ env.JAVA_VERSION }}/bellsoft-jdk${{ env.JAVA_VERSION }}-macos-aarch64-full.tar.gz
+            tar -xzf bellsoft-jdk${{ env.JAVA_VERSION }}-macos-aarch64-full.tar.gz
           else
             ARCH_SUFFIX="amd64"
-            wget -q https://download.bell-sw.com/java/21.0.5+11/bellsoft-jdk21.0.5+11-macos-amd64-full.tar.gz
-            tar -xzf bellsoft-jdk21.0.5+11-macos-amd64-full.tar.gz
+            wget -q https://download.bell-sw.com/java/${{ env.JAVA_VERSION }}/bellsoft-jdk${{ env.JAVA_VERSION }}-macos-amd64-full.tar.gz
+            tar -xzf bellsoft-jdk${{ env.JAVA_VERSION }}-macos-amd64-full.tar.gz
           fi
-          echo "JAVA_HOME=$(pwd)/jdk-21.0.5-full.jdk/Contents/Home" >> $GITHUB_ENV
+          # Extract major version for directory name
+          MAJOR_VERSION=$(echo "${{ env.JAVA_VERSION }}" | cut -d'.' -f1)
+          JDK_DIR=$(find . -maxdepth 1 -type d -name "jdk-${MAJOR_VERSION}*-full.jdk" | head -n1)
+          echo "JAVA_HOME=$(pwd)/$JDK_DIR/Contents/Home" >> $GITHUB_ENV
 
-      - name: Download Liberica Full JDK 21 (Windows)
+      - name: Download Liberica Full JDK (Windows)
         if: matrix.os == 'windows-latest'
         shell: pwsh
         run: |
-          # Download Liberica Full JDK 21 with JavaFX for Windows x64
-          Invoke-WebRequest -Uri "https://download.bell-sw.com/java/21.0.5+11/bellsoft-jdk21.0.5+11-windows-amd64-full.zip" -OutFile "bellsoft-jdk.zip"
+          # Download Liberica Full JDK with JavaFX for Windows x64
+          Invoke-WebRequest -Uri "https://download.bell-sw.com/java/${{ env.JAVA_VERSION }}/bellsoft-jdk${{ env.JAVA_VERSION }}-windows-amd64-full.zip" -OutFile "bellsoft-jdk.zip"
           Expand-Archive -Path "bellsoft-jdk.zip" -DestinationPath "."
-          $javaHome = (Get-Item "jdk-21.0.5-full").FullName
+          # Extract major version for directory name
+          $majorVersion = "${{ env.JAVA_VERSION }}".Split('.')[0]
+          $jdkDir = Get-ChildItem -Directory -Filter "jdk-${majorVersion}*-full" | Select-Object -First 1
+          $javaHome = $jdkDir.FullName
           echo "JAVA_HOME=$javaHome" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       # 5. Verify JAVA_HOME and jlink availability

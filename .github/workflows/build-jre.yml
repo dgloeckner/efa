@@ -141,7 +141,7 @@ jobs:
           # Run jlink to create custom runtime
           "$JAVA_HOME/bin/jlink" \
             --module-path "$JAVA_HOME/jmods" \
-            --add-modules java.base,java.logging,java.desktop,java.sql,java.naming,java.management,java.xml,java.prefs,javafx.controls,javafx.fxml,javafx.graphics,javafx.swing,javafx.media \
+            --add-modules  java.base,java.logging,java.desktop,java.sql,javafx.controls,javafx.fxml,javafx.graphics,jdk.jdwp.agent,jdk.httpserver,java.management,java.xml,java.prefs,javafx.swing,javafx.media \
             --output build/runtime \
             --strip-debug \
             --no-header-files \

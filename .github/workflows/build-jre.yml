@@ -134,7 +134,8 @@ jobs:
       - name: Build custom JRE with jlink
         shell: bash
         run: |
-          # Create output directory
+          # Remove any existing runtime directory to avoid conflicts and ensure jlink can create it
+          rm -rf build/runtime
           mkdir -p build/runtime
 
           # Run jlink to create custom runtime

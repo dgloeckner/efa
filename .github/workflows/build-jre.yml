@@ -18,7 +18,7 @@ on:
         type: string
 
 permissions:
-  contents: read
+  contents: write  # Required for creating releases and uploading assets
   packages: write  # Required for publishing to GitHub Packages
 
 jobs:
@@ -44,6 +44,8 @@ jobs:
       # 1. Check out the repository
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       # 2. Set Java and version parameters
       - name: Set Java and version parameters
@@ -99,8 +101,9 @@ jobs:
             exit 1
           fi
           echo "$JAVA_HOME/bin" >> $GITHUB_PATH
-          "$JAVA_HOME/bin/java" -version
-          "$JAVA_HOME/bin/jlink" --version
+          java -version
+          javac -version || true
+          jlink --version
 
       # 6. Create custom JRE runtime using jlink
       #    This creates a minimal runtime with JavaFX modules included

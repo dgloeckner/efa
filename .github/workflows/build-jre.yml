@@ -1,0 +1,249 @@
+name: Build and Publish JRE Runtime
+
+on:
+  push:
+    tags:
+      - 'v*'   # Trigger on version tags like v1.0.0
+
+permissions:
+  contents: read
+  packages: write  # Required for publishing to GitHub Packages
+
+jobs:
+  build-runtime:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        include:
+          # Define OS-specific variables for naming
+          - os: ubuntu-latest
+            os_name: linux
+            archive_ext: tar.gz
+          - os: macos-latest
+            os_name: macos
+            archive_ext: tar.gz
+          - os: windows-latest
+            os_name: windows
+            archive_ext: zip
+
+    steps:
+      # 1. Check out the repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Extract version from tag (strip leading 'v')
+      - name: Extract version from tag
+        shell: bash
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "Using version: $VERSION"
+
+      # 3. Detect architecture
+      - name: Detect architecture
+        shell: bash
+        run: |
+          ARCH=$(uname -m)
+          if [ "$ARCH" = "x86_64" ]; then
+            ARCH="x64"
+          elif [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then
+            ARCH="aarch64"
+          fi
+          echo "ARCH=$ARCH" >> $GITHUB_ENV
+          echo "Detected architecture: $ARCH"
+
+      # 4. Download and install Liberica Full JDK 21 with JavaFX
+      #    We'll download the JDK directly from BellSoft for all platforms
+      - name: Download Liberica Full JDK 21 (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          # Download Liberica Full JDK 21 with JavaFX for Linux x64
+          wget -q https://download.bell-sw.com/java/21.0.5+11/bellsoft-jdk21.0.5+11-linux-amd64-full.tar.gz
+          tar -xzf bellsoft-jdk21.0.5+11-linux-amd64-full.tar.gz
+          echo "JAVA_HOME=$(pwd)/jdk-21.0.5-full" >> $GITHUB_ENV
+
+      - name: Download Liberica Full JDK 21 (macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          # Download Liberica Full JDK 21 with JavaFX for macOS
+          ARCH_SUFFIX=""
+          if [ "${{ env.ARCH }}" = "aarch64" ]; then
+            ARCH_SUFFIX="aarch64"
+            wget -q https://download.bell-sw.com/java/21.0.5+11/bellsoft-jdk21.0.5+11-macos-aarch64-full.tar.gz
+            tar -xzf bellsoft-jdk21.0.5+11-macos-aarch64-full.tar.gz
+          else
+            ARCH_SUFFIX="amd64"
+            wget -q https://download.bell-sw.com/java/21.0.5+11/bellsoft-jdk21.0.5+11-macos-amd64-full.tar.gz
+            tar -xzf bellsoft-jdk21.0.5+11-macos-amd64-full.tar.gz
+          fi
+          echo "JAVA_HOME=$(pwd)/jdk-21.0.5-full.jdk/Contents/Home" >> $GITHUB_ENV
+
+      - name: Download Liberica Full JDK 21 (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          # Download Liberica Full JDK 21 with JavaFX for Windows x64
+          Invoke-WebRequest -Uri "https://download.bell-sw.com/java/21.0.5+11/bellsoft-jdk21.0.5+11-windows-amd64-full.zip" -OutFile "bellsoft-jdk.zip"
+          Expand-Archive -Path "bellsoft-jdk.zip" -DestinationPath "."
+          $javaHome = (Get-Item "jdk-21.0.5-full").FullName
+          echo "JAVA_HOME=$javaHome" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      # 5. Verify JAVA_HOME and jlink availability
+      - name: Verify Java installation
+        shell: bash
+        run: |
+          echo "JAVA_HOME: $JAVA_HOME"
+          ls -la "$JAVA_HOME/bin"
+          "$JAVA_HOME/bin/java" -version
+          "$JAVA_HOME/bin/jlink" --version
+
+      # 6. Create custom JRE runtime using jlink
+      #    This creates a minimal runtime with JavaFX modules included
+      - name: Build custom JRE with jlink
+        shell: bash
+        run: |
+          # Create output directory
+          mkdir -p build/runtime
+
+          # Run jlink to create custom runtime
+          # Module path points to JDK's jmods directory
+          # Add all required modules for JavaFX application
+          "$JAVA_HOME/bin/jlink" \
+            --module-path "$JAVA_HOME/jmods" \
+            --add-modules java.base,java.logging,java.desktop,java.sql,java.naming,java.management,java.xml,java.prefs,javafx.controls,javafx.fxml,javafx.graphics,javafx.swing,javafx.media \
+            --output build/runtime \
+            --strip-debug \
+            --no-header-files \
+            --no-man-pages \
+            --compress=2
+
+          echo "Custom JRE created successfully"
+          ls -la build/runtime
+
+      # 7. Create archive name based on OS, architecture, and version
+      - name: Set archive name
+        shell: bash
+        run: |
+          ARCHIVE_NAME="efa-jre-${{ env.VERSION }}-${{ matrix.os_name }}-${{ env.ARCH }}.${{ matrix.archive_ext }}"
+          echo "ARCHIVE_NAME=$ARCHIVE_NAME" >> $GITHUB_ENV
+          echo "Archive will be named: $ARCHIVE_NAME"
+
+      # 8. Archive the runtime (tar.gz for Linux/macOS, zip for Windows)
+      - name: Archive runtime (Linux/macOS)
+        if: matrix.os != 'windows-latest'
+        run: |
+          cd build
+          tar -czf "../${{ env.ARCHIVE_NAME }}" runtime
+          cd ..
+          echo "Archive created: ${{ env.ARCHIVE_NAME }}"
+          ls -lh "${{ env.ARCHIVE_NAME }}"
+
+      - name: Archive runtime (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          cd build
+          Compress-Archive -Path runtime -DestinationPath "..\${{ env.ARCHIVE_NAME }}"
+          cd ..
+          echo "Archive created: ${{ env.ARCHIVE_NAME }}"
+          Get-Item "${{ env.ARCHIVE_NAME }}" | Format-List
+
+      # 9. Generate SHA-256 checksum for the archive
+      - name: Generate SHA-256 checksum
+        shell: bash
+        run: |
+          if [ "${{ matrix.os }}" = "windows-latest" ]; then
+            sha256sum "${{ env.ARCHIVE_NAME }}" > "${{ env.ARCHIVE_NAME }}.sha256"
+          else
+            shasum -a 256 "${{ env.ARCHIVE_NAME }}" > "${{ env.ARCHIVE_NAME }}.sha256"
+          fi
+          cat "${{ env.ARCHIVE_NAME }}.sha256"
+
+      # 10. Upload artifact to GitHub Actions (for workflow verification)
+      - name: Upload runtime archive as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: jre-${{ matrix.os_name }}-${{ env.ARCH }}
+          path: |
+            ${{ env.ARCHIVE_NAME }}
+            ${{ env.ARCHIVE_NAME }}.sha256
+
+      # 11. Publish to GitHub Packages as a generic package
+      #     GitHub Packages supports generic packages via the API
+      #     We'll use the GitHub CLI (gh) which is pre-installed on runners
+      - name: Publish to GitHub Packages
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Package details
+          PACKAGE_NAME="${{ github.repository }}-jre"
+          PACKAGE_VERSION="${{ env.VERSION }}"
+
+          echo "Publishing package: $PACKAGE_NAME"
+          echo "Version: $PACKAGE_VERSION"
+          echo "File: ${{ env.ARCHIVE_NAME }}"
+
+          # Upload the archive to GitHub Packages using the API
+          # GitHub Packages requires uploading to a specific endpoint
+          # Format: https://maven.pkg.github.com/OWNER/REPO
+
+          # For generic packages, we can use the Releases API or Maven registry
+          # Since we're already creating a release workflow, we'll upload to releases
+          # For true generic package support, consider using a Maven-compatible approach
+          # or the Container registry with additional metadata
+
+          # Create a release if it doesn't exist
+          if ! gh release view "v${{ env.VERSION }}" >/dev/null 2>&1; then
+            gh release create "v${{ env.VERSION }}" \
+              --title "Release v${{ env.VERSION }}" \
+              --notes "Custom JRE runtime images for version ${{ env.VERSION }}" \
+              --draft=false \
+              --prerelease=false || true
+          fi
+
+          # Upload the archive to the release
+          gh release upload "v${{ env.VERSION }}" \
+            "${{ env.ARCHIVE_NAME }}" \
+            "${{ env.ARCHIVE_NAME }}.sha256" \
+            --clobber
+
+      # 12. Add download instructions as a comment
+      - name: Display download instructions
+        if: matrix.os == 'ubuntu-latest'
+        shell: bash
+        run: |
+          cat << 'EOF'
+
+          ═══════════════════════════════════════════════════════════════
+          📦 JRE Runtime Package Published Successfully!
+          ═══════════════════════════════════════════════════════════════
+
+          To download the runtime packages, use one of these methods:
+
+          1️⃣  Using GitHub CLI (gh):
+          ───────────────────────────────────────────────────────────────
+          gh release download v${{ env.VERSION }} \
+            --repo ${{ github.repository }} \
+            --pattern "efa-jre-*"
+
+          2️⃣  Using curl (example for Linux x64):
+          ───────────────────────────────────────────────────────────────
+          curl -L -o efa-jre.tar.gz \
+            "https://github.com/${{ github.repository }}/releases/download/v${{ env.VERSION }}/efa-jre-${{ env.VERSION }}-linux-x64.tar.gz"
+
+          3️⃣  Direct browser download:
+          ───────────────────────────────────────────────────────────────
+          https://github.com/${{ github.repository }}/releases/tag/v${{ env.VERSION }}
+
+          Available packages:
+            • efa-jre-${{ env.VERSION }}-linux-x64.tar.gz
+            • efa-jre-${{ env.VERSION }}-macos-<arch>.tar.gz
+            • efa-jre-${{ env.VERSION }}-windows-x64.zip
+
+          Each package includes a .sha256 checksum file for verification.
+          ═══════════════════════════════════════════════════════════════
+
+          EOF

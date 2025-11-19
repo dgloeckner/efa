@@ -98,6 +98,20 @@ jobs:
             ls -la "$JAVA_HOME" || true
             exit 1
           fi
+          # Check that jlink is executable
+          if [ ! -x "$JAVA_HOME/bin/jlink" ]; then
+            echo "ERROR: jlink not found or not executable at $JAVA_HOME/bin/jlink"
+            ls -la "$JAVA_HOME/bin" || true
+            exit 1
+          fi
+          # Check that jmods directory exists
+          if [ ! -d "$JAVA_HOME/jmods" ]; then
+            echo "ERROR: jmods directory not found at $JAVA_HOME/jmods"
+            ls -la "$JAVA_HOME" || true
+            exit 1
+          fi
+          echo "jlink path: $JAVA_HOME/bin/jlink"
+          echo "jmods path: $JAVA_HOME/jmods"
           echo "$JAVA_HOME/bin" >> $GITHUB_PATH
           "$JAVA_HOME/bin/java" -version
           "$JAVA_HOME/bin/jlink" --version
@@ -108,43 +122,92 @@ jobs:
         if: matrix.os != 'windows-latest'
         shell: bash
         run: |
-          # Ensure a clean output directory
-          rm -rf build/runtime
-          mkdir -p build/runtime
+          cat <<'BASH' > /tmp/new_unix_jlink.sh
+          set -euo pipefail
+          # Ensure jlink binary and jmods exist
+          echo "PWD: $(pwd)"
+          echo "GITHUB_WORKSPACE: ${GITHUB_WORKSPACE:-unset}"
+          OUTPUT_DIR="${GITHUB_WORKSPACE:-$PWD}/build/runtime"
+          echo "Output dir: $OUTPUT_DIR"
 
-          # Run jlink to create custom runtime
+          if [ ! -x "${JAVA_HOME}/bin/jlink" ]; then
+            echo "ERROR: jlink not found or not executable at ${JAVA_HOME}/bin/jlink"
+            ls -la "${JAVA_HOME}/bin" || true
+            exit 1
+          fi
+
+          if [ ! -d "${JAVA_HOME}/jmods" ]; then
+            echo "ERROR: jmods directory not found at ${JAVA_HOME}/jmods"
+            ls -la "${JAVA_HOME}" || true
+            exit 1
+          fi
+
+          # Remove any previous output but DO NOT create the directory: jlink requires non-existing output dir
+          rm -rf "$OUTPUT_DIR"
+
+          # Debug list parent dir
+          ls -la "$(dirname "$OUTPUT_DIR")" || true
+          [ -e "$OUTPUT_DIR" ] && { echo "ERROR: $OUTPUT_DIR still exists"; exit 1; } || echo "$OUTPUT_DIR does not exist, OK"
+
+          # Run jlink (jlink will create the output directory)
+          set -x
           "$JAVA_HOME/bin/jlink" \
             --module-path "$JAVA_HOME/jmods" \
             --add-modules java.base,java.logging,java.desktop,java.sql,java.naming,java.management,java.xml,java.prefs,javafx.controls,javafx.fxml,javafx.graphics,javafx.swing,javafx.media \
-            --output build/runtime \
+            --output "$OUTPUT_DIR" \
             --strip-debug \
             --no-header-files \
             --no-man-pages \
             --compress=2
+          set +x
 
           echo "Custom JRE created successfully"
-          ls -la build/runtime
+          ls -la "$OUTPUT_DIR"
+          BASH
+
+          /bin/bash /tmp/new_unix_jlink.sh
 
       - name: Build custom JRE with jlink (Windows)
         if: matrix.os == 'windows-latest'
         shell: pwsh
         run: |
-          # Ensure a clean output directory on Windows
-          if (Test-Path 'build/runtime') { Remove-Item 'build/runtime' -Recurse -Force }
-          New-Item -ItemType Directory -Path 'build/runtime' | Out-Null
+          # PowerShell script (exact content)
+          $ErrorActionPreference = 'Stop'
+          Write-Output "PWD: $(Get-Location)"
+          Write-Output "GITHUB_WORKSPACE: $env:GITHUB_WORKSPACE"
+          $outputDir = Join-Path $env:GITHUB_WORKSPACE 'build/runtime'
+          Write-Output "Output dir: $outputDir"
 
-          # Run jlink using Windows paths
+          if (-not (Test-Path (Join-Path $env:JAVA_HOME 'bin\jlink.exe'))) {
+            Write-Error "ERROR: jlink.exe not found at $env:JAVA_HOME\bin\jlink.exe"
+            Get-ChildItem "$env:JAVA_HOME\bin" -Force -ErrorAction SilentlyContinue | Format-List
+            exit 1
+          }
+
+          if (-not (Test-Path (Join-Path $env:JAVA_HOME 'jmods'))) {
+            Write-Error "ERROR: jmods directory not found at $env:JAVA_HOME\jmods"
+            Get-ChildItem $env:JAVA_HOME -Force -ErrorAction SilentlyContinue | Format-List
+            exit 1
+          }
+
+          if (Test-Path $outputDir) { Remove-Item $outputDir -Recurse -Force }
+
+          Get-ChildItem (Split-Path $outputDir -Parent) -Force -ErrorAction SilentlyContinue | Format-List
+
+          if (Test-Path $outputDir) { Write-Error "$outputDir still exists"; exit 1 } else { Write-Output "$outputDir does not exist, OK" }
+
+          # Run jlink (jlink will create the output directory)
           & "$env:JAVA_HOME\bin\jlink.exe" `
             --module-path "$env:JAVA_HOME\jmods" `
             --add-modules java.base,java.logging,java.desktop,java.sql,java.naming,java.management,java.xml,java.prefs,javafx.controls,javafx.fxml,javafx.graphics,javafx.swing,javafx.media `
-            --output build/runtime `
+            --output $outputDir `
             --strip-debug `
             --no-header-files `
             --no-man-pages `
             --compress=2
 
           Write-Output "Custom JRE created successfully"
-          Get-ChildItem build\runtime -Force | Format-List
+          Get-ChildItem $outputDir -Force | Format-List
 
       # 7. Create archive name based on OS, architecture, and version
       - name: Set archive name
